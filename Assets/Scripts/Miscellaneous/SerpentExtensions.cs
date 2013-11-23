@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+
+namespace SerpentExtensions
+{
+
+	public static class Extensions
+	{
+		static public string GetString(this Dictionary<string,object> dict, string key)
+		{
+			if (dict.ContainsKey(key) == false)	{ return null; }
+			object o = dict[key];
+			if (!(o is String)) {return null; }
+
+			return o as String;
+		}
+
+		static public int GetInt(this Dictionary<string,object> dict, string key)
+		{
+			if (dict.ContainsKey(key) == false)	{ return 0; }
+			object o = dict[key];
+			if (!(o is int) || o is Int64) { return 0; }
+			
+			return (int)o;
+		}
+
+		static public object GetObject(this Dictionary<string,object> dict, string key)
+		{
+			if (dict.ContainsKey(key) == false)	{ return null; }
+			object o = dict[key];
+			return o;
+		}
+	}
+
+}
