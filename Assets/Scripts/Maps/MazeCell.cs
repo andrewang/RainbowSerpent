@@ -14,8 +14,5 @@ public class MazeCell
 		this.Walls = new MazeWall[SerpentConsts.NumDirections];
 	}
 
-	public void Setup(string wallData)
-	{
-		
-	}
+
 }

@@ -12,25 +12,32 @@ using System;
 
 public class GameSceneController : RSSceneController
 {
-	[SerializeField] private GameObject mapCentre;
+	[SerializeField] private MazeController mazeController = null;
+
+	#region Verify Serialize Fields
+
+	override public void VerifySerializeFields()
+	{
+		if (this.mazeController == null) { Debug.LogError("GameSceneController: mazeController is null"); }
+	}
+
+	#endregion Verify Serialize Fields
 
 	override public void OnLoad()
 	{
 		Debug.Log("Game scene finally loaded");
+		LoadGameLevel(1);
 	}
 
-	private void LoadLevel(int levelNum)
+	private void LoadGameLevel(int levelNum)
 	{
-		// Right now we actually only have one level
-
-		// Clear the map
+		// TODO Clear the map
 
 		// Load in new map data.
-		TextAsset mazeTextAsset = Resources.Load("testMaze.txt") as TextAsset;
-		if (mazeTextAsset == null) { return; }
-
-		string text = mazeTextAsset.text;
+		TextAsset mazeTextAsset = Resources.Load("testMaze") as TextAsset;
+		this.mazeController.SetUp(mazeTextAsset);
 	}
+
 }
 
 

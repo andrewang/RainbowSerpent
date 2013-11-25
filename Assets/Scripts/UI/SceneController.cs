@@ -8,11 +8,16 @@ public class SceneController : MonoBehaviour
 	void Start () 
 	{
 		Managers.SceneManager.RegisterSceneController(this);
+		VerifySerializeFields();
 	}
 
 	void Initialize()
 	{
 
+	}
+
+	public virtual void VerifySerializeFields()
+	{
 	}
 
 	/// <summary>

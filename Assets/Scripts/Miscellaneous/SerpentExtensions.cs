@@ -19,9 +19,18 @@ namespace SerpentExtensions
 		{
 			if (dict.ContainsKey(key) == false)	{ return 0; }
 			object o = dict[key];
-			if (!(o is int) || o is Int64) { return 0; }
-			
-			return (int)o;
+			if (o is int) 
+			{
+				return (int) o; 
+			}
+			if (o is long)
+			{
+				long longInt = (long) o;
+				int i = (int) longInt;
+				return i;
+			}
+
+			return 0;
 		}
 
 		static public object GetObject(this Dictionary<string,object> dict, string key)
