@@ -1,26 +1,24 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UI\Components\MazeController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Creatures\Snakes\SnakeConfig.cs">
     <Files>
+      <File FileName="Assets\Scripts\Creatures\Snakes\SnakeConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Creatures\Snakes\SnakeHead.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\UI\SceneControllers\GameSceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\UI\Components\MazeController.cs" Line="43" Column="16" />
       <File FileName="Assets\Scripts\Maps\Maze.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\UI\SceneControllers\GameSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\UI\SceneControllers\SplashSceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Creatures\Snakes\SnakeBody.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Creatures\Snakes\SnakeSegment.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Creatures\Creature.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Creatures\Snakes\Snake.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Miscellaneous\SerpentConsts.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Creatures\Snakes\SnakeConfig.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Managers\Managers.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\UI\Components\MazeController.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\UI\Components\MazeController.cs" line="52" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\Maps\Maze.cs" line="49" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\Maps\Maze.cs" line="52" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\Maps\Maze.cs" line="45" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\Maps\Maze.cs" line="26" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\UI\Components\MazeController.cs" line="43" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\UI\Components\MazeController.cs" line="27" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\UI\SceneControllers\GameSceneController.cs" line="29" />
-      <Breakpoint file="E:\GitHub\RainbowSerpent\Assets\Scripts\UI\SceneControllers\GameSceneController.cs" line="37" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

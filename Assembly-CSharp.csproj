@@ -130,6 +130,12 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Creature.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Snakes\Snake.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeBody.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeConfig.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeHead.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeSegment.cs" />
      <Compile Include="Assets\Scripts\Managers\Managers.cs" />
      <Compile Include="Assets\Scripts\Managers\SceneManager.cs" />
      <Compile Include="Assets\Scripts\Maps\Maze.cs" />
