@@ -34,13 +34,24 @@ public class Snake : Creature
 	private SnakeConfig config;
 	private SnakeHead head;
 	
-	public void SetUp(SnakeConfig config, int numSegments)
+	public void SetUp(SnakeConfig config, int numSegments, bool playerControlled)
 	{
 		this.config = config;
 		for (int i = 0; i < numSegments; ++i)
 		{
 			AddSegment();
 		}
+
+		if (playerControlled)
+		{
+			this.Controller = new PlayerSnakeController();
+		}
+		else
+		{
+			this.Controller = new AISnakeController();
+		}
+		
+		
 	}
 
 	public void AddSegment()

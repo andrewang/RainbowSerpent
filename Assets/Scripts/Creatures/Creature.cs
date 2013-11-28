@@ -8,6 +8,11 @@ public class Creature : MonoBehaviour
 	{
 		get; set; 
 	}
+	
+	public CreatureController Controller
+	{
+		get; set;
+	}
 
 
 	public void Update()
