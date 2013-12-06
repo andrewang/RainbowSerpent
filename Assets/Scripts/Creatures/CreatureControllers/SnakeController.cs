@@ -10,10 +10,8 @@
 using System;
 
 public class SnakeController : CreatureController
-{
-	public SnakeController ()
-	{
-	}
+{	
+	
 }
 
 

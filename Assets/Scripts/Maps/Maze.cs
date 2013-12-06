@@ -51,6 +51,7 @@ public class Maze : MonoBehaviour
 
 		this.Width = width;
 		this.Height = height;
+		Debug.Log("Maze width " + width + " and height " + height);
 
 		// Create all the cells
 		this.Cells = new MazeCell[width,height];
@@ -85,7 +86,8 @@ public class Maze : MonoBehaviour
 				{
 					if (SerpentConsts.DirectionIndexes.ContainsKey(c) == false) { continue; }
 					
-					int side = SerpentConsts.DirectionIndexes[c];
+					SerpentConsts.Dir side = SerpentConsts.DirectionIndexes[c];
+					Debug.Log("Create wall at " + x + "," + y + " dir " + side);
 					CreateWall(position, side);
 				}
 			}			
@@ -95,16 +97,26 @@ public class Maze : MonoBehaviour
 		}
 	}
 
-	private void CreateWall(IntVector2 position, int side)
+	private void CreateWall(IntVector2 position, SerpentConsts.Dir side)
 	{
+		if (position.x >= this.Cells.GetLength(0) || position.y >= this.Cells.GetLength(1))
+		{
+			return;
+		}
+	
 		MazeWall wall = new MazeWall();
-		this.Cells[position.x,position.y].Walls[side] = wall;
+		int intSide = (int)side;
+		//Debug.Log("Wall side index is " + intSide);
+		this.Cells[position.x,position.y].Walls[(int)side] = wall;
 
 		// Connect the other side of the wall as well, provided the other side of the wall is not "out of bounds"
-		IntVector2 newPosition = position + SerpentConsts.DirectionVector[side];
+		IntVector2 newPosition = position + SerpentConsts.DirectionVector[(int)side];
 		if (newPosition.x < 0 || newPosition.x >= this.Width || newPosition.y < 0 || newPosition.y >= this.Height) { return; }
 
-		this.Cells[newPosition.x,newPosition.y].Walls[ SerpentConsts.OppositeDirection[side] ] = wall;
+		int oppositeSide = (int)SerpentConsts.OppositeDirection[(int)side];
+		this.Cells[newPosition.x,newPosition.y].Walls[ oppositeSide ] = wall;
 
 	}
+	
+	
 }

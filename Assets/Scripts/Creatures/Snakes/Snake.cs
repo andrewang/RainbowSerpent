@@ -17,6 +17,8 @@ public class Snake : Creature
 			return numSegments;
 		}
 	}
+	
+	public float Speed { get; set; }
 
 	private SnakeSegment lastSegment
 	{
@@ -34,8 +36,10 @@ public class Snake : Creature
 	private SnakeConfig config;
 	private SnakeHead head;
 	
-	public void SetUp(SnakeConfig config, int numSegments, bool playerControlled)
+	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments, bool playerControlled)
 	{
+		base.SetUp(mazeController);
+		
 		this.config = config;
 		for (int i = 0; i < numSegments; ++i)
 		{
@@ -50,8 +54,15 @@ public class Snake : Creature
 		{
 			this.Controller = new AISnakeController();
 		}
+	}
+	
+	public void SetLocation(Vector3 position, SerpentConsts.Dir facingDirection)
+	{
+		// Set head location to the desired position and facing
+		// Each body segment should be laid out in opposite direction, with the same facing.
+		// For now just the head TODO FIX
 		
-		
+		this.head.transform.localPosition = position;
 	}
 
 	public void AddSegment()
@@ -87,6 +98,42 @@ public class Snake : Creature
 			// The body of the snake is all gone.  Time to die!
 		}
 
+	}
+	
+	public override void Update()
+	{
+		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
+		// to the Controller.
+		if (this.CurrentDirection != SerpentConsts.Dir.None)
+		{
+			UpdatePosition();
+			
+		}
+		
+		// If we reach the centre of a tile, after making the callback, if movement in the current direction is 
+		// impossible, stop.
+		
+		// Check for interactions with other creatures (after moving). 
+		
+	}	
+	
+	private void UpdatePosition()
+	{
+		float displacement =  this.Speed * Time.smoothDeltaTime;
+		
+		float remainingDisplacement;
+		bool arrived = this.head.UpdatePosition( displacement, out remainingDisplacement );
+		if (arrived == false) { return; }
+		
+		// Inform the controller we arrived, and receive the new direction to go in.
+		this.CurrentDirection = this.Controller.OnArrival();		
+		// TODO update new destination position
+		
+		if (this.CurrentDirection == SerpentConsts.Dir.None) { return; }
+		this.head.CurrentDirection = this.CurrentDirection;
+
+		float dummyOutput = 0.0f;
+		this.head.UpdatePosition( remainingDisplacement, out dummyOutput );	
 	}
 }
 

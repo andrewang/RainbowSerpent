@@ -12,26 +12,32 @@ public static class SerpentConsts
 	public const string WallsKey = "walls";
 	public const string XKey = "x";
 	public const string YKey = "y";
-	public const int N = 0;
-	public const int E = 1;
-	public const int S = 2;
-	public const int W = 3;
 
 	public const int CellWidth = 64;
 	public const int CellHeight = 48;
 	//public const int MazeWidth = 10;
 	//public const int MazeHeight = 14;
-
-	public static Dictionary<char,int> DirectionIndexes = new Dictionary<char,int>()
+	
+	public enum Dir
 	{
-		{'n', SerpentConsts.N},
-		{'e', SerpentConsts.E},
-		{'s', SerpentConsts.S},
-		{'w', SerpentConsts.W},
-		{'N', SerpentConsts.N},
-		{'E', SerpentConsts.E},
-		{'S', SerpentConsts.S},
-		{'W', SerpentConsts.W}
+		N = 0,
+		E,
+		S,
+		W,
+		None
+	}
+
+	public static Dictionary<char,SerpentConsts.Dir> DirectionIndexes = new Dictionary<char,SerpentConsts.Dir>()
+	{
+		{'n', SerpentConsts.Dir.N},
+		{'e', SerpentConsts.Dir.E},
+		{'s', SerpentConsts.Dir.S},
+		{'w', SerpentConsts.Dir.W},
+		{' ', SerpentConsts.Dir.None},
+		{'N', SerpentConsts.Dir.N},
+		{'E', SerpentConsts.Dir.E},
+		{'S', SerpentConsts.Dir.S},
+		{'W', SerpentConsts.Dir.W}
 	};
 
 	public static IntVector2[] DirectionVector = new IntVector2[]
@@ -39,7 +45,8 @@ public static class SerpentConsts
 		new IntVector2( 0,  1),
 		new IntVector2( 1,  0),
 		new IntVector2( 0, -1),
-		new IntVector2(-1,  0)
+		new IntVector2(-1,  0),
+		new IntVector2( 0,  0)
 	};
 
 	public static Vector3[] DirectionVector3 = new Vector3[]
@@ -47,15 +54,17 @@ public static class SerpentConsts
 		new Vector3( 0,  1, 0),
 		new Vector3( 1,  0, 0),
 		new Vector3( 0, -1, 0),
-		new Vector3(-1,  0, 0)
+		new Vector3(-1,  0, 0),
+		new Vector3( 0,  0, 0)
 	};
 
-	public static int[] OppositeDirection = new int[]
+	public static SerpentConsts.Dir[] OppositeDirection = new SerpentConsts.Dir[]
 	{
-		SerpentConsts.S,
-		SerpentConsts.W,
-		SerpentConsts.N,
-		SerpentConsts.E
+		SerpentConsts.Dir.S,
+		SerpentConsts.Dir.W,
+		SerpentConsts.Dir.N,
+		SerpentConsts.Dir.E,
+		SerpentConsts.Dir.None		
 	};
 
 	public static class SceneNames

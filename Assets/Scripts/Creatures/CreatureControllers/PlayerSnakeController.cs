@@ -11,8 +11,34 @@ using System;
 
 public class PlayerSnakeController : SnakeController
 {
-	public PlayerSnakeController ()
+	/// <summary>
+	/// The desired direction.  If that direction is currently blocked, the snake will turn in that direction
+	/// at the next possible opportunity.
+	/// </summary>
+	private SerpentConsts.Dir desiredDirection;
+	
+	public override void ChangeDirection(SerpentConsts.Dir direction)
 	{
+		if (direction == this.desiredDirection) { return; }
+		if (direction == SerpentConsts.OppositeDirection[ (int)	this.desiredDirection ])
+		{
+			// TODO This is always something we can validly do, and need to do a call immediately to make it
+			// take effect.			
+		}
+		// Else we'll turn to that direction at the next intersection.
+	
+		// Either way, store the desired direction.
+		this.desiredDirection = direction;
 	}
+	
+	/// <summary>
+	/// Handles the arrival event - the creature arriving at the centre of a tile.  Returns the
+	/// direction to travel in from this point on.
+	/// </summary>
+	public override SerpentConsts.Dir OnArrival()	
+	{
+		return this.desiredDirection;
+	}
+	
 }
 

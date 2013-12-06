@@ -32,7 +32,7 @@ public class SceneManager : MonoBehaviour
 		}
 
 		// Load loading scene first?
-		Application.LoadLevel(SerpentConsts.SceneNames.Loading);
+		//Application.LoadLevel(SerpentConsts.SceneNames.Loading);
 
 		yield return new WaitForEndOfFrame();
 
