@@ -105,7 +105,7 @@ public class Maze : MonoBehaviour
 		}
 	
 		MazeWall wall = new MazeWall();
-		int intSide = (int)side;
+		//int intSide = (int)side;
 		//Debug.Log("Wall side index is " + intSide);
 		this.Cells[position.x,position.y].Walls[(int)side] = wall;
 

@@ -10,7 +10,7 @@ public class MazeController : MonoBehaviour
 	/// <summary>
 	/// The centre position of the lower leftmost cell in the maze
 	/// </summary>
-	private Vector3 lowerLeftCorner = new Vector3(0,0,0);
+	private Vector3 lowerLeftCellCentre = new Vector3(0,0,0);
 
 	#region Verify Serialize Fields
 
@@ -51,8 +51,8 @@ public class MazeController : MonoBehaviour
 		if (width == 0 || height == 0) { return; }
 
 		// Determine the lower left corner of the map.
-		this.lowerLeftCorner.x = -1 * (width * SerpentConsts.CellWidth) / 2;
-		this.lowerLeftCorner.y = -1 * (height * SerpentConsts.CellHeight) / 2;
+		this.lowerLeftCellCentre.x = -1.0f * ((width - 1) * SerpentConsts.CellWidth) * 0.5f;
+		this.lowerLeftCellCentre.y = -1.0f * ((height - 1) * SerpentConsts.CellHeight) * 0.5f;
 
 		// most of the walls can be rendered by checking the south and west edges
 		int y;
@@ -120,7 +120,7 @@ public class MazeController : MonoBehaviour
 	/// <param name="y">The y coordinate.</param>
 	public Vector3 GetCellCentre(float x, float y)
 	{
-		Vector3 pos = this.lowerLeftCorner;
+		Vector3 pos = this.lowerLeftCellCentre;
 		pos.x += x * SerpentConsts.CellWidth;
 		pos.y += y * SerpentConsts.CellHeight;
 		return pos;
@@ -128,7 +128,7 @@ public class MazeController : MonoBehaviour
 	
 	private MazeCell GetCellForPosition(Vector3 position)
 	{
-		Vector3 displacement = position - this.lowerLeftCorner;
+		Vector3 displacement = position - this.lowerLeftCellCentre;
 		int x = (int) (displacement.x / SerpentConsts.CellWidth);
 		int y = (int) (displacement.y / SerpentConsts.CellHeight);
 		return this.maze.Cells[x,y];

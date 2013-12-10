@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace SerpentExtensions
 {
-
 	public static class Extensions
 	{
 		static public string GetString(this Dictionary<string,object> dict, string key)

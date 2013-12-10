@@ -6,7 +6,7 @@ public class GameSceneController : RSSceneController
 {
 	#region Serialized Fields
 	[SerializeField] private MazeController mazeController = null;
-	
+	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
 	
 	#endregion Serialized Fields
@@ -63,15 +63,14 @@ public class GameSceneController : RSSceneController
 		this.mazeController.SetUp(mazeTextAsset);
 		
 		// Create creatures
-		// Need to create Snake prefab because it's a monobehavior.
-		/*
+		// Need to create Snake prefab because it's a monobehavior.		
 		SnakeConfig playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
-		Snake playerSnake = new Snake();
+		Snake playerSnake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
 		playerSnake.SetUp(this.mazeController, playerSnakeConf, 1, true);
 		
 		Vector3 position = this.mazeController.GetCellCentre(2, 2);
 		playerSnake.SetLocation(position, SerpentConsts.Dir.N);
-		*/
+		
 	}
 
 

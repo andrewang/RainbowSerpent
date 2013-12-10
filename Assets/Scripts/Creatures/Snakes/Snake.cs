@@ -72,16 +72,12 @@ public class Snake : Creature
 		// its current position.
 		if (this.head == null)
 		{
-			GameObject newObj = (GameObject) Instantiate(this.config.HeadPrefab, new Vector3(0,0,0), Quaternion.identity);
-
-			this.head = newObj.GetComponent<SnakeHead>();
-			// how do we set head position...?
+			this.head = SerpentUtils.SerpentInstantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
 		}
 		else
 		{
-			GameObject newObj = (GameObject) Instantiate(this.config.BodyPrefab, new Vector3(0,0,0), Quaternion.identity);
-			SnakeSegment newSegment = newObj.GetComponent<SnakeSegment>();
-
+			SnakeSegment newSegment = SerpentUtils.SerpentInstantiate<SnakeSegment>(this.config.BodyPrefab, this.transform);
+			
 			SnakeSegment lastSegment = this.lastSegment;
 			lastSegment.NextSegment = newSegment;
 
