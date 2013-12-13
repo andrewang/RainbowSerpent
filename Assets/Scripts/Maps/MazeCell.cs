@@ -13,6 +13,11 @@ public class MazeCell
 		this.Y = y;
 		this.Walls = new MazeWall[SerpentConsts.NumDirections];
 	}
-
+	
+	public bool MotionBlocked(SerpentConsts.Dir direction)
+	{		
+		MazeWall wall = this.Walls[(int)direction];
+		return (wall != null);
+	}
 
 }

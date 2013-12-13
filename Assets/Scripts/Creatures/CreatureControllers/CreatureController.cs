@@ -11,7 +11,7 @@ public class CreatureController
 		this.mazeController = mazeController;
 	}
 	
-	public virtual void ChangeDirection(SerpentConsts.Dir direction)
+	public virtual void MoveIn(SerpentConsts.Dir direction)
 	{
 		//this.Creature
 	}

@@ -23,7 +23,7 @@ public class Creature : MonoBehaviour
 	/// <summary>
 	/// The current direction.  Creatures can only change direction at the centre of tiles
 	/// </summary>
-	private SerpentConsts.Dir currentDirection = SerpentConsts.Dir.N;
+	private SerpentConsts.Dir currentDirection = SerpentConsts.Dir.None;
 	protected SerpentConsts.Dir CurrentDirection
 	{
 		get

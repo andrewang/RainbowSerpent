@@ -6,6 +6,7 @@ public class SnakeConfig : MonoBehaviour
 	[SerializeField] public GameObject HeadPrefab;
 	[SerializeField] public GameObject BodyPrefab;
 	[SerializeField] public Color Colour;
+	[SerializeField] public bool Player;
 }
 
 

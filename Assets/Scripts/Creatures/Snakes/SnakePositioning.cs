@@ -117,7 +117,6 @@ public class SnakePositioning
 	{
 		for (int i = 0; i < this.positions.Count; ++i)
 		{
-			Vector3 v = this.positions[i].Position;
 			float d = this.positions[i].DistanceFromHead;
 			if (d > distanceFromHead)
 			{

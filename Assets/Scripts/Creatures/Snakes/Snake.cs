@@ -36,9 +36,17 @@ public class Snake : Creature
 
 	private SnakeConfig config;
 	private SnakeHead head;
+	public SnakeHead Head
+	{
+		get
+		{
+			return this.head;
+		}
+	}
+	
 	private SnakePositioning positioning;
 	
-	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments, bool playerControlled)
+	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments)
 	{
 		base.SetUp(mazeController);
 		
@@ -53,20 +61,23 @@ public class Snake : Creature
 			AddSegment();
 		}
 
-		if (playerControlled)
+		if (config.Player)
 		{
 			this.Controller = new PlayerSnakeController(this, mazeController);
 		}
 		else
 		{
-			this.Controller = new AISnakeController( this, mazeController);
+			this.Controller = new AISnakeController(this, mazeController);
 		}
 	}
 	
 	public void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
 	{
-		// Set head location to the desired position and facing
-		// Each body segment should be laid out in opposite direction, with the same facing.
+		Vector3 rotation = SerpentConsts.RotationVector3[ (int) facingDirection ];
+		SetSegmentsRotation(rotation);
+		
+		// Set head location to the desired position
+		// Each body segment should be laid out in opposite direction
 		this.head.transform.localPosition = position;
 		
 		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) facingDirection ];
@@ -78,6 +89,16 @@ public class Snake : Creature
 
 		this.positioning.UpdateHeadPosition(position);
 		PositionBodySegments();
+	}
+	
+	private void SetSegmentsRotation(Vector3 rotation)
+	{
+		SnakeSegment segment = this.head;
+		while (segment != null)
+		{
+			segment.transform.eulerAngles = rotation;
+			segment = segment.NextSegment;
+		}
 	}
 	
 	private void PositionBodySegments()
@@ -205,9 +226,9 @@ public class Snake : Creature
 		this.head.UpdatePosition( remainingDisplacement, out dummyOutput );	
 		this.positioning.UpdateHeadPosition(this.head.transform.localPosition);		
 		PositionBodySegments();
-	}
+	}	
 	
-	public void ChangeDirection(SerpentConsts.Dir direction)
+	public void MoveIn(SerpentConsts.Dir direction)
 	{
 		// Most of the time we'll ignore this, and wait until we reach an intersection, then ask the controller
 		// for the next direction to go in.
@@ -223,8 +244,10 @@ public class Snake : Creature
 			process = true;
 		}
 		
-		if (process == false) { return; }
-		
+		if (process == false) 
+		{
+			return; 
+		}		
 		if (MotionBlocked( direction ))
 		{
 			return;

@@ -156,8 +156,8 @@ public class MazeController : MonoBehaviour
 	{
 		MazeCell cell = GetCellForPosition(position);
 		if (cell == null) { return true; }
-		MazeWall wall = cell.Walls[(int)direction];
-		return (wall != null);
+		
+		return cell.MotionBlocked(direction);
 	}
 
 	/// <summary>

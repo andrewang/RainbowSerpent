@@ -8,6 +8,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private MazeController mazeController = null;
 	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
+	[SerializeField] private GameObject enemySnakeConfig = null;
 	
 	#endregion Serialized Fields
 	
@@ -63,15 +64,23 @@ public class GameSceneController : RSSceneController
 		this.mazeController.SetUp(mazeTextAsset);
 		
 		// Create creatures
-		// Need to create Snake prefab because it's a monobehavior.		
 		SnakeConfig playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
-		Snake playerSnake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
-		playerSnake.SetUp(this.mazeController, playerSnakeConf, 5, true);
-		
-		Vector3 position = this.mazeController.GetCellCentre(2, 2);
-		playerSnake.SetInitialLocation(position, SerpentConsts.Dir.N);
-		
-		this.creatures.Add(playerSnake);
+		CreateSnake(playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
+
+		// Enemy snake
+		SnakeConfig enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
+		Snake enemySnake = CreateSnake(enemySnakeConf, 5, 2, 4, SerpentConsts.Dir.E);
+		enemySnake.MoveIn(SerpentConsts.Dir.E);
+	}
+	
+	private Snake CreateSnake(SnakeConfig config, int length, int x, int y, SerpentConsts.Dir direction)
+	{
+		Snake snake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
+		snake.SetUp(this.mazeController, config, length);
+		Vector3 position = this.mazeController.GetCellCentre(x, y);
+		snake.SetInitialLocation(position, direction);
+		this.creatures.Add(snake);
+		return snake;
 	}
 
 
@@ -102,7 +111,7 @@ public class GameSceneController : RSSceneController
 		PlayerSnakeController controller = this.PlayerController;
 		if (controller == null) { return; }
 		
-		controller.ChangeDirection(direction);
+		controller.MoveIn(direction);
 	}
 
 	#endregion Input
