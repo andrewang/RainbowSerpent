@@ -126,13 +126,31 @@ public class MazeController : MonoBehaviour
 		return pos;
 	}
 	
-	private MazeCell GetCellForPosition(Vector3 position)
+	public MazeCell GetCellForPosition(Vector3 position)
 	{
 		Vector3 displacement = position - this.lowerLeftCellCentre;
-		int x = (int) (displacement.x / SerpentConsts.CellWidth);
-		int y = (int) (displacement.y / SerpentConsts.CellHeight);
+		int x = (int) (displacement.x / SerpentConsts.CellWidth + 0.5f);
+		int y = (int) (displacement.y / SerpentConsts.CellHeight + 0.5f);
 		return this.maze.Cells[x,y];
 	}
+	
+	public Vector3 GetNextCellCentre(Vector3 position, SerpentConsts.Dir direction)
+	{
+		Vector3 pos = position - this.lowerLeftCellCentre;
+		Vector3 cellPos = pos;
+		cellPos.x /= (float)SerpentConsts.CellWidth;
+		cellPos.y /= (float)SerpentConsts.CellHeight;
+		cellPos += SerpentConsts.DirectionVector3[(int) direction];
+		// NOW round to nearest position
+		
+		IntVector2 intCellPos = new IntVector2(0,0);
+		
+		intCellPos.x = (int) (cellPos.x + 0.5f);
+		intCellPos.y = (int) (cellPos.y + 0.5f);
+		
+		Vector3 newPos = GetCellCentre( intCellPos.x, intCellPos.y );
+		return newPos;
+	}	
 	
 	public bool MotionBlocked(Vector3 position, SerpentConsts.Dir direction)
 	{

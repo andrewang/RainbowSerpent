@@ -2,11 +2,13 @@ using System;
 
 public class CreatureController
 {
-	private Creature creature;
+	protected Creature creature;
+	protected MazeController mazeController;
 	
-	public void SetUp( Creature creature, Maze mazeController )
+	public CreatureController( Creature creature, MazeController mazeController )
 	{
 		this.creature = creature;
+		this.mazeController = mazeController;
 	}
 	
 	public virtual void ChangeDirection(SerpentConsts.Dir direction)

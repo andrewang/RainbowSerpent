@@ -3,6 +3,9 @@ using System.Collections;
 
 public class SnakeBody : SnakeSegment 
 {
+	public float DistanceFromHead { get; set; }
+	
+	/*
 	override public void UpdatePosition(SerpentConsts.Dir parentDirection, float displacement)
 	{
 		// Here the direction vector passed in is the direction of the segment ahead of this segment.
@@ -32,5 +35,5 @@ public class SnakeBody : SnakeSegment
 		// Pass message to next segment with the full displacement
 		UpdateNextSegmentPosition( this.CurrentDirection, displacement );		
 	}
-	
+	*/	
 }

@@ -11,7 +11,12 @@ using System;
 
 public class SnakeController : CreatureController
 {	
+	protected Snake snake;
 	
+	public SnakeController( Creature creature, MazeController mazeController ) : base( creature, mazeController )
+	{
+		this.snake = (Snake) creature;
+	}
 }
 
 

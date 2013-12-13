@@ -11,7 +11,7 @@ using System;
 
 public class AISnakeController : SnakeController
 {
-	public AISnakeController ()
+	public AISnakeController( Creature creature, MazeController mazeController ) : base( creature, mazeController )
 	{
 	}
 }

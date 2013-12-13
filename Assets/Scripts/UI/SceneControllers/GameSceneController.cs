@@ -66,11 +66,12 @@ public class GameSceneController : RSSceneController
 		// Need to create Snake prefab because it's a monobehavior.		
 		SnakeConfig playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
 		Snake playerSnake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
-		playerSnake.SetUp(this.mazeController, playerSnakeConf, 1, true);
+		playerSnake.SetUp(this.mazeController, playerSnakeConf, 5, true);
 		
 		Vector3 position = this.mazeController.GetCellCentre(2, 2);
-		playerSnake.SetLocation(position, SerpentConsts.Dir.N);
+		playerSnake.SetInitialLocation(position, SerpentConsts.Dir.N);
 		
+		this.creatures.Add(playerSnake);
 	}
 
 

@@ -57,6 +57,15 @@ public static class SerpentConsts
 		new Vector3(-1,  0, 0),
 		new Vector3( 0,  0, 0)
 	};
+	
+	public static Vector3[] RotationVector3 = new Vector3[]
+	{
+		new Vector3( 0, 0, 0 ),
+		new Vector3( 0, 0, -90 ),
+		new Vector3( 0, 0, -180 ),
+		new Vector3( 0, 0, 90 ),
+		new Vector3( 0, 0, 0 )		
+	};
 
 	public static SerpentConsts.Dir[] OppositeDirection = new SerpentConsts.Dir[]
 	{

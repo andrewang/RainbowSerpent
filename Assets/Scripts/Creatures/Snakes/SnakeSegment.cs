@@ -22,6 +22,8 @@ public class SnakeSegment : MonoBehaviour
 		{
 			this.currentDirection = value;
 			this.currentDirectionVector = SerpentConsts.DirectionVector3[ (int)value ];
+			// change the rotation of the segment
+			this.transform.eulerAngles = SerpentConsts.RotationVector3[ (int)value ];
 		}
 	}
 	
@@ -39,17 +41,45 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
-	protected Vector3 CurrentDestination
+	public Vector3 CurrentDestination
 	{
 		get; set; 
 	}	
 
-	public SnakeSegment Head { get; set; }
-	public SnakeSegment NextSegment { get; set; }
+	public SnakeHead Head { get; set; }
+	public SnakeBody NextSegment { get; set; }
 	public Snake Owner { get; set; }
 	
+	public float Width 
+	{
+		get
+		{
+			return this.sprite.width;
+		}
+	}
+	
+	public float Height 
+	{
+		get
+		{
+			return this.sprite.height;
+		}
+	}
+	
+	public Color Colour	
+	{
+		get
+		{
+			return this.sprite.color;
+		}
+		set
+		{
+			this.sprite.color = value;
+		}
+	}
+	
 	// Any segment will have a sprite
-	public UISprite sprite;
+	[SerializeField] private UISprite sprite;
 
 	virtual public void UpdatePosition(SerpentConsts.Dir parentDirection, float distance)
 	{
