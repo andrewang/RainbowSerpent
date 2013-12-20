@@ -66,11 +66,15 @@ public class GameSceneController : RSSceneController
 		// Create creatures
 		SnakeConfig playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
 		CreateSnake(playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
-
+		// If I want the player snake to start moving east, I need to send that information to the player
+		// snake *controller*
+		this.PlayerController.StartMoving(SerpentConsts.Dir.E);
+		//playerSnake.StartMoving(SerpentConsts.Dir.E);
+		
 		// Enemy snake
 		SnakeConfig enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
 		Snake enemySnake = CreateSnake(enemySnakeConf, 5, 2, 4, SerpentConsts.Dir.E);
-		enemySnake.MoveIn(SerpentConsts.Dir.E);
+		enemySnake.StartMoving(SerpentConsts.Dir.E);
 	}
 	
 	private Snake CreateSnake(SnakeConfig config, int length, int x, int y, SerpentConsts.Dir direction)
@@ -111,7 +115,7 @@ public class GameSceneController : RSSceneController
 		PlayerSnakeController controller = this.PlayerController;
 		if (controller == null) { return; }
 		
-		controller.MoveIn(direction);
+		controller.StartMoving(direction);
 	}
 
 	#endregion Input

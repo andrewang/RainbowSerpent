@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class SnakePositioning
+public class SnakeTrail
 {
 	public class SnakePosition
 	{
@@ -26,7 +26,7 @@ public class SnakePositioning
 	
 	private const float MaxLength = SerpentConsts.CellWidth * 10.0f;
 	
-	public SnakePositioning ()
+	public SnakeTrail ()
 	{
 		this.positions = new List<SnakePosition>();
 		SnakePosition headPosition = new SnakePosition( new Vector3( 0, 0, 0 ) );
@@ -51,7 +51,7 @@ public class SnakePositioning
 			float distance = displacement.magnitude;
 			totalDistance = totalDistance + distance;
 			this.positions[i].DistanceFromHead = totalDistance;
-			if (totalDistance > SnakePositioning.MaxLength)
+			if (totalDistance > SnakeTrail.MaxLength)
 			{
 				removeElements = true;
 				break;

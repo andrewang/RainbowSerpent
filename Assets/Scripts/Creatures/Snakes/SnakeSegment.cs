@@ -8,6 +8,24 @@ using System.Collections;
 
 public class SnakeSegment : MonoBehaviour
 {	
+	#region Serialized Fields
+
+	// Any segment will have a sprite
+	[SerializeField] private UISprite sprite;
+		
+	#endregion Serialized Fields
+	
+	#region Properties
+	
+	private Vector3 currentDirectionVector;
+	protected Vector3 CurrentDirectionVector
+	{
+		get
+		{
+			return this.currentDirectionVector;
+		}
+	}
+	
 	/// <summary>
 	/// The current direction.  Creatures can only change direction at the centre of tiles
 	/// </summary>
@@ -27,28 +45,9 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
-	public SerpentConsts.Dir NextDirection
-	{
-		get; set; 
-	}
-	
-	private Vector3 currentDirectionVector;
-	protected Vector3 CurrentDirectionVector
-	{
-		get
-		{
-			return this.currentDirectionVector;
-		}
-	}
-	
-	public Vector3 CurrentDestination
-	{
-		get; set; 
-	}	
-
+	public Vector3 CurrentDestination { get; set; }	
 	public SnakeHead Head { get; set; }
 	public SnakeBody NextSegment { get; set; }
-	public Snake Owner { get; set; }
 	
 	public float Width 
 	{
@@ -78,16 +77,6 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
-	// Any segment will have a sprite
-	[SerializeField] private UISprite sprite;
-
-	virtual public void UpdatePosition(SerpentConsts.Dir parentDirection, float distance)
-	{
-	}
-		
-	protected void UpdateNextSegmentPosition(SerpentConsts.Dir parentDirection, float distance)
-	{
-		if (this.NextSegment == null ) { return; }
-		this.NextSegment.UpdatePosition( parentDirection, distance );
-	}
+	#endregion Properties
+	
 }

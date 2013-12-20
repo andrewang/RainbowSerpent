@@ -33,11 +33,18 @@ public static class SerpentConsts
 		{'e', SerpentConsts.Dir.E},
 		{'s', SerpentConsts.Dir.S},
 		{'w', SerpentConsts.Dir.W},
-		{' ', SerpentConsts.Dir.None},
 		{'N', SerpentConsts.Dir.N},
 		{'E', SerpentConsts.Dir.E},
 		{'S', SerpentConsts.Dir.S},
 		{'W', SerpentConsts.Dir.W}
+	};
+	
+	public static char[] DirectionChar = new char[]
+	{
+		'N',
+		'E',
+		'S',
+		'W'
 	};
 
 	public static IntVector2[] DirectionVector = new IntVector2[]

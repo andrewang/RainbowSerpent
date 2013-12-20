@@ -63,7 +63,30 @@ public class Maze : MonoBehaviour
 			}
 		}
 
+		CreateOutsideWalls();
 		CreateWalls(wallData);
+	}
+	
+	private void CreateOutsideWalls()
+	{
+		IntVector2 position = new IntVector2(0, 0);
+		for (int x = 0; x < this.Width; ++x)
+		{
+			position.x = x;
+			position.y = 0;
+			CreateWall(position, SerpentConsts.Dir.S);
+			position.y = (this.Height - 1);
+			CreateWall(position, SerpentConsts.Dir.N);
+		}
+		
+		for (int y = 0; y < this.Height; ++y)
+		{
+			position.y = y;
+			position.x = 0;
+			CreateWall(position, SerpentConsts.Dir.W);
+			position.x = (this.Width - 1);
+			CreateWall(position, SerpentConsts.Dir.E);
+		}
 	}
 
 	private void CreateWalls(List<object> wallData)
@@ -87,7 +110,7 @@ public class Maze : MonoBehaviour
 					if (SerpentConsts.DirectionIndexes.ContainsKey(c) == false) { continue; }
 					
 					SerpentConsts.Dir side = SerpentConsts.DirectionIndexes[c];
-					Debug.Log("Create wall at " + x + "," + y + " dir " + side);
+					//Debug.Log("Create wall at " + x + "," + y + " dir " + side);
 					CreateWall(position, side);
 				}
 			}			
@@ -99,11 +122,12 @@ public class Maze : MonoBehaviour
 
 	private void CreateWall(IntVector2 position, SerpentConsts.Dir side)
 	{
-		if (position.x >= this.Cells.GetLength(0) || position.y >= this.Cells.GetLength(1))
+		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height) 
 		{
-			return;
+			Debug.Log("Bad position given for wall");
+			return; 
 		}
-	
+		
 		MazeWall wall = new MazeWall();
 		//int intSide = (int)side;
 		//Debug.Log("Wall side index is " + intSide);

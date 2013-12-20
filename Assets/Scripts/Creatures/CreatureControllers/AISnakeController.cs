@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class AISnakeController : SnakeController
 {
@@ -23,7 +24,8 @@ public class AISnakeController : SnakeController
 	public override SerpentConsts.Dir OnArrival()	
 	{
 		// Get our current direction first.  We want to turn in a random direction but not do a reverse turn.
-		
+		// So assemble a list of all the directions, excluding the opposite direction to the current, and also
+		// excluding directions where motion is blocked.		
 		Snake snake = this.snake;
 		SnakeHead head = snake.Head;
 		SerpentConsts.Dir currentDirection = head.CurrentDirection;
@@ -31,7 +33,7 @@ public class AISnakeController : SnakeController
 		Vector3 position = head.CurrentDestination;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
 		
-		BetterList<SerpentConsts.Dir> availableDirections = new BetterList<SerpentConsts.Dir>();
+		List<SerpentConsts.Dir> availableDirections = new List<SerpentConsts.Dir>();
 		
 		for (int i = 0; i < SerpentConsts.NumDirections; ++i)
 		{
@@ -40,19 +42,19 @@ public class AISnakeController : SnakeController
 			{
 				continue;
 			}
-			else if (cell.MotionBlocked(dir))
+			else if (cell.IsMotionBlocked(dir))
 			{
 				continue;
 			}
 			availableDirections.Add(dir);
 		}
 		
-		if (availableDirections.size == 0) 
+		if (availableDirections.Count == 0) 
 		{
 			return SerpentConsts.Dir.N; 
 		}
 		
-		int randomIndex = UnityEngine.Random.Range(0, availableDirections.size);
+		int randomIndex = UnityEngine.Random.Range(0, availableDirections.Count);
 		SerpentConsts.Dir randomDir = availableDirections[randomIndex];
 		return randomDir;
 	}

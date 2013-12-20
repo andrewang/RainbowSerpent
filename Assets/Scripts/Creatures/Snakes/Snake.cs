@@ -35,6 +35,7 @@ public class Snake : Creature
 	}
 
 	private SnakeConfig config;
+	
 	private SnakeHead head;
 	public SnakeHead Head
 	{
@@ -44,13 +45,13 @@ public class Snake : Creature
 		}
 	}
 	
-	private SnakePositioning positioning;
+	private SnakeTrail trail;
 	
 	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments)
 	{
 		base.SetUp(mazeController);
 		
-		this.positioning = new SnakePositioning();
+		this.trail = new SnakeTrail();
 		
 		// temp
 		this.Speed = 80;
@@ -85,9 +86,9 @@ public class Snake : Creature
 		Vector3 displacement = oppositeVector * 500.0f; // TODO FIX
 		Vector3 tailPos = position + displacement;
 		
-		this.positioning.AddPosition( tailPos ); 
+		this.trail.AddPosition( tailPos ); 
 
-		this.positioning.UpdateHeadPosition(position);
+		this.trail.UpdateHeadPosition(position);
 		PositionBodySegments();
 	}
 	
@@ -108,7 +109,7 @@ public class Snake : Creature
 		while( bodySegment != null )
 		{
 			float dist = bodySegment.DistanceFromHead;
-			Vector3 pos = this.positioning.GetSegmentPosition( dist );
+			Vector3 pos = this.trail.GetSegmentPosition( dist );
 			bodySegment.transform.localPosition = pos;
 			bodySegment = bodySegment.NextSegment;
 		}
@@ -181,8 +182,8 @@ public class Snake : Creature
 		float displacement =  this.Speed * Time.smoothDeltaTime;
 		
 		float remainingDisplacement = 0.0f;
-		bool arrived = this.head.UpdatePosition( displacement, out remainingDisplacement );
-		this.positioning.UpdateHeadPosition(this.head.transform.localPosition);
+		bool arrived = this.head.MoveForward( displacement, out remainingDisplacement );
+		this.trail.UpdateHeadPosition(this.head.transform.localPosition);
 		PositionBodySegments();
 		if (arrived == false) { return; }
 		
@@ -202,11 +203,11 @@ public class Snake : Creature
 		bool directionChanged = (newDirection != this.CurrentDirection);
 		
 		// Change the current direction if it's possible to go that way.
-		if (!MotionBlocked( newDirection ))
+		if (!IsMotionBlocked( newDirection ))
 		{
 			this.CurrentDirection = newDirection;
 		}
-		else if (MotionBlocked( this.CurrentDirection ))
+		else if (IsMotionBlocked( this.CurrentDirection ))
 		{
 			// stop moving
 			this.CurrentDirection = SerpentConsts.Dir.None;
@@ -216,45 +217,41 @@ public class Snake : Creature
 		if (directionChanged)
 		{			
 			// Note that we changed direction at this point
-			this.positioning.AddPosition(this.head.transform.localPosition);
+			this.trail.AddPosition(this.head.transform.localPosition);
 		}
 		
 		this.head.CurrentDirection = this.CurrentDirection;
 		UpdateDestination();
 		
 		float dummyOutput = 0.0f;
-		this.head.UpdatePosition( remainingDisplacement, out dummyOutput );	
-		this.positioning.UpdateHeadPosition(this.head.transform.localPosition);		
+		this.head.MoveForward( remainingDisplacement, out dummyOutput );	
+		this.trail.UpdateHeadPosition(this.head.transform.localPosition);		
 		PositionBodySegments();
 	}	
 	
-	public void MoveIn(SerpentConsts.Dir direction)
+	/// <summary>
+	/// This method handles direct input to move in a specified direction immediately
+	/// rather than when a snake reaches an intersection..
+	/// </summary>
+	/// <param name="direction">Direction.</param>
+	public void StartMoving(SerpentConsts.Dir direction)
 	{
-		// Most of the time we'll ignore this, and wait until we reach an intersection, then ask the controller
+		// Most of the time we'll ignore this call, and wait until we reach an intersection, then ask the controller
 		// for the next direction to go in.
-		bool process = false;
 		
-		if (this.CurrentDirection == SerpentConsts.Dir.None)
+		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) this.CurrentDirection ];
+		if (this.CurrentDirection != SerpentConsts.Dir.None && direction != oppositeDirection)
 		{
-			process = true;
-		}
-		else if (direction == SerpentConsts.OppositeDirection[ (int) this.CurrentDirection ])
-		{
-			// always handle immediately
-			process = true;
+			return;
 		}
 		
-		if (process == false) 
-		{
-			return; 
-		}		
-		if (MotionBlocked( direction ))
+		if (IsMotionBlocked( direction ))
 		{
 			return;
 		}
 	
 		// Note that we changed direction at this point
-		this.positioning.AddPosition(this.head.transform.localPosition);
+		this.trail.AddPosition(this.head.transform.localPosition);
 				
 		this.head.CurrentDirection = direction;
 		this.CurrentDirection = direction;		
@@ -262,11 +259,20 @@ public class Snake : Creature
 		UpdateDestination();
 	}
 	
-	private bool MotionBlocked( SerpentConsts.Dir direction )
+	/// <summary>
+	/// Determines whether motion is blocked in the specified direction.
+	/// </summary>
+	/// <returns><c>true</c> if motion is blocked in the specified direction; otherwise, <c>false</c>.</returns>
+	/// <param name="direction">Direction.</param>
+	private bool IsMotionBlocked( SerpentConsts.Dir direction )
 	{
-		return this.MazeController.MotionBlocked( this.head.transform.localPosition, direction );		
+		return this.MazeController.IsMotionBlocked( this.head.transform.localPosition, direction );		
 	}
 	
+	
+	/// <summary>
+	/// Updates the destination of the snake in the direction it's facing
+	/// </summary>
 	private void UpdateDestination()
 	{
 		Vector3 newPos = this.MazeController.GetNextCellCentre( this.head.transform.localPosition, this.CurrentDirection );
@@ -274,37 +280,5 @@ public class Snake : Creature
 		this.head.CurrentDestination = newPos;
 	}
 	
-	/*
-	#region Gizmos
-	
-	public void OnDrawGizmos()
-	{
-		Gizmos.color = Color.green;
-		
-		List<SnakePositioning.SnakePosition> positions = this.positioning.Positions;
-		
-		int i = 0;
-		SnakePositioning.SnakePosition headPos = positions[0];
-		Vector3 v = headPos.Position;
-		v.x = v.x / Screen.width;
-		v.y = v.y / Screen.height;
-		Gizmos.DrawSphere(v, 0.03f);
-
-		Gizmos.color = Color.yellow;
-		
-		for( i = 1; i < positions.Count; ++i )
-		{
-			SnakePositioning.SnakePosition pos = positions[i];
-			v = pos.Position;
-			v.x = v.x / Screen.width;
-			v.y = v.y / Screen.height;
-			Gizmos.DrawSphere(v, 0.03f);
-		}
-		
-	
-	}
-	
-	#endregion Gizmos
-	*/
 }
 

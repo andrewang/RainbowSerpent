@@ -12,10 +12,10 @@ public class PlayerSnakeController : SnakeController
 	{
 	}
 	
-	public override void MoveIn(SerpentConsts.Dir direction)
+	public override void StartMoving(SerpentConsts.Dir direction)
 	{
 		if (direction == this.desiredDirection) { return; }
-		this.snake.MoveIn(direction);
+		this.snake.StartMoving(direction);
 
 		// Else we'll turn to that direction at the next intersection.
 	

@@ -35,11 +35,6 @@ public class MazeController : MonoBehaviour
 		this.maze.SetUp(mazeTextAsset);
 		CreateMazeSprites();
 	}
-	
-	public IEnumerator Test()
-	{
-		yield return new WaitForSeconds(5.0f);
-	}
 
 	/// <summary>
 	/// Creates the maze sprites.  These will be centred on the origin of the maze controller.
@@ -62,6 +57,8 @@ public class MazeController : MonoBehaviour
 			for (x = 0; x < width; ++x)
 			{
 				MazeCell cell = this.maze.Cells[x,y];
+				// Note that this algorithm makes a call for each POTENTIAL wall.  CreateWallSprite will abort
+				// if there is no wall to create there.
 				CreateWallSprite(cell, SerpentConsts.Dir.S);
 				CreateWallSprite(cell, SerpentConsts.Dir.W);
 				if (x == width - 1)
@@ -77,10 +74,18 @@ public class MazeController : MonoBehaviour
 
 	}
 
+	/// <summary>
+	/// Creates a wall sprite.
+	/// </summary>
+	/// <param name="cell">Cell.</param>
+	/// <param name="side">The side of the cell on which to make the sprite.</param>
 	private void CreateWallSprite(MazeCell cell, SerpentConsts.Dir side)
 	{
 		int intSide = (int)side;
-		if (cell.Walls[intSide] == null) { return; }
+		if (cell.Walls[intSide] == null) 
+		{
+			return; 
+		}
 
 		// Create and locate the sprite.
 		GameObject newWall = (GameObject) Instantiate(this.wallSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
@@ -90,10 +95,13 @@ public class MazeController : MonoBehaviour
 		newWall.transform.localPosition = pos;
 		newWall.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 		
-		Debug.Log("Creating wall sprite at  " + pos.x + "," + pos.y + " for cell " + cell.X + "," + cell.Y + " side " + intSide);
+		Debug.Log("Creating wall sprite at  " + pos.x + "," + pos.y + " for cell " + cell.X + "," + cell.Y + " side " + SerpentConsts.DirectionChar[ intSide ]);
 
 		UISprite newWallSprite = newWall.GetComponent<UISprite>();
-		if (newWallSprite == null) { return; }
+		if (newWallSprite == null) 
+		{ 
+			return; 
+		}
 
 		// Note, we're assuming here that the wall sprite is horizontal, not vertical.  So if the wall
 		// is actually vertical, we have to set the rotation
@@ -106,6 +114,7 @@ public class MazeController : MonoBehaviour
 		{
 			// Vertical
 			newWallSprite.width = SerpentConsts.CellHeight;
+			// Rotate the sprite to be vertical
 			newWallSprite.transform.Rotate(Vector3.forward * 90.0f);
 		}
 
@@ -126,9 +135,14 @@ public class MazeController : MonoBehaviour
 		return pos;
 	}
 	
+	/// <summary>
+	/// Gets the maze cell containing the provided position.
+	/// </summary>
+	/// <returns>The cell for position.</returns>
+	/// <param name="position">Position.</param>
 	public MazeCell GetCellForPosition(Vector3 position)
 	{
-		Vector3 displacement = position - this.lowerLeftCellCentre;
+		Vector3 displacement = position - this.lowerLeftCellCentre;		
 		int x = (int) (displacement.x / SerpentConsts.CellWidth + 0.5f);
 		int y = (int) (displacement.y / SerpentConsts.CellHeight + 0.5f);
 		return this.maze.Cells[x,y];
@@ -136,28 +150,38 @@ public class MazeController : MonoBehaviour
 	
 	public Vector3 GetNextCellCentre(Vector3 position, SerpentConsts.Dir direction)
 	{
+		// Convert the Vector3 position into a floating point position measured
+		// in cells.  Then adjust the position by a step in the direction specified,
+		// and then round off the position to determine which cell that is.
+		
 		Vector3 pos = position - this.lowerLeftCellCentre;
 		Vector3 cellPos = pos;
 		cellPos.x /= (float)SerpentConsts.CellWidth;
 		cellPos.y /= (float)SerpentConsts.CellHeight;
 		cellPos += SerpentConsts.DirectionVector3[(int) direction];
-		// NOW round to nearest position
 		
-		IntVector2 intCellPos = new IntVector2(0,0);
-		
+		// now round to nearest position		
+		IntVector2 intCellPos = new IntVector2(0,0);		
 		intCellPos.x = (int) (cellPos.x + 0.5f);
 		intCellPos.y = (int) (cellPos.y + 0.5f);
 		
-		Vector3 newPos = GetCellCentre( intCellPos.x, intCellPos.y );
+		// Get the centre position of this cell, and return it.		
+		Vector3 newPos = GetCellCentre(intCellPos.x, intCellPos.y);
 		return newPos;
 	}	
 	
-	public bool MotionBlocked(Vector3 position, SerpentConsts.Dir direction)
+	/// <summary>
+	/// Return whether motion is blocked from a given position, in a given direction.
+	/// </summary>
+	/// <returns><c>true</c>, if motion was blocked, <c>false</c> otherwise.</returns>
+	/// <param name="position">Position.</param>
+	/// <param name="direction">Direction.</param>
+	public bool IsMotionBlocked(Vector3 position, SerpentConsts.Dir direction)
 	{
 		MazeCell cell = GetCellForPosition(position);
 		if (cell == null) { return true; }
 		
-		return cell.MotionBlocked(direction);
+		return cell.IsMotionBlocked(direction);
 	}
 
 	/// <summary>

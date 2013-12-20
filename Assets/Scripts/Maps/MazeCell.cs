@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 public class MazeCell
 {
@@ -14,9 +14,16 @@ public class MazeCell
 		this.Walls = new MazeWall[SerpentConsts.NumDirections];
 	}
 	
-	public bool MotionBlocked(SerpentConsts.Dir direction)
+	public bool IsMotionBlocked(SerpentConsts.Dir direction)
 	{		
-		MazeWall wall = this.Walls[(int)direction];
+		int intDirection = (int)direction;
+		if (intDirection < 0 || intDirection > SerpentConsts.NumDirections)
+		{
+			// out of range.
+			return false;
+		}
+		
+		MazeWall wall = this.Walls[intDirection];
 		return (wall != null);
 	}
 
