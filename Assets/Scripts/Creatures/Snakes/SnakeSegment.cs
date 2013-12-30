@@ -65,6 +65,15 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
+	private float Radius
+	{
+		get
+		{
+			// Average width and height and then halve again in order to get a radius value.
+			return (this.sprite.height + this.sprite.width) * 0.25f;
+		}
+	}
+	
 	public Color Colour	
 	{
 		get
@@ -77,6 +86,23 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
+	public bool TouchesSegment( SnakeSegment otherSegment )
+	{
+		Vector3 positionDiff = this.transform.localPosition - otherSegment.transform.localPosition;
+		float distanceSq = positionDiff.sqrMagnitude;
+		float radii = this.Radius + otherSegment.Radius;
+		float radiiSq = radii * radii;
+		return (distanceSq <= radiiSq);
+	}
+	
 	#endregion Properties
 	
+	public void OnDestroy()
+	{
+		if (this.sprite != null)
+		{
+			Destroy(this.sprite);
+			this.sprite = null;
+		}
+	}
 }

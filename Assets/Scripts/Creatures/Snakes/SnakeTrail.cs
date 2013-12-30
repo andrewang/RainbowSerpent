@@ -104,7 +104,9 @@ public class SnakeTrail
 		int indexBefore = GetPositionIndexBefore( distanceFromHead );
 		if (indexBefore == -1) 
 		{
-			return new Vector3(0,0,0);
+			// return the last position in the trail.
+			SnakePosition position = this.positions[ this.positions.Count - 1 ];
+			return position.Position;
 		}
 		
 		SnakePosition posBefore = this.positions[indexBefore];

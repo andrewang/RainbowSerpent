@@ -3,9 +3,16 @@ using UnityEngine;
 
 public class Creature : MonoBehaviour
 {
+	public enum CreatureCategory
+	{
+		PlayerSnake,
+		EnemySnake,
+		Frog
+	}
+	
 	// Faction is used for player snake vs enemy snake vs frog (vs ???).  Interactions should be 
 	// skipped between creatures of the same faction.
-	public int Faction
+	public CreatureCategory Category
 	{
 		get; set; 
 	}
@@ -66,6 +73,16 @@ public class Creature : MonoBehaviour
 		
 		// If we reach the centre of a tile, after making the callback, if movement in the current direction is 
 		// impossible, stop.
+	}
+	
+	/// <summary>
+	/// Tests for interaction.
+	/// </summary>
+	/// <returns><c>true</c>, if the other creature should die, <c>false</c> otherwise.</returns>
+	/// <param name="otherCreature">Other creature.</param>
+	public virtual bool TestForInteraction(Creature otherCreature)
+	{		
+		return false;
 	}
 }
 

@@ -47,6 +47,8 @@ public class Snake : Creature
 	
 	private SnakeTrail trail;
 	
+	#region Set Up
+	
 	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments)
 	{
 		base.SetUp(mazeController);
@@ -65,6 +67,10 @@ public class Snake : Creature
 		if (config.Player)
 		{
 			this.Controller = new PlayerSnakeController(this, mazeController);
+			
+			// temp
+			this.Speed = 120;
+			
 		}
 		else
 		{
@@ -102,19 +108,10 @@ public class Snake : Creature
 		}
 	}
 	
-	private void PositionBodySegments()
-	{
-		SnakeHead head = this.head;
-		SnakeBody bodySegment = head.NextSegment;
-		while( bodySegment != null )
-		{
-			float dist = bodySegment.DistanceFromHead;
-			Vector3 pos = this.trail.GetSegmentPosition( dist );
-			bodySegment.transform.localPosition = pos;
-			bodySegment = bodySegment.NextSegment;
-		}
-	}
-
+	#endregion Set Up
+	
+	#region Segments
+	
 	public void AddSegment()
 	{
 		// This method should add a new segment at the end of the snake.  It can be in the same position
@@ -143,18 +140,67 @@ public class Snake : Creature
 			}
 			newSegment.DistanceFromHead = distance;			
 		}
-
 	}
-
-	public void CheckValidity()
+	
+	/// <summary>
+	/// Severs snake at segment.
+	/// </summary>
+	/// <returns><c>true</c>, if the snake should now die <c>false</c> otherwise.</returns>
+	/// <param name="segment">Segment.</param>
+	public bool SeverAtSegment( SnakeSegment segment )
 	{
-		int numSegments = this.NumSegments;
-		if (numSegments == 1)		
+		SnakeSegment seg = this.head.NextSegment;
+		SnakeSegment previousSeg;
+		
+		bool willDie = (segment == this.head || segment == seg);
+		if (willDie)
 		{
-			// The body of the snake is all gone.  Time to die!
+			seg = this.head;		
+			previousSeg = seg;	
 		}
+		else
+		{
+			do
+			{
+				previousSeg = seg;			
+				seg = seg.NextSegment;
+				if (seg == segment)
+				{
+					break;
+				}
+			} while (seg != null);
+		}
+		
+		if (seg == null)
+		{
+			// error!
+			return false;
+		}
+		
+		// destroy this and all subsequent segments
+		SnakeSegment nextSegment;
+		do
+		{
+			nextSegment = seg.NextSegment;
+			Destroy( seg );
+			seg = nextSegment;
+		} while (seg != null );	
 
+		// Sever connection to destroyed segment
+		previousSeg.NextSegment = null;				
+				
+		return willDie;
+		
 	}
+	
+	private void Die()
+	{
+		Destroy(this);
+	}
+
+	#endregion Segments
+	
+	#region Update
 	
 	public override void Update()
 	{
@@ -175,7 +221,20 @@ public class Snake : Creature
 		
 		// Check for interactions with other creatures (after moving). 
 		
-	}	
+	}		
+	
+	private void PositionBodySegments()
+	{
+		SnakeHead head = this.head;
+		SnakeBody bodySegment = head.NextSegment;
+		while( bodySegment != null )
+		{
+			float dist = bodySegment.DistanceFromHead;
+			Vector3 pos = this.trail.GetSegmentPosition( dist );
+			bodySegment.transform.localPosition = pos;
+			bodySegment = bodySegment.NextSegment;
+		}
+	}
 	
 	private void UpdatePosition()
 	{
@@ -229,6 +288,8 @@ public class Snake : Creature
 		PositionBodySegments();
 	}	
 	
+	#endregion Update
+	
 	/// <summary>
 	/// This method handles direct input to move in a specified direction immediately
 	/// rather than when a snake reaches an intersection..
@@ -279,6 +340,79 @@ public class Snake : Creature
 		this.CurrentDestination = newPos;		
 		this.head.CurrentDestination = newPos;
 	}
+
+	#region Interaction with other creatures
+	
+	public override bool TestForInteraction(Creature otherCreature)
+	{
+		// get position of this snake's head
+		Snake otherSnake = otherCreature as Snake;
+		if (otherSnake != null)	
+		{
+			return TestForInteraction( otherSnake );
+		}
+		
+		// otherwise - check if it's a frog or an egg.
+		return false;
+	}
+	
+	private bool TestForInteraction(Snake otherSnake)
+	{	
+		SnakeHead head = this.head;
+		if (CanBiteHead(otherSnake))
+		{
+			otherSnake.SeverAtSegment(otherSnake.Head);
+			AddSegment();
+			return true;		
+		}
+		
+		SnakeSegment otherSegment = otherSnake.Head.NextSegment;
+		while( otherSegment != null )
+		{
+			if (head.TouchesSegment( otherSegment ))
+			{
+				// Sever the snake at that point.
+				bool willDie = otherSnake.SeverAtSegment(otherSegment);
+				if (willDie)
+				{
+					AddSegment();
+				}
+				return willDie;
+			}
+			
+			otherSegment = otherSegment.NextSegment;
+		}
+		
+		return false;
+	}
+	
+	private bool CanBiteHead( Snake otherSnake )
+	{
+		SnakeHead otherHead = otherSnake.Head;
+		if (head.TouchesSegment(otherHead))
+		{
+			// If this is a head-head collision, check if we can bite this snake.  If not, do nothing
+			int numSegments = this.NumSegments;
+			int otherSegments = otherSnake.NumSegments;
+			if (numSegments < otherSegments)				
+			{
+				return false;
+			}
+			else if (numSegments == otherSnake.NumSegments)
+			{
+				// Note that player snakes lose a tied biting contest
+				if (this.Controller is PlayerSnakeController)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		return false;
+	}
+	
+	#endregion Interaction with other creatures
 	
 }
 

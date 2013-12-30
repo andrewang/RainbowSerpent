@@ -27,16 +27,27 @@ public static class SerpentConsts
 		None
 	}
 
-	public static Dictionary<char,SerpentConsts.Dir> DirectionIndexes = new Dictionary<char,SerpentConsts.Dir>()
+	public static Dictionary<char,List<SerpentConsts.Dir>> DirectionIndexes = new Dictionary<char,List<SerpentConsts.Dir>>()
 	{
-		{'n', SerpentConsts.Dir.N},
-		{'e', SerpentConsts.Dir.E},
-		{'s', SerpentConsts.Dir.S},
-		{'w', SerpentConsts.Dir.W},
-		{'N', SerpentConsts.Dir.N},
-		{'E', SerpentConsts.Dir.E},
-		{'S', SerpentConsts.Dir.S},
-		{'W', SerpentConsts.Dir.W}
+		{'n', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N}},
+		{'e', new List<SerpentConsts.Dir>{SerpentConsts.Dir.E}},
+		{'s', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S}},
+		{'w', new List<SerpentConsts.Dir>{SerpentConsts.Dir.W}},
+		{'N', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N}},
+		{'E', new List<SerpentConsts.Dir>{SerpentConsts.Dir.E}},
+		{'S', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S}},
+		{'W', new List<SerpentConsts.Dir>{SerpentConsts.Dir.W}},
+		
+		{'f', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.W}},
+		{'g', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.E}},
+		{'b', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.E}},
+		{'v', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.W}},
+		
+		{'F', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.W}},
+		{'G', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.E}},
+		{'B', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.E}},
+		{'V', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.W}},
+		
 	};
 	
 	public static char[] DirectionChar = new char[]
@@ -82,7 +93,7 @@ public static class SerpentConsts
 		SerpentConsts.Dir.E,
 		SerpentConsts.Dir.None		
 	};
-
+	
 	public static class SceneNames
 	{
 		public const string Loading = "LoadingScene";

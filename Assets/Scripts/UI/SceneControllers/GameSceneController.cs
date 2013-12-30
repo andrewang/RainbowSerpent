@@ -12,30 +12,9 @@ public class GameSceneController : RSSceneController
 	
 	#endregion Serialized Fields
 	
-	private List<Creature> creatures = new List<Creature>();
-		
-		
-	PlayerSnakeController playerController = null;
-	PlayerSnakeController PlayerController
-	{
-		get
-		{
-			if (this.playerController != null) 
-			{ 
-				return this.playerController;
-			}
-			// Otherwise get the player controller and assign it to the field.	
-			foreach( Creature creature in this.creatures )
-			{
-				if (creature.Controller is PlayerSnakeController)
-				{
-					this.playerController = creature.Controller as PlayerSnakeController;
-					break;
-				}				
-			}
-			return this.playerController;
-		}
-	}
+	private Snake playerSnake = null; 
+	private List<Snake> enemySnakes = new List<Snake>();
+	
 
 	#region Verify Serialize Fields
 
@@ -56,24 +35,23 @@ public class GameSceneController : RSSceneController
 	{
 		// TODO Clear the map
 		
-		// Empty creature list
-		this.creatures.Clear();
+		// Empty creature dict
 
 		// Load in new map data.
-		TextAsset mazeTextAsset = Resources.Load("testMaze") as TextAsset;
+		TextAsset mazeTextAsset = Resources.Load("level1") as TextAsset;
 		this.mazeController.SetUp(mazeTextAsset);
 		
 		// Create creatures
 		SnakeConfig playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
-		CreateSnake(playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
-		// If I want the player snake to start moving east, I need to send that information to the player
-		// snake *controller*
-		this.PlayerController.StartMoving(SerpentConsts.Dir.E);
-		//playerSnake.StartMoving(SerpentConsts.Dir.E);
+		this.playerSnake = CreateSnake(playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
+		// If I want the player snake to start moving east, I need to send that information
+		// to the player snake *controller*
+		this.playerSnake.Controller.StartMoving(SerpentConsts.Dir.E);
 		
 		// Enemy snake
 		SnakeConfig enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
 		Snake enemySnake = CreateSnake(enemySnakeConf, 5, 2, 4, SerpentConsts.Dir.E);
+		this.enemySnakes.Add(enemySnake);
 		enemySnake.StartMoving(SerpentConsts.Dir.E);
 	}
 	
@@ -83,10 +61,49 @@ public class GameSceneController : RSSceneController
 		snake.SetUp(this.mazeController, config, length);
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
 		snake.SetInitialLocation(position, direction);
-		this.creatures.Add(snake);
 		return snake;
 	}
 
+	#region Update
+	
+	private void Update()
+	{
+		if (this.playerSnake == null) { return; }
+		
+		// Test for creature-creature interactions.
+		for( int i = 0; i < this.enemySnakes.Count; )
+		{
+			Snake enemySnake = this.enemySnakes[i];
+			bool enemyDies = this.playerSnake.TestForInteraction(enemySnake);
+			if (enemyDies)
+			{
+				this.enemySnakes.RemoveAt(i);
+				Destroy(enemySnake);
+				// By removing a snake from enemySnakes, we move all the snakes after it up one in the list
+				// So we continue the loop by reiterating with the same 'i' value as before.
+				continue;
+			}
+			bool playerDies = enemySnake.TestForInteraction(playerSnake);
+			if (playerDies)
+			{
+				Destroy (this.playerSnake);
+				this.playerSnake = null;
+			}
+			++i;
+		}
+		
+		/*
+		foreach( Creature.CreatureCategory category in this.creaturesDict.Keys )
+		{
+			List<Creature> creatures = this.creaturesDict[category];
+			for (Creature creature in creatures)
+			{
+			}
+		}
+		*/
+	}
+	
+	#endregion Update
 
 	#region Input
 
@@ -112,7 +129,8 @@ public class GameSceneController : RSSceneController
 		
 	private void OnPressDirection(SerpentConsts.Dir direction)
 	{
-		PlayerSnakeController controller = this.PlayerController;
+		if (this.playerSnake == null) { return; }
+		PlayerSnakeController controller = this.playerSnake.Controller as PlayerSnakeController;
 		if (controller == null) { return; }
 		
 		controller.StartMoving(direction);

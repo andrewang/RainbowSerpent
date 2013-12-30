@@ -141,6 +141,7 @@
 'Assets/Scripts/Miscellaneous/SerpentExtensions.cs'
 'Assets/Scripts/Miscellaneous/SerpentUtils.cs'
 'Assets/Scripts/UI/Components/MazeController.cs'
+'Assets/Scripts/UI/Components/ScaleDimensions.cs'
 'Assets/Scripts/UI/RSSceneController.cs'
 'Assets/Scripts/UI/SceneController.cs'
 'Assets/Scripts/UI/SceneControllers/GameSceneController.cs'

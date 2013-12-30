@@ -1,0 +1,19 @@
+{
+  "walls": [
+    " SS SSS SS ",
+    " E SS SSE  ",
+    " VB SSS VB ",
+    "E S SSS SE ",
+    " V VS SB B ",
+    " SS  S  SS ",
+    "E EE SEE E ",
+    "  VB   VB  ",
+    " VS EE  SB ",
+    "  EEEEEE   ",
+    "E VBEE VBE ",
+    " VS V B SB ",
+    "           ",
+   ],
+  "width": 11,
+  "height": 13
+}

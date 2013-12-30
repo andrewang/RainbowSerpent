@@ -97,6 +97,27 @@ public class Maze : MonoBehaviour
 		int y = (this.Height) - 1;
 		foreach (object rowWallData in wallData)
 		{
+			string cellsWallData = rowWallData as string;
+			if (cellsWallData == null) 
+			{
+				Debug.Log ("Wall data is not a string, it's " + rowWallData.GetType().ToString () );
+				continue;
+			}
+			for (int x = 0; x < cellsWallData.Length; ++x)
+			{
+				char c = cellsWallData[x];
+				IntVector2 position = new IntVector2(x, y);
+				
+				if (SerpentConsts.DirectionIndexes.ContainsKey(c)) 
+				{				
+					List<SerpentConsts.Dir> sides = SerpentConsts.DirectionIndexes[c];
+					foreach( SerpentConsts.Dir side in sides )
+					{
+						CreateWall(position, side);	
+					}
+				}
+			}
+			/*
 			List<object> cellsWallData = rowWallData as List<object>;
 			if (cellsWallData == null) { break; }
 
@@ -114,7 +135,8 @@ public class Maze : MonoBehaviour
 					CreateWall(position, side);
 				}
 			}			
-
+			*/
+			
 			--y;
 			if (y < 0) { break; }
 		}
