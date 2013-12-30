@@ -47,6 +47,8 @@ public class Snake : Creature
 	
 	private SnakeTrail trail;
 	
+	public event Action SnakeSegmentsChanged = null;
+	
 	#region Set Up
 	
 	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments)
@@ -69,8 +71,7 @@ public class Snake : Creature
 			this.Controller = new PlayerSnakeController(this, mazeController);
 			
 			// temp
-			this.Speed = 120;
-			
+			this.Speed = 120;			
 		}
 		else
 		{
@@ -140,6 +141,21 @@ public class Snake : Creature
 			}
 			newSegment.DistanceFromHead = distance;			
 		}
+		
+		if (this.SnakeSegmentsChanged != null)
+		{
+			SnakeSegmentsChanged();
+		}
+	}
+	
+	public void ChangeColour(Color newColour)
+	{
+		SnakeSegment segment = this.Head;
+		while (segment != null)
+		{
+			segment.Colour = newColour;
+			segment = segment.NextSegment;
+		}
 	}
 	
 	/// <summary>
@@ -187,8 +203,13 @@ public class Snake : Creature
 		} while (seg != null );	
 
 		// Sever connection to destroyed segment
-		previousSeg.NextSegment = null;				
-				
+		previousSeg.NextSegment = null;		
+		
+		if (this.SnakeSegmentsChanged != null)
+		{
+			SnakeSegmentsChanged();
+		}
+		
 		return willDie;
 		
 	}

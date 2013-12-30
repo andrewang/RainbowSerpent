@@ -9,7 +9,8 @@ public class SerpentUtils
 		
 		if (parentTransform != null)
 		{
-			newObj.transform.parent = parentTransform;		
+			newObj.transform.parent = parentTransform;
+			newObj.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);		
 			newObj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 		}
 				

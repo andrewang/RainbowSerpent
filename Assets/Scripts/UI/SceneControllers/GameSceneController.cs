@@ -10,11 +10,14 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private GameObject playerSnakeConfig = null;
 	[SerializeField] private GameObject enemySnakeConfig = null;
 	
+	private SnakeConfig playerSnakeConf;
+	private SnakeConfig enemySnakeConf;
+	
 	#endregion Serialized Fields
 	
 	private Snake playerSnake = null; 
 	private List<Snake> enemySnakes = new List<Snake>();
-	
+	private bool updateSnakeColours = false;
 
 	#region Verify Serialize Fields
 
@@ -42,17 +45,23 @@ public class GameSceneController : RSSceneController
 		this.mazeController.SetUp(mazeTextAsset);
 		
 		// Create creatures
-		SnakeConfig playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
-		this.playerSnake = CreateSnake(playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
+		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
+		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
+		
+		this.playerSnake = CreateSnake(this.playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
 		// If I want the player snake to start moving east, I need to send that information
 		// to the player snake *controller*
 		this.playerSnake.Controller.StartMoving(SerpentConsts.Dir.E);
 		
 		// Enemy snake
-		SnakeConfig enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
-		Snake enemySnake = CreateSnake(enemySnakeConf, 5, 2, 4, SerpentConsts.Dir.E);
+		Snake enemySnake = CreateSnake(this.enemySnakeConf, 5, 8, 12, SerpentConsts.Dir.W);
 		this.enemySnakes.Add(enemySnake);
-		enemySnake.StartMoving(SerpentConsts.Dir.E);
+		enemySnake.StartMoving(SerpentConsts.Dir.W);
+
+		Snake enemySnake2 = CreateSnake(this.enemySnakeConf, 5, 10, 9, SerpentConsts.Dir.S);
+		this.enemySnakes.Add(enemySnake2);
+		enemySnake2.StartMoving(SerpentConsts.Dir.S);
+		
 	}
 	
 	private Snake CreateSnake(SnakeConfig config, int length, int x, int y, SerpentConsts.Dir direction)
@@ -60,7 +69,9 @@ public class GameSceneController : RSSceneController
 		Snake snake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
 		snake.SetUp(this.mazeController, config, length);
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
+		Debug.Log("Adding snake at (" + x + "," + y + "): " + position.x + "," + position.y);
 		snake.SetInitialLocation(position, direction);
+		snake.SnakeSegmentsChanged += this.NumSnakeSegmentsChanged;
 		return snake;
 	}
 
@@ -78,6 +89,8 @@ public class GameSceneController : RSSceneController
 			if (enemyDies)
 			{
 				this.enemySnakes.RemoveAt(i);
+				enemySnake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
+				
 				Destroy(enemySnake);
 				// By removing a snake from enemySnakes, we move all the snakes after it up one in the list
 				// So we continue the loop by reiterating with the same 'i' value as before.
@@ -86,6 +99,8 @@ public class GameSceneController : RSSceneController
 			bool playerDies = enemySnake.TestForInteraction(playerSnake);
 			if (playerDies)
 			{
+				this.playerSnake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
+				
 				Destroy (this.playerSnake);
 				this.playerSnake = null;
 			}
@@ -101,10 +116,44 @@ public class GameSceneController : RSSceneController
 			}
 		}
 		*/
+		
+		if (this.updateSnakeColours)
+		{
+			UpdateEnemySnakeColours();
+			this.updateSnakeColours = false;
+		}
+	}
+
+	private void NumSnakeSegmentsChanged()
+	{
+		this.updateSnakeColours = true;
+	}
+		
+	public void UpdateEnemySnakeColours()
+	{
+		if (this.playerSnake == null) { return; }
+		
+		int playerLength = this.playerSnake.NumSegments;
+		
+		for( int i = 0; i < this.enemySnakes.Count; ++i)
+		{
+			Snake enemySnake = this.enemySnakes[i];
+			if (enemySnake.NumSegments >= playerLength)
+			{
+				// dangerous colour
+				enemySnake.ChangeColour(this.enemySnakeConf.Colour);
+			}
+			else
+			{
+				// safe colour
+				enemySnake.ChangeColour(this.enemySnakeConf.Colour2);
+			}
+		}		
 	}
 	
 	#endregion Update
-
+	
+	
 	#region Input
 
 	private void OnPressUp()

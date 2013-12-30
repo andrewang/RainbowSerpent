@@ -95,7 +95,7 @@ public class MazeController : MonoBehaviour
 		newWall.transform.localPosition = pos;
 		newWall.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 		
-		Debug.Log("Creating wall sprite at  " + pos.x + "," + pos.y + " for cell " + cell.X + "," + cell.Y + " side " + SerpentConsts.DirectionChar[ intSide ]);
+		//Debug.Log("Creating wall sprite at  " + pos.x + "," + pos.y + " for cell " + cell.X + "," + cell.Y + " side " + SerpentConsts.DirectionChar[ intSide ]);
 
 		UISprite newWallSprite = newWall.GetComponent<UISprite>();
 		if (newWallSprite == null) 
@@ -145,6 +145,7 @@ public class MazeController : MonoBehaviour
 		Vector3 displacement = position - this.lowerLeftCellCentre;		
 		int x = (int) (displacement.x / SerpentConsts.CellWidth + 0.5f);
 		int y = (int) (displacement.y / SerpentConsts.CellHeight + 0.5f);
+		if (x >= this.maze.Width || y >= this.maze.Height) { return null; }
 		return this.maze.Cells[x,y];
 	}
 	
