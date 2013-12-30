@@ -54,14 +54,16 @@ public class GameSceneController : RSSceneController
 		this.playerSnake.Controller.StartMoving(SerpentConsts.Dir.E);
 		
 		// Enemy snake
-		Snake enemySnake = CreateSnake(this.enemySnakeConf, 5, 8, 12, SerpentConsts.Dir.W);
+		CreateEnemySnake(5, 8, 12, SerpentConsts.Dir.W);
+		CreateEnemySnake(5, 10, 9, SerpentConsts.Dir.S);
+		CreateEnemySnake(5, 0, 9, SerpentConsts.Dir.S);
+	}
+	
+	private void CreateEnemySnake(int length, int x, int y, SerpentConsts.Dir direction)
+	{
+		Snake enemySnake = CreateSnake(this.enemySnakeConf, length, x, y, direction);
 		this.enemySnakes.Add(enemySnake);
-		enemySnake.StartMoving(SerpentConsts.Dir.W);
-
-		Snake enemySnake2 = CreateSnake(this.enemySnakeConf, 5, 10, 9, SerpentConsts.Dir.S);
-		this.enemySnakes.Add(enemySnake2);
-		enemySnake2.StartMoving(SerpentConsts.Dir.S);
-		
+		enemySnake.StartMoving(direction);	
 	}
 	
 	private Snake CreateSnake(SnakeConfig config, int length, int x, int y, SerpentConsts.Dir direction)
