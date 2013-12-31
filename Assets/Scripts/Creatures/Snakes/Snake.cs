@@ -35,6 +35,7 @@ public class Snake : Creature
 	}
 
 	private SnakeConfig config;
+	private Color colour;
 	
 	private SnakeHead head;
 	public SnakeHead Head
@@ -57,9 +58,6 @@ public class Snake : Creature
 		
 		this.trail = new SnakeTrail();
 		
-		// temp
-		this.Speed = 80;
-		
 		this.config = config;
 		for (int i = 0; i < numSegments; ++i)
 		{
@@ -68,15 +66,17 @@ public class Snake : Creature
 
 		if (config.Player)
 		{
-			this.Controller = new PlayerSnakeController(this, mazeController);
-			
-			// temp
-			this.Speed = 120;			
+			this.Controller = new PlayerSnakeController(this, mazeController);			
 		}
 		else
 		{
 			this.Controller = new AISnakeController(this, mazeController);
-		}
+		}		
+	}
+	
+	private void UpdateSpeed()
+	{
+		this.Speed = this.config.BaseSpeed - this.config.SpeedPenaltyPerSegment * this.NumSegments;
 	}
 	
 	public void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
@@ -121,12 +121,12 @@ public class Snake : Creature
 		if (this.head == null)
 		{
 			this.head = SerpentUtils.SerpentInstantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
-			this.head.Colour = this.config.Colour;
+			this.head.Colour = this.colour;
 		}
 		else
 		{
 			SnakeBody newSegment = SerpentUtils.SerpentInstantiate<SnakeBody>(this.config.BodyPrefab, this.transform);
-			newSegment.Colour = this.config.Colour;
+			newSegment.Colour = this.colour;
 			
 			SnakeSegment last = this.lastSegment;
 			
@@ -146,10 +146,13 @@ public class Snake : Creature
 		{
 			SnakeSegmentsChanged();
 		}
+		UpdateSpeed();
 	}
 	
 	public void ChangeColour(Color newColour)
 	{
+		this.colour = newColour;
+		
 		SnakeSegment segment = this.Head;
 		while (segment != null)
 		{
@@ -209,6 +212,7 @@ public class Snake : Creature
 		{
 			SnakeSegmentsChanged();
 		}
+		UpdateSpeed();
 		
 		return willDie;
 		

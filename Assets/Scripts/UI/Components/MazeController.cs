@@ -5,7 +5,8 @@ using System.Collections;
 public class MazeController : MonoBehaviour
 {
 	[SerializeField] private Maze maze = null;
-	[SerializeField] private GameObject wallSpritePrefab = null; 
+	[SerializeField] private GameObject wallSpritePrefab = null;
+	private Color wallColour; 
 
 	/// <summary>
 	/// The centre position of the lower leftmost cell in the maze
@@ -30,8 +31,9 @@ public class MazeController : MonoBehaviour
 	/// Sets up the maze controller
 	/// </summary>
 	/// <param name="mazeTextAsset">Maze text asset.</param>
-	public void SetUp(TextAsset mazeTextAsset)
+	public void SetUp(TextAsset mazeTextAsset, Color wallColour)
 	{
+		this.wallColour = wallColour;
 		this.maze.SetUp(mazeTextAsset);
 		CreateMazeSprites();
 	}
@@ -102,6 +104,7 @@ public class MazeController : MonoBehaviour
 		{ 
 			return; 
 		}
+		newWallSprite.color = this.wallColour;
 
 		// Note, we're assuming here that the wall sprite is horizontal, not vertical.  So if the wall
 		// is actually vertical, we have to set the rotation

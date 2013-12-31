@@ -46,8 +46,8 @@ public class ScaleDimensions : MonoBehaviour
 	
 	private void DetermineScales()
 	{
-		this.widthScale = this.baseWidth / Screen.width;
-		this.heightScale = this.baseHeight / Screen.height;
+		this.widthScale = Screen.width / this.baseWidth ;
+		this.heightScale = Screen.height / this.baseHeight ;
 		
 		if (this.maintainProportions)
 		{
