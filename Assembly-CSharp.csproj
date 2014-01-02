@@ -147,6 +147,7 @@
      <Compile Include="Assets\Scripts\Maps\Maze.cs" />
      <Compile Include="Assets\Scripts\Maps\MazeCell.cs" />
      <Compile Include="Assets\Scripts\Maps\MazeWall.cs" />
+     <Compile Include="Assets\Scripts\Miscellaneous\GameState.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\IntVector2.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\MiniJSON.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentConsts.cs" />

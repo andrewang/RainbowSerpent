@@ -13,6 +13,7 @@ public class SplashSceneController : RSSceneController
 	{
 		// begin the game
 		Debug.Log("Start play!");
+		
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
 	}
 

@@ -17,6 +17,12 @@ public class SnakeController : CreatureController
 	{
 		this.snake = (Snake) creature;
 	}
+	
+	public override void StartMoving(SerpentConsts.Dir direction)
+	{
+		this.snake.StartMoving(direction);
+	}
+	
 }
 
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public class GameSceneController : RSSceneController
@@ -12,6 +13,9 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private GameObject enemySnakeConfig = null;
 	[SerializeField] private LevelTheme theme = null;
 	[SerializeField] private UILabel[] labels;
+	[SerializeField] private UILabel levelLabel;
+	[SerializeField] private UILabel scoreLabel;
+	[SerializeField] private UILabel livesLabel;
 	
 	private SnakeConfig playerSnakeConf;
 	private SnakeConfig enemySnakeConf;
@@ -34,7 +38,7 @@ public class GameSceneController : RSSceneController
 	override public void OnLoad()
 	{
 		Debug.Log("Game scene finally loaded");
-		LoadGameLevel(1);
+		LoadGameLevel(Managers.GameState.Level);
 	}
 
 	private void LoadGameLevel(int levelNum)
@@ -58,36 +62,49 @@ public class GameSceneController : RSSceneController
 		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
 		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
 		
-		this.playerSnake = CreateSnake(this.playerSnakeConf, 3, 1, 0, SerpentConsts.Dir.E);
+		this.playerSnake = CreateSnake(this.playerSnakeConf, 3);
 		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
-		
-		this.playerSnake.Controller.StartMoving(SerpentConsts.Dir.E);
-		
-		// Enemy snake
-		CreateEnemySnake(5, 8, 12, SerpentConsts.Dir.W);
-		CreateEnemySnake(5, 10, 9, SerpentConsts.Dir.S);
-		CreateEnemySnake(5, 0, 9, SerpentConsts.Dir.S);
+		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
+				
+		// Enemy snakes
+		CreateEnemySnake(5);
+		CreateEnemySnake(5);
+		CreateEnemySnake(5);
+		StartCoroutine( PlaceEnemySnakes() );
 	}
 	
-	private void CreateEnemySnake(int length, int x, int y, SerpentConsts.Dir direction)
+	private IEnumerator PlaceEnemySnakes()
 	{
-		Snake enemySnake = CreateSnake(this.enemySnakeConf, length, x, y, direction);
-		enemySnake.ChangeColour(this.theme.EnemySnakeColour);
-		
-		this.enemySnakes.Add(enemySnake);
-		// TODO make instruction to start moving go through enemy snake controller
-		enemySnake.StartMoving(direction);	
+		PlaceSnake(this.enemySnakes[0], 8, 12, SerpentConsts.Dir.W);
+		yield return new WaitForSeconds(5.0f);
+		PlaceSnake(this.enemySnakes[1], 8, 12, SerpentConsts.Dir.W);
+		yield return new WaitForSeconds(5.0f);
+		PlaceSnake(this.enemySnakes[2], 8, 12, SerpentConsts.Dir.W);
 	}
 	
-	private Snake CreateSnake(SnakeConfig config, int length, int x, int y, SerpentConsts.Dir direction)
+	private void CreateEnemySnake(int length)
+	{
+		Snake enemySnake = CreateSnake(this.enemySnakeConf, length);
+		enemySnake.ChangeColour(this.theme.EnemySnakeColour);
+		this.enemySnakes.Add(enemySnake);
+		// place enemy snake offscreen?
+	}
+	
+	private Snake CreateSnake(SnakeConfig config, int length)
 	{
 		Snake snake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
 		snake.SetUp(this.mazeController, config, length);
+		snake.SnakeSegmentsChanged += this.NumSnakeSegmentsChanged;
+		return snake;
+	}
+	
+	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction)
+	{
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
 		Debug.Log("Adding snake at (" + x + "," + y + "): " + position.x + "," + position.y);
 		snake.SetInitialLocation(position, direction);
-		snake.SnakeSegmentsChanged += this.NumSnakeSegmentsChanged;
-		return snake;
+		snake.Visible = true;
+		snake.Controller.StartMoving(direction);		
 	}
 
 	#region Update
@@ -98,8 +115,14 @@ public class GameSceneController : RSSceneController
 		
 		// Test for creature-creature interactions.
 		for( int i = 0; i < this.enemySnakes.Count; )
-		{
+		{		
 			Snake enemySnake = this.enemySnakes[i];
+			if (enemySnake.Visible == false) 
+			{ 
+				++i;
+				continue; 
+			}
+			
 			bool enemyDies = this.playerSnake.TestForInteraction(enemySnake);
 			if (enemyDies)
 			{
@@ -118,6 +141,7 @@ public class GameSceneController : RSSceneController
 				
 				Destroy (this.playerSnake);
 				this.playerSnake = null;
+				break;
 			}
 			++i;
 		}
@@ -137,6 +161,8 @@ public class GameSceneController : RSSceneController
 			UpdateEnemySnakeColours();
 			this.updateSnakeColours = false;
 		}
+		
+		UpdateText();		
 	}
 
 	private void NumSnakeSegmentsChanged()
@@ -144,7 +170,7 @@ public class GameSceneController : RSSceneController
 		this.updateSnakeColours = true;
 	}
 		
-	public void UpdateEnemySnakeColours()
+	private void UpdateEnemySnakeColours()
 	{
 		if (this.playerSnake == null) { return; }
 		
@@ -164,6 +190,12 @@ public class GameSceneController : RSSceneController
 				enemySnake.ChangeColour(this.theme.WeakEnemySnakeColour);
 			}
 		}		
+	}
+	
+	private void UpdateText()
+	{
+		this.levelLabel.text = Managers.GameState.Level.ToString();
+		this.scoreLabel.text = Managers.GameState.Score.ToString();
 	}
 	
 	#endregion Update

@@ -4,6 +4,26 @@ using System.Collections.Generic;
 
 public class Snake : Creature
 {
+	private bool visible;
+	public bool Visible 
+	{
+		get
+		{
+			return this.visible;
+		}
+		
+		set
+		{
+			this.visible = value;
+			SnakeSegment segment = this.head;
+			while (segment != null)
+			{
+				segment.Visible = value;
+				segment = segment.NextSegment;
+			}
+		}
+	}
+	
 	public int NumSegments
 	{
 		get
@@ -55,6 +75,8 @@ public class Snake : Creature
 	public void SetUp(MazeController mazeController, SnakeConfig config, int numSegments)
 	{
 		base.SetUp(mazeController);
+		
+		this.Visible = false;
 		
 		this.trail = new SnakeTrail();
 		
@@ -122,11 +144,13 @@ public class Snake : Creature
 		{
 			this.head = SerpentUtils.SerpentInstantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
 			this.head.Colour = this.colour;
+			this.head.Visible = this.visible;
 		}
 		else
 		{
 			SnakeBody newSegment = SerpentUtils.SerpentInstantiate<SnakeBody>(this.config.BodyPrefab, this.transform);
 			newSegment.Colour = this.colour;
+			newSegment.Visible = this.visible;
 			
 			SnakeSegment last = this.lastSegment;
 			
@@ -229,6 +253,8 @@ public class Snake : Creature
 	
 	public override void Update()
 	{
+		if (this.Visible == false ) { return; }
+		
 		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
 		// to the Controller.
 		if (this.CurrentDirection != SerpentConsts.Dir.None)
@@ -388,6 +414,10 @@ public class Snake : Creature
 		{
 			otherSnake.SeverAtSegment(otherSnake.Head);
 			AddSegment();
+			if (this.Controller is PlayerSnakeController)
+			{
+				Managers.GameState.Score += 300;
+			}
 			return true;		
 		}
 		
@@ -402,6 +432,11 @@ public class Snake : Creature
 				{
 					AddSegment();
 				}
+				
+				if (this.Controller is PlayerSnakeController)
+				{
+					Managers.GameState.Score += 100;
+				}				
 				return willDie;
 			}
 			

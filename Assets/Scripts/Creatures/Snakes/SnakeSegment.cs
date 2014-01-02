@@ -82,7 +82,26 @@ public class SnakeSegment : MonoBehaviour
 		}
 		set
 		{
-			this.sprite.color = value;
+			// Incorporate separately-set visibility into the colour value
+			float a = this.sprite.color.a;
+			Color c = value;
+			c.a = a;
+			this.sprite.color = c;
+		}
+	}
+	
+	public bool Visible
+	{
+		get
+		{
+			Color c = this.sprite.color;
+			return (c.a > 0);
+		}		
+		set
+		{
+			Color c = this.sprite.color;
+			c.a = value ? 255 : 0;	
+			this.sprite.color = c;
 		}
 	}
 	
