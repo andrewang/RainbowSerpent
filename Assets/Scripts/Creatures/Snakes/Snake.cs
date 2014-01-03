@@ -24,6 +24,10 @@ public class Snake : Creature
 		}
 	}
 	
+	public bool Dead { get; set; }
+	
+	private int initialNumSegments;
+	
 	public int NumSegments
 	{
 		get
@@ -68,7 +72,7 @@ public class Snake : Creature
 	
 	private SnakeTrail trail;
 	
-	public event Action SnakeSegmentsChanged = null;
+	public event Action<Snake> SnakeSegmentsChanged = null;
 	
 	#region Set Up
 	
@@ -77,10 +81,12 @@ public class Snake : Creature
 		base.SetUp(mazeController);
 		
 		this.Visible = false;
+		this.Dead = false;
 		
 		this.trail = new SnakeTrail();
 		
 		this.config = config;
+		this.initialNumSegments = numSegments;
 		for (int i = 0; i < numSegments; ++i)
 		{
 			AddSegment();
@@ -94,6 +100,27 @@ public class Snake : Creature
 		{
 			this.Controller = new AISnakeController(this, mazeController);
 		}		
+	}
+	
+	public void Reset()
+	{
+		this.Visible = false;
+		this.Dead = false;
+		
+		// Clear the trail	
+		this.trail.Reset();
+		
+		this.CurrentDirection = SerpentConsts.Dir.None;
+
+		// IF the snake died (and only then) restore the initial number of segments.		
+		int numSegments = this.NumSegments;
+		if (numSegments == 0)
+		{
+			for (int i = numSegments; i < this.initialNumSegments; ++i)	
+			{
+				AddSegment();
+			}
+		}
 	}
 	
 	private void UpdateSpeed()
@@ -168,7 +195,7 @@ public class Snake : Creature
 		
 		if (this.SnakeSegmentsChanged != null)
 		{
-			SnakeSegmentsChanged();
+			this.SnakeSegmentsChanged(this);
 		}
 		UpdateSpeed();
 	}
@@ -220,21 +247,28 @@ public class Snake : Creature
 			return false;
 		}
 		
-		// destroy this and all subsequent segments
-		SnakeSegment nextSegment;
-		do
-		{
-			nextSegment = seg.NextSegment;
-			Destroy( seg );
-			seg = nextSegment;
-		} while (seg != null );	
-
-		// Sever connection to destroyed segment
+		// destroy this and all subsequent segments		
+		SnakeSegment nextSegment = seg.NextSegment;
+		
+		// Sever connection to destroyed segments prior to calling destroy but AFTER hanging a pointer to the next 
+		// segment, in case previousSeg and seg are the same.
 		previousSeg.NextSegment = null;		
 		
-		if (this.SnakeSegmentsChanged != null)
+		do
 		{
-			SnakeSegmentsChanged();
+			Destroy( seg.gameObject );
+			seg = nextSegment;
+			if (seg == null)
+			{
+				break;
+			}
+			nextSegment = seg.NextSegment;
+		} while ( true );
+
+
+		if ( this.SnakeSegmentsChanged != null )
+		{
+			SnakeSegmentsChanged( this );
 		}
 		UpdateSpeed();
 		
@@ -253,7 +287,10 @@ public class Snake : Creature
 	
 	public override void Update()
 	{
-		if (this.Visible == false ) { return; }
+		if (this.Visible == false || this.Dead) 
+		{
+			return; 
+		}
 		
 		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
 		// to the Controller.
@@ -263,15 +300,9 @@ public class Snake : Creature
 		}
 		else
 		{
-			// testing.
+			// testing. (???)
 			PositionBodySegments();			
 		}
-		
-		// If we reach the centre of a tile, after making the callback, if movement in the current direction is 
-		// impossible, stop.
-		
-		// Check for interactions with other creatures (after moving). 
-		
 	}		
 	
 	private void PositionBodySegments()

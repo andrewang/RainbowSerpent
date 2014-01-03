@@ -29,9 +29,17 @@ public class SnakeTrail
 	public SnakeTrail ()
 	{
 		this.positions = new List<SnakePosition>();
+		Reset();
+	}
+	
+	public void Reset()
+	{
+		// Clear all
+		this.positions.Clear();
+		// Add a dummy head position
 		SnakePosition headPosition = new SnakePosition( new Vector3( 0, 0, 0 ) );
 		headPosition.DistanceFromHead = 0.0f;
-		this.positions.Add( headPosition );
+		this.positions.Add( headPosition );		
 	}
 	
 	public void UpdateHeadPosition( Vector3 pos )
