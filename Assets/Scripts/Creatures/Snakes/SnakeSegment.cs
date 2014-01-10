@@ -5,6 +5,7 @@ using System.Collections;
 /// The snake segment is the base class for the snake body (segment) and head (segment) containing 
 /// code and properties common to both.
 /// </summary>
+using System;
 
 public class SnakeSegment : MonoBehaviour
 {	
@@ -46,7 +47,7 @@ public class SnakeSegment : MonoBehaviour
 	}
 	
 	public Vector3 CurrentDestination { get; set; }	
-	public SnakeHead Head { get; set; }
+	public Snake Snake { get; set; }
 	public SnakeBody NextSegment { get; set; }
 	
 	public float Width 
@@ -105,6 +106,13 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
+	// The final segment of a snake may have an egg that it is creating.
+	private Egg egg;
+	private event Action<SnakeSegment,Egg> eggFullyGrown;	
+	private event Action<Egg> eggDestroyed;
+	
+	#endregion Properties
+	
 	public bool TouchesSegment( SnakeSegment otherSegment )
 	{
 		Vector3 positionDiff = this.transform.localPosition - otherSegment.transform.localPosition;
@@ -124,7 +132,31 @@ public class SnakeSegment : MonoBehaviour
 		
 	}
 	
-	#endregion Properties
+	public void BeginToCreateEgg(Egg egg, Action<SnakeSegment,Egg> eggFullyGrown, Action<Egg> eggDestroyed)
+	{
+		// Attach the egg to this segment
+		egg.transform.parent = this.transform;
+		// Make sure egg is displayed on top of the segment
+		egg.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+		egg.SetSpriteDepth(5);
+		
+		egg.FullyGrown += this.EggFullyGrown;
+		this.egg = egg;
+		
+		this.eggFullyGrown += eggFullyGrown;
+		this.eggDestroyed += eggDestroyed;
+	}
+	
+	private void EggFullyGrown()
+	{
+		egg.SetSpriteDepth(0);
+		this.eggFullyGrown(this, this.egg);
+		this.egg = null;
+		
+		// this snake segment needs to be removed from its snake.		
+		this.Snake.SeverAtSegment(this);
+		
+	}
 	
 	public void OnDestroy()
 	{
@@ -132,6 +164,12 @@ public class SnakeSegment : MonoBehaviour
 		{
 			Destroy(this.sprite);
 			this.sprite = null;
+		}
+		if (this.egg != null)
+		{
+			this.eggDestroyed(this.egg);
+			Destroy(this.egg.gameObject);
+			this.egg = null;
 		}
 	}
 }

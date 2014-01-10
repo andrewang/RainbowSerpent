@@ -27,7 +27,9 @@ public class GameSceneController : RSSceneController
 	private List<Snake> enemySnakes = new List<Snake>();
 	private int maxNumEnemySnakes;	
 	private bool updateSnakeColours = false;
-	
+
+	private DateTime playerEggTimer;
+	private Egg playerEgg;
 	private DateTime enemyEggTimer;
 	private Egg enemyEgg;
 
@@ -77,6 +79,7 @@ public class GameSceneController : RSSceneController
 		}
 		
 		this.enemyEggTimer = new DateTime(0);
+		this.playerEggTimer = new DateTime(0);
 		
 		StartCoroutine( PlaceSnakes() );
 	}
@@ -124,28 +127,48 @@ public class GameSceneController : RSSceneController
 		snake.Controller.StartMoving(direction);		
 	}
 	
+	private Egg CreateEgg()
+	{
+		Egg egg = SerpentUtils.SerpentInstantiate<Egg>(this.eggPrefab, this.mazeController.transform);
+		egg.Hatched += EggHatched;
+		return egg;
+	}
+	
+	/*
 	private Egg CreateEgg(int x, int y, SerpentConsts.Dir direction)
 	{
 		Egg egg = SerpentUtils.SerpentInstantiate<Egg>(this.eggPrefab, this.mazeController.transform);
-		egg.EggHatched += EggHatched;
+		egg.Hatched += EggHatched;
 		PlaceCreature(egg, x, y, direction);
 		return egg;
+	}
+	*/
+	
+	private void EggFullyGrown( SnakeSegment segment, Egg egg )
+	{
+		// place egg in the map cell of the snake segment
+		egg.transform.parent = this.mazeController.transform;
+		egg.transform.localPosition = segment.transform.localPosition;
 	}
 	
 	private void EggHatched( Egg egg )
 	{
-		// For now, any hatched snake will start with a north direction
+		MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
+		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;
+		int randomIndex = UnityEngine.Random.Range (0, availableDirections.Count);
+		SerpentConsts.Dir dir = availableDirections[randomIndex];
 		
+		Snake newSnake = null;
 		if (egg == this.enemyEgg)
 		{
-			MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
-			
-			Snake newEnemy = CreateEnemySnake(SerpentConsts.SmallEnemySnakeLength);
-			PlaceSnake(newEnemy, cell.X, cell.Y, SerpentConsts.Dir.N);
+			newSnake = CreateEnemySnake(SerpentConsts.SmallEnemySnakeLength);
 			
 			Destroy (egg.gameObject);
 			this.enemyEgg = null;
 		}
+		
+		PlaceSnake(newSnake, cell.X, cell.Y, dir);
+		
 	}
 	
 	private void PlaceCreature(Creature creature, int x, int y, SerpentConsts.Dir direction)
@@ -217,9 +240,13 @@ public class GameSceneController : RSSceneController
 		if (this.enemyEgg == null && this.enemySnakes.Count < this.maxNumEnemySnakes)
 		{
 			HandleEnemyEggs();
-			
 		}
-		
+		/*
+		if (this.playerEgg == null && this.playerSnake != null)
+		{		
+			HandlePlayerEggs();
+		}
+		*/
 		UpdateText();
 	}
 	
@@ -236,21 +263,52 @@ public class GameSceneController : RSSceneController
 			List<Snake> qualifiedSnakes = this.enemySnakes.FindAll( s => s.NumSegments >= 3 );
 			if (qualifiedSnakes.Count == 0)
 			{
-				// TODO CONTINUE FROM HERE.
+				// Can't spawn an egg.  Reset the timer.
+				this.enemyEggTimer = DateTime.Now + SerpentConsts.EnemyEggFrequency;								
+				return;
 			}
 			
-			int i = UnityEngine.Random.Range( 0, this.enemySnakes.Count );
-			Snake enemySnake = this.enemySnakes[i];	
-			// initial test: just put the egg at the centre of the location of the snake's tail.
-			MazeCell cell = this.mazeController.GetCellForPosition( enemySnake.LastSegment.transform.localPosition );
-			int x = cell.X;
-			int y = cell.Y;
-			Egg e = CreateEgg(x, y, SerpentConsts.Dir.N);
-			this.enemyEgg = e;
+			int i = UnityEngine.Random.Range( 0, qualifiedSnakes.Count );
+			Snake enemySnake = qualifiedSnakes[i];	
+			SnakeSegment lastSegment = enemySnake.LastSegment;
+			Egg e = CreateEgg();
+			this.enemyEgg = e;			
+			lastSegment.BeginToCreateEgg(e, EggFullyGrown, EggDestroyed);			
 			
 			// reset the timer for next time.
 			this.enemyEggTimer = new DateTime(0);
 		}	
+	}
+	
+	private void EggDestroyed(Egg e)
+	{
+		if (e == this.enemyEgg)
+		{
+			this.enemyEgg = null;
+		}
+	}
+	
+	private void HandlePlayerEggs()
+	{
+		if (this.playerEggTimer.Ticks == 0)
+		{
+			// set the timer.
+			this.playerEggTimer = DateTime.Now + SerpentConsts.PlayerEggFrequency;				
+		}
+		else if (DateTime.Now > this.playerEggTimer)
+		{
+			// initial test: just put the egg at the centre of the location of the snake's tail.
+			/*
+			MazeCell cell = this.mazeController.GetCellForPosition( this.playerSnake.LastSegment.transform.localPosition );
+			int x = cell.X;
+			int y = cell.Y;
+			Egg e = CreateEgg(x, y, SerpentConsts.Dir.N);
+			this.playerEgg = e;
+			
+			// reset the timer for next time.
+			this.playerEggTimer = new DateTime(0);
+			*/
+		}		
 	}
 
 	private void NumSnakeSegmentsChanged(Snake snake)
@@ -362,5 +420,3 @@ public class GameSceneController : RSSceneController
 
 	#endregion Input
 }
-
-

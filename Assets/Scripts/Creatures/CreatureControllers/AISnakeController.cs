@@ -33,22 +33,9 @@ public class AISnakeController : SnakeController
 		Vector3 position = head.CurrentDestination;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
 		
-		List<SerpentConsts.Dir> availableDirections = new List<SerpentConsts.Dir>();
-		
-		for (int i = 0; i < SerpentConsts.NumDirections; ++i)
-		{
-			SerpentConsts.Dir dir = (SerpentConsts.Dir) i;
-			if (dir == oppositeDirection)
-			{
-				continue;
-			}
-			else if (cell.IsMotionBlocked(dir))
-			{
-				continue;
-			}
-			availableDirections.Add(dir);
-		}
-		
+		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;
+		availableDirections.Remove(oppositeDirection);
+			
 		if (availableDirections.Count == 0) 
 		{
 			return SerpentConsts.Dir.N; 

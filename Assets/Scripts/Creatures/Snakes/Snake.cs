@@ -172,12 +172,14 @@ public class Snake : MobileCreature
 			this.head = SerpentUtils.SerpentInstantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
 			this.head.Colour = this.colour;
 			this.head.Visible = this.visible;
+			this.head.Snake = this;
 		}
 		else
 		{
 			SnakeBody newSegment = SerpentUtils.SerpentInstantiate<SnakeBody>(this.config.BodyPrefab, this.transform);
 			newSegment.Colour = this.colour;
 			newSegment.Visible = this.visible;
+			newSegment.Snake = this;
 			
 			SnakeSegment last = this.LastSegment;
 			

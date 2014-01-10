@@ -6,10 +6,13 @@ public class Egg : Creature
 	// An egg will have a sprite
 	[SerializeField] private UISprite sprite;	
 	
-	public event Action<Egg> EggHatched;
+	public event Action FullyGrown;
+	public event Action<Egg> Hatched;
 	
-	private float timeUntilHatched;
-		
+	private DateTime grownTime;
+	private DateTime hatchingTime;
+	private bool fullyGrown = false;
+			
 	new public float Radius
 	{
 		get
@@ -21,17 +24,35 @@ public class Egg : Creature
 	
 	void Start()
 	{
-		this.timeUntilHatched = (float) SerpentConsts.EnemyEggHatchingTime.TotalSeconds;
+		this.grownTime = DateTime.Now + SerpentConsts.TimeToLayEgg;		
+		this.hatchingTime = this.grownTime + SerpentConsts.EnemyEggHatchingTime;
+		
+		// Begin animation of scaling up
+		this.transform.localScale = new Vector3(0.01f, 0.01f);
+		Vector3 finalScale = new Vector3(1.0f, 1.0f);
+		TweenScale.Begin(this.gameObject, (float)SerpentConsts.TimeToLayEgg.TotalSeconds, finalScale);
 	}
 	
 	// Hatching behavior?
 	void Update()
 	{
-		this.timeUntilHatched -= Time.smoothDeltaTime;
-		if (this.timeUntilHatched < 0)
+		if (this.fullyGrown == false)
 		{
-			this.EggHatched(this);
+			if (DateTime.Now > this.grownTime)
+			{
+				this.fullyGrown = true;
+				this.FullyGrown();
+			}
 		}
+		else if (DateTime.Now > this.hatchingTime)
+		{
+			this.Hatched(this);
+		}		
+	}
+	
+	public void SetSpriteDepth(int depth)
+	{
+		this.sprite.depth = depth;
 	}
 }
 
