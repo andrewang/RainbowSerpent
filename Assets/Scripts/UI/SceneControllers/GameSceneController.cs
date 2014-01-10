@@ -9,6 +9,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private MazeController mazeController = null;
 	[SerializeField] private UISprite background = null;
 	[SerializeField] private GameObject snakePrefab = null;
+	[SerializeField] private GameObject eggPrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
 	[SerializeField] private GameObject enemySnakeConfig = null;
 	[SerializeField] private LevelTheme theme = null;
@@ -24,7 +25,11 @@ public class GameSceneController : RSSceneController
 	
 	private Snake playerSnake = null; 
 	private List<Snake> enemySnakes = new List<Snake>();
+	private int maxNumEnemySnakes;	
 	private bool updateSnakeColours = false;
+	
+	private DateTime enemyEggTimer;
+	private Egg enemyEgg;
 
 	#region Verify Serialize Fields
 
@@ -62,10 +67,16 @@ public class GameSceneController : RSSceneController
 		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
 		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
 		
-		CreatePlayerSnake(3);
-		CreateEnemySnake(5);
-		CreateEnemySnake(5);
-		CreateEnemySnake(5);
+		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
+		
+		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
+		
+		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		{
+			CreateEnemySnake(SerpentConsts.NormalEnemySnakeLength);
+		}
+		
+		this.enemyEggTimer = new DateTime(0);
 		
 		StartCoroutine( PlaceSnakes() );
 	}
@@ -74,13 +85,11 @@ public class GameSceneController : RSSceneController
 	{
 		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
 		
-		PlaceSnake(this.enemySnakes[0], 8, 12, SerpentConsts.Dir.W);
-		yield return new WaitForSeconds(5.0f);
-		
-		PlaceSnake(this.enemySnakes[1], 8, 12, SerpentConsts.Dir.W);
-		yield return new WaitForSeconds(5.0f);
-		
-		PlaceSnake(this.enemySnakes[2], 8, 12, SerpentConsts.Dir.W);
+		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		{		
+			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
+			yield return new WaitForSeconds(5.0f);
+		}	
 	}
 	
 	private void CreatePlayerSnake(int length)
@@ -89,13 +98,13 @@ public class GameSceneController : RSSceneController
 		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
 		
 	}
-	
-	private void CreateEnemySnake(int length)
+		
+	private Snake CreateEnemySnake(int length)
 	{
 		Snake enemySnake = CreateSnake(this.enemySnakeConf, length);
 		enemySnake.ChangeColour(this.theme.EnemySnakeColour);
 		this.enemySnakes.Add(enemySnake);
-		// place enemy snake offscreen?
+		return enemySnake;
 	}
 	
 	private Snake CreateSnake(SnakeConfig config, int length)
@@ -114,6 +123,36 @@ public class GameSceneController : RSSceneController
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);		
 	}
+	
+	private Egg CreateEgg(int x, int y, SerpentConsts.Dir direction)
+	{
+		Egg egg = SerpentUtils.SerpentInstantiate<Egg>(this.eggPrefab, this.mazeController.transform);
+		egg.EggHatched += EggHatched;
+		PlaceCreature(egg, x, y, direction);
+		return egg;
+	}
+	
+	private void EggHatched( Egg egg )
+	{
+		// For now, any hatched snake will start with a north direction
+		
+		if (egg == this.enemyEgg)
+		{
+			MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
+			
+			Snake newEnemy = CreateEnemySnake(SerpentConsts.SmallEnemySnakeLength);
+			PlaceSnake(newEnemy, cell.X, cell.Y, SerpentConsts.Dir.N);
+			
+			Destroy (egg.gameObject);
+			this.enemyEgg = null;
+		}
+	}
+	
+	private void PlaceCreature(Creature creature, int x, int y, SerpentConsts.Dir direction)
+	{		
+		Vector3 position = this.mazeController.GetCellCentre(x, y);
+		creature.SetInitialLocation(position, direction);		
+	}
 
 	#region Update
 	
@@ -121,7 +160,7 @@ public class GameSceneController : RSSceneController
 	{
 		if (this.playerSnake.Dead) { return; }
 		
-		// Test for creature-creature interactions.
+		// Test for snake interactions, based on player first
 		for( int i = 0; i < this.enemySnakes.Count; )
 		{		
 			Snake enemySnake = this.enemySnakes[i];
@@ -148,6 +187,17 @@ public class GameSceneController : RSSceneController
 			++i;
 		}
 		
+		// Check for player eating enemy egg
+		if (this.enemyEgg != null)
+		{
+			bool ateEgg = this.playerSnake.TestForInteraction(this.enemyEgg);
+			if (ateEgg)
+			{
+				Destroy(this.enemyEgg.gameObject);
+				this.enemyEgg = null;
+			}
+		}
+		
 		/*
 		foreach( Creature.CreatureCategory category in this.creaturesDict.Keys )
 		{
@@ -164,7 +214,43 @@ public class GameSceneController : RSSceneController
 			this.updateSnakeColours = false;
 		}
 		
-		UpdateText();		
+		if (this.enemyEgg == null && this.enemySnakes.Count < this.maxNumEnemySnakes)
+		{
+			HandleEnemyEggs();
+			
+		}
+		
+		UpdateText();
+	}
+	
+	private void HandleEnemyEggs()
+	{
+		if (this.enemyEggTimer.Ticks == 0)
+		{
+			// set the timer.
+			this.enemyEggTimer = DateTime.Now + SerpentConsts.EnemyEggFrequency;				
+		}
+		else if (DateTime.Now > this.enemyEggTimer)
+		{
+			// time for a random enemy snake to start laying an egg.  But we need a snake with 3+ segments.
+			List<Snake> qualifiedSnakes = this.enemySnakes.FindAll( s => s.NumSegments >= 3 );
+			if (qualifiedSnakes.Count == 0)
+			{
+				// TODO CONTINUE FROM HERE.
+			}
+			
+			int i = UnityEngine.Random.Range( 0, this.enemySnakes.Count );
+			Snake enemySnake = this.enemySnakes[i];	
+			// initial test: just put the egg at the centre of the location of the snake's tail.
+			MazeCell cell = this.mazeController.GetCellForPosition( enemySnake.LastSegment.transform.localPosition );
+			int x = cell.X;
+			int y = cell.Y;
+			Egg e = CreateEgg(x, y, SerpentConsts.Dir.N);
+			this.enemyEgg = e;
+			
+			// reset the timer for next time.
+			this.enemyEggTimer = new DateTime(0);
+		}	
 	}
 
 	private void NumSnakeSegmentsChanged(Snake snake)

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Snake : Creature
+public class Snake : MobileCreature
 {
 	private bool visible;
 	public bool Visible 
@@ -45,7 +45,7 @@ public class Snake : Creature
 	
 	public float Speed { get; set; }
 
-	private SnakeSegment lastSegment
+	public SnakeSegment LastSegment
 	{
 		get
 		{
@@ -128,7 +128,7 @@ public class Snake : Creature
 		this.Speed = this.config.BaseSpeed - this.config.SpeedPenaltyPerSegment * this.NumSegments;
 	}
 	
-	public void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
+	public override void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
 	{
 		Vector3 rotation = SerpentConsts.RotationVector3[ (int) facingDirection ];
 		SetSegmentsRotation(rotation);
@@ -179,7 +179,7 @@ public class Snake : Creature
 			newSegment.Colour = this.colour;
 			newSegment.Visible = this.visible;
 			
-			SnakeSegment last = this.lastSegment;
+			SnakeSegment last = this.LastSegment;
 			
 			last.NextSegment = newSegment;
 			
@@ -285,7 +285,7 @@ public class Snake : Creature
 	
 	#region Update
 	
-	public override void Update()
+	public void Update()
 	{
 		if (this.Visible == false || this.Dead) 
 		{
@@ -427,14 +427,22 @@ public class Snake : Creature
 	
 	public override bool TestForInteraction(Creature otherCreature)
 	{
-		// get position of this snake's head
 		Snake otherSnake = otherCreature as Snake;
 		if (otherSnake != null)	
 		{
 			return TestForInteraction( otherSnake );
 		}
 		
-		// otherwise - check if it's a frog or an egg.
+		// Otherwise test with the snake's head versus the other creature's own transform position
+		if (this.head.TouchesCreature(otherCreature))
+		{
+			if (otherCreature is Egg)
+			{
+				this.AddSegment();
+			}
+			return true;
+		}
+		
 		return false;
 	}
 	

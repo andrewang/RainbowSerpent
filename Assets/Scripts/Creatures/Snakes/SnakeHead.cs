@@ -12,7 +12,7 @@ public class SnakeHead : SnakeSegment
 	public bool MoveForward(float displacement, out float remainingDisplacement)
 	{
 		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
-		if (displacement < toDest.sqrMagnitude)
+		if (displacement <= toDest.sqrMagnitude)
 		{
 			// Have not reached current destionation so just move.
 			this.transform.localPosition += (this.CurrentDirectionVector * displacement);

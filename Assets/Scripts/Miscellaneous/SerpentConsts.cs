@@ -94,6 +94,15 @@ public static class SerpentConsts
 		SerpentConsts.Dir.None		
 	};
 	
+	public static TimeSpan EnemyEggFrequency = new TimeSpan(0, 0, 15);
+	public static TimeSpan TimeToLayEgg = new TimeSpan(0, 0, 10);
+	public static TimeSpan EnemyEggHatchingTime = new TimeSpan(0, 0, 30);
+	
+	public static int MaxNumEnemySnakes = 3;
+	public static int NormalEnemySnakeLength = 5;
+	public static int SmallEnemySnakeLength = 3;
+	public static int PlayerSnakeLength = 3;
+	
 	public static class SceneNames
 	{
 		public const string Loading = "LoadingScene";

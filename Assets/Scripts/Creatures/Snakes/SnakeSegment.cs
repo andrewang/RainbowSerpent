@@ -114,6 +114,16 @@ public class SnakeSegment : MonoBehaviour
 		return (distanceSq <= radiiSq);
 	}
 	
+	public bool TouchesCreature( Creature otherCreature )
+	{
+		Vector3 positionDiff = this.transform.localPosition - otherCreature.transform.localPosition;
+		float distanceSq = positionDiff.sqrMagnitude;
+		float radii = this.Radius + otherCreature.Radius;
+		float radiiSq = radii * radii;
+		return (distanceSq <= radiiSq);
+		
+	}
+	
 	#endregion Properties
 	
 	public void OnDestroy()
