@@ -1,30 +1,18 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Creature : MonoBehaviour
 {
-	/*
-	public enum CreatureCategory
-	{
-		PlayerSnake,
-		EnemySnake,
-		Frog
-	}
-	
-	// Faction is used for player snake vs enemy snake vs frog (vs ???).  Interactions should be 
-	// skipped between creatures of the same faction.
-	public CreatureCategory Category
-	{
-		get; set; 
-	}
-	*/
+	// Many subclasses of creature have a single sprite, although the snake class does not.
+	[SerializeField] protected UISprite sprite;	
 	
 	public float Radius
 	{
 		get
 		{
-			// Average width and height and then halve again in order to get a radius value.
-			return 1.0f;
+			// Average width and height and then halve this average diameter in order to get a radius.
+			return (this.sprite.height + this.sprite.width) * 0.25f;
 		}
 	}
 	
@@ -54,8 +42,33 @@ public class Creature : MonoBehaviour
 		
 		this.transform.eulerAngles = rotation;		
 		this.transform.localPosition = position;
-				
 	}
 	
+	private float DistanceSqToCreature( Creature otherCreature )
+	{
+		Vector3 positionDiff = this.transform.localPosition - otherCreature.transform.localPosition;
+		float distanceSq = positionDiff.sqrMagnitude;
+		return distanceSq;		
+	}
+	
+	protected Creature GetNearestCreature( List<Creature> creatures )
+	{		
+		if (creatures.Count == 0) { return null; }
+		
+		Creature nearestCreature = creatures[0]; 
+		float nearestDistSq = DistanceSqToCreature( nearestCreature );
+		
+		for (int i = 1; i < creatures.Count; ++i)
+		{
+			float distSq = DistanceSqToCreature( creatures[i] );
+			if (distSq < nearestDistSq)
+			{
+				nearestCreature = creatures[i];
+				nearestDistSq = distSq;				
+			}
+		}
+		
+		return nearestCreature;
+	}
 }
 

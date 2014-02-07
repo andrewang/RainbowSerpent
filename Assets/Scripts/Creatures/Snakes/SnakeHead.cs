@@ -29,7 +29,5 @@ public class SnakeHead : SnakeSegment
 		
 		remainingDisplacement = displacement - distToDest;
 		return true;
-	}
-
-	
+	}	
 }

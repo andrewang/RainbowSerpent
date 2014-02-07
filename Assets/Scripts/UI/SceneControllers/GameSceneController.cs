@@ -10,6 +10,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UISprite background = null;
 	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject eggPrefab = null;
+	[SerializeField] private GameObject frogPrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
 	[SerializeField] private GameObject enemySnakeConfig = null;
 	[SerializeField] private LevelTheme theme = null;
@@ -133,16 +134,7 @@ public class GameSceneController : RSSceneController
 		egg.Hatched += EggHatched;
 		return egg;
 	}
-	
-	/*
-	private Egg CreateEgg(int x, int y, SerpentConsts.Dir direction)
-	{
-		Egg egg = SerpentUtils.SerpentInstantiate<Egg>(this.eggPrefab, this.mazeController.transform);
-		egg.Hatched += EggHatched;
-		PlaceCreature(egg, x, y, direction);
-		return egg;
-	}
-	*/
+
 	
 	private void EggFullyGrown( SnakeSegment segment, Egg egg )
 	{
@@ -175,6 +167,17 @@ public class GameSceneController : RSSceneController
 	{		
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
 		creature.SetInitialLocation(position, direction);		
+	}
+	
+	private void CreateFrog()
+	{
+		Frog frog = SerpentUtils.SerpentInstantiate<Frog>(this.frogPrefab, this.mazeController.transform);
+		if (frog == null) { return; }
+		
+		int x = 5;
+		int y = 5;
+		
+		PlaceCreature(frog, x, y, SerpentConsts.Dir.N);
 	}
 
 	#region Update
@@ -419,4 +422,30 @@ public class GameSceneController : RSSceneController
 	}
 
 	#endregion Input
+		
+	public List<Creature> GetSnakes()
+	{
+		List<Creature> snakes = new List<Creature>();
+		if (this.playerSnake != null)
+		{
+			snakes.Add(this.playerSnake);
+		}
+		for (int i = 0; i < this.enemySnakes.Count; ++i)
+		{
+			snakes.Add( this.enemySnakes[i] );
+		}
+		return snakes;
+	}
+	
+	public List<Creature> GetEggs()
+	{
+		List<Creature> eggs = new List<Creature>();
+		
+		if (this.enemyEgg != null)
+		{
+			eggs.Add(this.enemyEgg);
+		}
+		return eggs;
+	}
+	
 }

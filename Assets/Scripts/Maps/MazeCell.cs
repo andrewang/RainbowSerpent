@@ -26,7 +26,7 @@ public class MazeCell
 			return availableDirections;
 		}
 	}
-
+	
 	public MazeCell(int x, int y)
 	{
 		this.X = x;

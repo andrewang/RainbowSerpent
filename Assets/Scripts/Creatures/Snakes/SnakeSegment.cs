@@ -128,8 +128,7 @@ public class SnakeSegment : MonoBehaviour
 		float distanceSq = positionDiff.sqrMagnitude;
 		float radii = this.Radius + otherCreature.Radius;
 		float radiiSq = radii * radii;
-		return (distanceSq <= radiiSq);
-		
+		return (distanceSq <= radiiSq);		
 	}
 	
 	public void BeginToCreateEgg(Egg egg, Action<SnakeSegment,Egg> eggFullyGrown, Action<Egg> eggDestroyed)

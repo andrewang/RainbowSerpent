@@ -136,6 +136,7 @@
      <Compile Include="Assets\Scripts\Creatures\CreatureControllers\PlayerSnakeController.cs" />
      <Compile Include="Assets\Scripts\Creatures\CreatureControllers\SnakeController.cs" />
      <Compile Include="Assets\Scripts\Creatures\Egg.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Frog.cs" />
      <Compile Include="Assets\Scripts\Creatures\MobileCreature.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\Snake.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeBody.cs" />
@@ -152,10 +153,12 @@
      <Compile Include="Assets\Scripts\Miscellaneous\GameState.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\IntVector2.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\MiniJSON.cs" />
+     <Compile Include="Assets\Scripts\Miscellaneous\ScreenShotTaker.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentConsts.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentExtensions.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentUtils.cs" />
      <Compile Include="Assets\Scripts\UI\Components\MazeController.cs" />
+     <Compile Include="Assets\Scripts\UI\Components\ScaleClipping.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScaleDimensions.cs" />
      <Compile Include="Assets\Scripts\UI\RSSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneController.cs" />

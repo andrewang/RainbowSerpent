@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ScaleClipping : MonoBehaviour
+public class ScaleDimensions : MonoBehaviour
 {
 	#region Serialize Fields
 	
@@ -61,22 +61,16 @@ public class ScaleClipping : MonoBehaviour
 			}
 		}
 		
-		UIPanel panel = this.GetComponentInChildren<UIPanel>();
-		if (panel == null) { return; }
-		
-		Vector4 clipRange = panel.clipRange;
-		// remember, size of clip range is ZW.
-		
+		Vector3 scale = this.transform.localScale;
 		if (this.horizontal)		
 		{
-			clipRange.z *= this.widthScale;
+			scale.x = this.widthScale;
 		}
 		if (this.vertical)
 		{
-			clipRange.y *= this.heightScale;
+			scale.y = this.heightScale;
 		}
-		
-		panel.clipRange = clipRange;
+		this.transform.localScale = scale;
 	}
 	
 }
