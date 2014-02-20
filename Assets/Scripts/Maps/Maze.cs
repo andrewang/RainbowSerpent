@@ -42,8 +42,12 @@ public class Maze : MonoBehaviour
 		int width = mazeData.GetInt(SerpentConsts.WidthKey);
 		int height = mazeData.GetInt(SerpentConsts.HeightKey);
 		object rawWallData = mazeData.GetObject(SerpentConsts.WallsKey);
+		object rawDoorsData = mazeData.GetObject(SerpentConsts.DoorsKey);
+		
 		List<object> wallData = rawWallData as List<object>;
-
+		List<object> doorData = rawDoorsData as List<object>;
+		
+		// door data is optional so don't cancel if there isn't any
 		if (width == 0 || height == 0 || wallData == null) 
 		{ 
 			return; 
@@ -65,6 +69,11 @@ public class Maze : MonoBehaviour
 
 		CreateOutsideWalls();
 		CreateWalls(wallData);
+		
+		if (doorData != null)
+		{
+			CreateDoors(doorData);
+		}
 	}
 	
 	private void CreateOutsideWalls()
@@ -117,25 +126,6 @@ public class Maze : MonoBehaviour
 					}
 				}
 			}
-			/*
-			List<object> cellsWallData = rowWallData as List<object>;
-			if (cellsWallData == null) { break; }
-
-			for (int x = 0; x < cellsWallData.Count; ++x)
-			{
-				IntVector2 position = new IntVector2(x, y);
-				string cellWallData = cellsWallData[x] as string;
-				// Each character in the string represents a wall.
-				foreach (char c in cellWallData)
-				{
-					if (SerpentConsts.DirectionIndexes.ContainsKey(c) == false) { continue; }
-					
-					SerpentConsts.Dir side = SerpentConsts.DirectionIndexes[c];
-					//Debug.Log("Create wall at " + x + "," + y + " dir " + side);
-					CreateWall(position, side);
-				}
-			}			
-			*/
 			
 			--y;
 			if (y < 0) { break; }
@@ -150,19 +140,70 @@ public class Maze : MonoBehaviour
 			return; 
 		}
 		
-		MazeWall wall = new MazeWall();
-		//int intSide = (int)side;
-		//Debug.Log("Wall side index is " + intSide);
-		this.Cells[position.x,position.y].Walls[(int)side] = wall;
+		Wall wall = new Wall();
+		
+		SetupWallLinks(wall, position, side);
+	}
+	
+	private void CreateDoors(List<object> doorsData)
+	{		
+		// doorData should be a list, each element of which is a list with 3 values - two integers for x,y and a string for direction.
+		foreach( object o in doorsData )
+		{
+			Dictionary<string,object> doorData = o as Dictionary<string,object>;
+			if (doorData == null) 
+			{ 
+				continue; 
+			}
+			
+			int x = doorData.GetInt(SerpentConsts.XKey);
+			int y = doorData.GetInt(SerpentConsts.YKey);
+			string directionString = doorData.GetString (SerpentConsts.DirectionKey);
+			if (string.IsNullOrEmpty(directionString)) 
+			{
+				continue;
+			}
 
+			IntVector2 position = new IntVector2(x, y);
+			
+			// Read the first character out of the string.  It should be a recognizable mapping to side data.  There
+			// should only be one side in question, but the code is stronger handling all cases.
+			char c = directionString[0];			
+			if (SerpentConsts.DirectionIndexes.ContainsKey(c)) 
+			{				
+				List<SerpentConsts.Dir> sides = SerpentConsts.DirectionIndexes[c];
+				foreach( SerpentConsts.Dir side in sides )
+				{
+					CreateDoor(position, side);
+				}
+			}
+			
+		}
+	}
+	
+	private void CreateDoor(IntVector2 position, SerpentConsts.Dir side)
+	{
+		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height) 
+		{
+			Debug.Log("Bad position given for door");
+			return; 
+		}
+		
+		Door door = new Door(side);
+		
+		SetupWallLinks(door, position, side);
+	}
+	
+	private void SetupWallLinks( Wall wall, IntVector2 position, SerpentConsts.Dir side)
+	{
+		this.Cells[position.x,position.y].Walls[(int)side] = wall;
+		
 		// Connect the other side of the wall as well, provided the other side of the wall is not "out of bounds"
 		IntVector2 newPosition = position + SerpentConsts.DirectionVector[(int)side];
 		if (newPosition.x < 0 || newPosition.x >= this.Width || newPosition.y < 0 || newPosition.y >= this.Height) { return; }
-
+		
 		int oppositeSide = (int)SerpentConsts.OppositeDirection[(int)side];
-		this.Cells[newPosition.x,newPosition.y].Walls[ oppositeSide ] = wall;
-
+		this.Cells[newPosition.x,newPosition.y].Walls[ oppositeSide ] = wall;		
 	}
-	
-	
 }
+

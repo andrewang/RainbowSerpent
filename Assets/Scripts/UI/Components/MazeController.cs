@@ -10,7 +10,6 @@ public class MazeController : MonoBehaviour
 	[SerializeField] private ScreenShotTaker screenShotTaker = null; 
 	[SerializeField] private UIPanel panel = null;
 	private Color wallColour; 
-	private bool wallSpritesCollated = false;
 
 	/// <summary>
 	/// The centre position of the lower leftmost cell in the maze
@@ -31,15 +30,6 @@ public class MazeController : MonoBehaviour
 	
 	#endregion Verify Serialize Fields
 	
-	private void Update()
-	{
-		if (Input.GetKeyDown("k") && this.wallSpritesCollated == false)
-		{
-			CollateWallSprites();
-			this.wallSpritesCollated = true;
-		}
-	}
-	
 	/// <summary>
 	/// Sets up the maze controller
 	/// </summary>
@@ -48,11 +38,15 @@ public class MazeController : MonoBehaviour
 	{
 		this.wallColour = wallColour;
 		this.maze.SetUp(mazeTextAsset);
-		DetermineSpriteScale();		
+		DetermineMazeScale();		
 		CreateMazeSprites();
 	}
 	
-	private void DetermineSpriteScale()
+	/// <summary>
+	// DetermineSpriteScale compares the size of a cell with what is available on-screen and
+	// determines how much the whole maze needs to be scaled down.
+	// </summary>
+	private void DetermineMazeScale()
 	{
 		Vector4 spriteBounds = this.panel.clipRange;
 		// clip range is ZW.
@@ -81,67 +75,191 @@ public class MazeController : MonoBehaviour
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
-		
-		CreateHorizontalWallSprite(0, width - 1, 0, (int) SerpentConsts.Dir.S);		
-		CreateHorizontalWallSprite(0, width - 1, height - 1, (int) SerpentConsts.Dir.N);
-		CreateVerticalWallSprite(0, height - 1, 0, (int) SerpentConsts.Dir.W);		
-		CreateVerticalWallSprite(0, height - 1, width - 1, (int) SerpentConsts.Dir.E);
 	}
 	
 	private void CreateHorizontalWallSprites()
 	{
-		int height = this.maze.Height;
-		for (int y = 0; y < height; ++y)
+		int y = 0;
+		int intSide = 0;
+		
+		//
+		// In order to reduce the number of methods and prevent duplication of the code to loop through the rows/columns
+		// to create walls, this and the CreateVerticalWallSprites method define funcs in the context of the values
+		// y and intSide that can be passed into a method which does the looping.
+		//
+		Func<int, Wall> getWallFunction = delegate( int x )
 		{
-			CreateHorizontalWallSpritesForRow( y, (int) SerpentConsts.Dir.S );
-		}		
-		CreateHorizontalWallSpritesForRow( height - 1, (int) SerpentConsts.Dir.N );	
+			MazeCell cell = this.maze.Cells[x,y];			
+			Wall wall = cell.Walls[intSide];
+			return wall;		
+		};
+		
+		//
+		// This function creates a horizontal wall sprite stretching from startX to 
+		// endX in maze coordinates.  
+		//
+		Func<int, int, UISprite> createSpriteFunction = delegate( int startX, int endX )
+		{
+			GameObject newWall = CreateWallObject();
+			UISprite newWallSprite = GetWallSprite(newWall);
+			if (newWallSprite == null) 
+			{ 
+				return null; 
+			}
+			newWallSprite.color = this.wallColour;			
+			
+			// Configure as horizontal.
+			Vector3 pos = GetCellSideCentre( (float)(startX + endX) * 0.5f, y, intSide);
+			newWall.transform.localPosition = pos;			
+			newWallSprite.width = SerpentConsts.CellWidth * (endX - startX + 1);
+			
+			return newWallSprite;		
+		};
+		
+		// Create south walls along all rows.
+		intSide = (int) SerpentConsts.Dir.S;
+		for (y = 0; y < this.maze.Height; ++y)
+		{
+			CreateWalls(this.maze.Width, getWallFunction, createSpriteFunction);
+		}
+		
+		// create the top and bottom borders
+		y = 0;
+		intSide = (int)SerpentConsts.Dir.S;
+		createSpriteFunction(0, this.maze.Width - 1);
+		
+		y = this.maze.Height - 1;
+		intSide = (int)SerpentConsts.Dir.N;
+		createSpriteFunction(0, this.maze.Width - 1);		
 	}
 	
-	private void CreateHorizontalWallSpritesForRow( int y, int intSide )
+	
+	private void CreateVerticalWallSprites()
+	{
+		int x = 0;
+		int intSide = 0;
+		
+		//
+		// In order to reduce the number of methods and prevent duplication of the code to loop through the rows/columns
+		// to create walls, this and the CreateVerticalWallSprites method define funcs in the context of the values
+		// y and intSide that can be passed into a method which does the looping.
+		//
+		Func<int, Wall> getWallFunction = delegate( int y )
+		{
+			MazeCell cell = this.maze.Cells[x,y];			
+			Wall wall = cell.Walls[intSide];
+			return wall;		
+		};
+		
+		//
+		// This function creates a horizontal wall sprite stretching from startY to 
+		// endY in maze coordinates.  
+		//
+		Func<int, int, UISprite> createSpriteFunction = delegate( int startY, int endY )
+		{
+			GameObject newWall = CreateWallObject();
+			UISprite newWallSprite = GetWallSprite(newWall);
+			if (newWallSprite == null) 
+			{ 
+				return null; 
+			}
+			newWallSprite.color = this.wallColour;			
+			
+			// Configure as vertical.
+			Vector3 pos = GetCellSideCentre( x, (float)(startY + endY) * 0.5f, intSide);			
+			newWall.transform.localPosition = pos;			
+			// Horizontal - set the width		
+			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1);
+			// Rotate the sprite to be vertical
+			newWallSprite.transform.Rotate(Vector3.forward * 90.0f);
+			
+			return newWallSprite;		
+		};
+		
+		// Create east walls along all columns.
+		intSide = (int) SerpentConsts.Dir.E;
+		for (x = 0; x < this.maze.Width; ++x)
+		{
+			CreateWalls(this.maze.Height, getWallFunction, createSpriteFunction);
+		}
+		
+		// create the left and right borders
+		x = 0;
+		intSide = (int)SerpentConsts.Dir.W;
+		createSpriteFunction(0, this.maze.Height - 1);
+		
+		x = this.maze.Width - 1;
+		intSide = (int)SerpentConsts.Dir.E;
+		createSpriteFunction(0, this.maze.Height - 1);
+		
+	}
+	
+	/// <summary>
+	/// Creates walls given certain specifications and actions.
+	/// </summary>
+	/// <param name="loopLimit">Loop limit.</param>
+	/// <param name="getWallAction">Get wall action.</param>
+	/// <param name="createWallAction">Create wall action.</param>
+	private void CreateWalls(int loopLimit, Func<int, Wall> getWallFunction, Func<int, int, UISprite> createWallFunction)
 	{
 		int start = -1;
-		for (int x = 0; x < this.maze.Width; ++x)
+		for (int loop = 0; loop < loopLimit; ++loop)
 		{
-			MazeCell cell = this.maze.Cells[x,y];
-			
-			if (cell.Walls[intSide] != null)
+			Wall wall = getWallFunction(loop);
+			bool wallEnds = (start >= 0 && (wall == null || wall is Door));
+			if (wallEnds)
 			{
-				if (start == -1)
-				{
-					// start of a wall
-					start = x;
-				}
+				createWallFunction(start, loop - 1);
+				start = -1;			
 			}
-			else if (start >= 0)
+			if (wall is Door)
 			{
-				// end of a wall
-				CreateHorizontalWallSprite( start, x - 1, y, intSide);
-				start = -1;
+				Door door = wall as Door;
+				// Create a sprite for the door.
+				UISprite doorSprite = createWallFunction(loop, loop);	
+				door.Sprite = doorSprite;			
 			}
-		}	
+			else if (wall != null && start == -1)
+			{
+				// no wall start is recorded, so record the start of one
+				start = loop;
+			}
+		}
+		
+		// Any final wall at the end?
+		if (start != -1)
+		{
+			createWallFunction(start, loopLimit - 1);
+		}
 	}
 	
-	private void CreateHorizontalWallSprite( int x0, int x1, int y, int intSide )
-	{			
+	
+	/// <summary>
+	/// Creates a wall object with default parentage and scale
+	/// </summary>
+	/// <returns>The new wall object.</returns>
+	private GameObject CreateWallObject()
+	{
 		GameObject newWall = (GameObject) Instantiate(this.wallSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
 		newWall.transform.parent = this.transform;
-		
-		Vector3 pos = GetCellSideCentre( (float)(x1 + x0) * 0.5f, y, intSide);
-		newWall.transform.localPosition = pos;
 		newWall.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-				
-		UISprite newWallSprite = newWall.GetComponent<UISprite>();
-		if (newWallSprite == null) 
-		{ 
-			return; 
-		}
-		newWallSprite.color = this.wallColour;
-		
-		// Horizontal
-		newWallSprite.width = SerpentConsts.CellWidth * (x1 - x0 + 1);
+		return newWall;
 	}
 	
+	/// <summary>
+	/// Gets the wall sprite component from a newly created game object.
+	/// </summary>
+	/// <returns>The wall sprite.</returns>
+	/// <param name="obj">Object.</param>
+	private UISprite GetWallSprite(GameObject obj)
+	{
+		UISprite newWallSprite = obj.GetComponent<UISprite>();
+		if (newWallSprite == null) { return null; }
+		
+		return newWallSprite;
+	}
+	
+	/*
 	private void CreateVerticalWallSprites()
 	{
 		int width = this.maze.Width;
@@ -177,7 +295,7 @@ public class MazeController : MonoBehaviour
 	}
 	
 	
-	private void CreateVerticalWallSprite( int y0, int y1, int x, int intSide )
+	private UISprite CreateVerticalWallSprite( int y0, int y1, int x, int intSide )
 	{		
 		GameObject newWall = (GameObject) Instantiate(this.wallSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
 		newWall.transform.parent = this.transform;
@@ -189,88 +307,19 @@ public class MazeController : MonoBehaviour
 		UISprite newWallSprite = newWall.GetComponent<UISprite>();
 		if (newWallSprite == null) 
 		{ 
-			return; 
+			return null; 
 		}
 		newWallSprite.color = this.wallColour;
 		
-		// Horizontal
-		
+		// Horizontal - set the width		
 		newWallSprite.width = SerpentConsts.CellHeight * (y1 - y0 + 1);
 		// Rotate the sprite to be vertical
 		newWallSprite.transform.Rotate(Vector3.forward * 90.0f);
+		
+		return newWallSprite;
 	}	
 	
-	/// <summary>
-	/// Creates a wall sprite.
-	/// </summary>
-	/// <param name="cell">Cell.</param>
-	/// <param name="side">The side of the cell on which to make the sprite.</param>
-	private void CreateWallSprite(MazeCell cell, SerpentConsts.Dir side)
-	{
-		int intSide = (int)side;
-		if (cell.Walls[intSide] == null) 
-		{
-			return; 
-		}
-
-		// Create and locate the sprite.
-		GameObject newWall = (GameObject) Instantiate(this.wallSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
-		newWall.transform.parent = this.transform;
-
-		Vector3 pos = GetCellSideCentre(cell.X, cell.Y, intSide);
-		newWall.transform.localPosition = pos;
-		newWall.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		
-		//Debug.Log("Creating wall sprite at  " + pos.x + "," + pos.y + " for cell " + cell.X + "," + cell.Y + " side " + SerpentConsts.DirectionChar[ intSide ]);
-
-		UISprite newWallSprite = newWall.GetComponent<UISprite>();
-		if (newWallSprite == null) 
-		{ 
-			return; 
-		}
-		newWallSprite.color = this.wallColour;
-
-		// Note, we're assuming here that the wall sprite is horizontal, not vertical.  So if the wall
-		// is actually vertical, we have to set the rotation
-		if (side == SerpentConsts.Dir.N || side == SerpentConsts.Dir.S)
-		{
-			// Horizontal
-			newWallSprite.width = SerpentConsts.CellWidth;
-		}
-		else
-		{
-			// Vertical
-			newWallSprite.width = SerpentConsts.CellHeight;
-			// Rotate the sprite to be vertical
-			newWallSprite.transform.Rotate(Vector3.forward * 90.0f);
-		}
-	}
-	
-	// This method should create a single PNG image of all the wall sprites existing at this point.  The game can then
-	// continue to use this sprite instead of all the individual sprite objects, of which there many.
-	// To do this, we need access to the camera and to create a RenderTexture
-	private void CollateWallSprites()
-	{
-	/*
-		// As a test, start by writing out a screenshot
-		int resWidth = Screen.width;
-		int resHeight = Screen.height;
-		RenderTexture rt = new RenderTexture(resWidth, resHeight, 32);
-		sceneCamera.targetTexture = rt;
-		Texture2D screenShot = new Texture2D(resWidth, resHeight, TextureFormat.ARGB32, false);
-		sceneCamera.Render();
-		RenderTexture.active = rt;
-		screenShot.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
-		sceneCamera.targetTexture = null;
-		RenderTexture.active = null; // JC: added to avoid errors
-		Destroy(rt);
-		byte[] bytes = screenShot.EncodeToPNG();
-		string filename = "maze.png";
-		System.IO.File.WriteAllBytes(filename, bytes);
-		*/
-		this.screenShotTaker.TakeScreenShot(0);		
-	}
-
+	*/	
 
 	/// <summary>
 	/// Gets the centre position of a cell

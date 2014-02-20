@@ -6,7 +6,7 @@ public class MazeCell
 	public int X { get; set; }
 	public int Y { get; set; }
 
-	public MazeWall[] Walls; 
+	public Wall[] Walls; 
 	
 	public List<SerpentConsts.Dir> UnblockedDirections
 	{
@@ -31,7 +31,7 @@ public class MazeCell
 	{
 		this.X = x;
 		this.Y = y;
-		this.Walls = new MazeWall[SerpentConsts.NumDirections];
+		this.Walls = new Wall[SerpentConsts.NumDirections];
 	}
 	
 	public bool IsMotionBlocked(SerpentConsts.Dir direction)
@@ -43,8 +43,16 @@ public class MazeCell
 			return false;
 		}
 		
-		MazeWall wall = this.Walls[intDirection];
-		return (wall != null);
+		Wall wall = this.Walls[intDirection];
+		if (wall is Door)
+		{
+			Door door = wall as Door;
+			return door.OpenableFrom(direction);
+		}
+		else
+		{
+			return (wall != null);
+		}
 	}
 	
 

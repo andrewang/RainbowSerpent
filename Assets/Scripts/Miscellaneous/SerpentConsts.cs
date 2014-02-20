@@ -6,17 +6,19 @@ public static class SerpentConsts
 {
 	public const int NumDirections = 4; 
 
+	// Keys for reading level data	
 	public const string WidthKey = "width";
 	public const string HeightKey = "height";
 	public const string CellsKey = "cells";
 	public const string WallsKey = "walls";
+	public const string DoorsKey = "doors";
 	public const string XKey = "x";
 	public const string YKey = "y";
-
+	public const string DirectionKey = "dir";
+	
+	// Pixel sizes of cells.
 	public const int CellWidth = 64;
 	public const int CellHeight = 48;
-	//public const int MazeWidth = 10;
-	//public const int MazeHeight = 14;
 	
 	public enum Dir
 	{
