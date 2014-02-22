@@ -72,7 +72,7 @@ public class GameSceneController : RSSceneController
 		
 		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
 		
-		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
+		this.maxNumEnemySnakes = 0; //SerpentConsts.MaxNumEnemySnakes;
 		
 		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
 		{

@@ -106,6 +106,8 @@ public class SnakeTrail
 		
 	}
 	
+	/*
+	
 	public Vector3 GetSegmentPosition( float distanceFromHead )
 	{
 		// Interpolate (distanceFromHead) units between the appropriate positions in the list.
@@ -122,10 +124,40 @@ public class SnakeTrail
 		return posBefore.Position + displacement;		
 	}
 	
+	*/
 	
-	public int GetPositionIndexBefore( float distanceFromHead )
+	public void SetSegmentPositions( SnakeHead head )
 	{
-		for (int i = 0; i < this.positions.Count; ++i)
+		int index = 0;
+		SnakeBody bodySegment = head.NextSegment;
+		while( bodySegment != null )
+		{
+			index = SetSegmentPosition( bodySegment, index );
+			bodySegment = bodySegment.NextSegment;
+		}
+	}
+	
+	public int SetSegmentPosition( SnakeBody bodySegment, int startingIndex )
+	{
+		int indexBefore = GetPositionIndexBefore( bodySegment.DistanceFromHead, startingIndex );
+		if (indexBefore == -1) 
+		{
+			// return the last position in the trail.
+			SnakePosition position = this.positions[ this.positions.Count - 1 ];
+			bodySegment.transform.localPosition = position.Position;			
+			return -1;
+		}
+		
+		SnakePosition posBefore = this.positions[indexBefore];
+		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (bodySegment.DistanceFromHead - posBefore.DistanceFromHead);
+		bodySegment.transform.localPosition = posBefore.Position + displacement;		
+		return indexBefore;
+	}
+	
+	
+	public int GetPositionIndexBefore( float distanceFromHead, int startingIndex = 0 )
+	{
+		for (int i = startingIndex; i < this.positions.Count; ++i)
 		{
 			float d = this.positions[i].DistanceFromHead;
 			if (d > distanceFromHead)
