@@ -142,10 +142,18 @@ public class SnakeTrail
 		int indexBefore = GetPositionIndexBefore( bodySegment.DistanceFromHead, startingIndex );
 		if (indexBefore == -1) 
 		{
+			// extrapolate based on last position in the trail, if possible.
 			// return the last position in the trail.
 			SnakePosition position = this.positions[ this.positions.Count - 1 ];
-			bodySegment.transform.localPosition = position.Position;			
-			return -1;
+			if (position.UnitVectorToPreviousPosition.magnitude > 0.0f)
+			{
+				indexBefore = this.positions.Count - 1;
+			}
+			else
+			{
+				bodySegment.transform.localPosition = position.Position;
+				return 0;
+			}
 		}
 		
 		SnakePosition posBefore = this.positions[indexBefore];

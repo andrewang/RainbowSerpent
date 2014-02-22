@@ -72,7 +72,7 @@ public class GameSceneController : RSSceneController
 		
 		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
 		
-		this.maxNumEnemySnakes = 0; //SerpentConsts.MaxNumEnemySnakes;
+		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
 		
 		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
 		{
@@ -108,6 +108,7 @@ public class GameSceneController : RSSceneController
 		Snake enemySnake = CreateSnake(this.enemySnakeConf, length);
 		enemySnake.ChangeColour(this.theme.EnemySnakeColour);
 		this.enemySnakes.Add(enemySnake);
+		EnemySnakeAdded();
 		return enemySnake;
 	}
 	
@@ -315,6 +316,11 @@ public class GameSceneController : RSSceneController
 	}
 
 	private void NumSnakeSegmentsChanged(Snake snake)
+	{
+		this.updateSnakeColours = true;
+	}
+	
+	private void EnemySnakeAdded()
 	{
 		this.updateSnakeColours = true;
 	}

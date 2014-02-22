@@ -140,15 +140,12 @@ public class Snake : MobileCreature
 		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) facingDirection ];
 		Vector3 oppositeVector = SerpentConsts.DirectionVector3[ (int) oppositeDirection ];
 		
-		// Add some fake positions so the snake segments can be positioned.
+		// Add a fake position so the snake segments can be positioned.
 		// TODO FIX with better solution		
-		for (int i = 0; i < 5; ++i)
-		{
-			Vector3 displacement = oppositeVector * i * 100.0f;
-			Vector3 tailPos = position + displacement;
-		
-			this.trail.AddPosition( tailPos );
-		}
+		Vector3 displacement = oppositeVector * 5 * SerpentConsts.CellWidth;
+		Vector3 tailPos = position + displacement;
+	
+		this.trail.AddPosition( tailPos );
 
 		this.trail.UpdateHeadPosition(position);
 		PositionBodySegments();
