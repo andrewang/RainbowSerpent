@@ -1,5 +1,8 @@
 using System;
 
+/// <summary>
+/// 2-dimensional int vector.
+/// </summary>
 public class IntVector2
 {
 	public int x;

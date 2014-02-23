@@ -1,9 +1,10 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Miscellaneous/SerpentConsts.cs">
     <Files>
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" Line="150" Column="44" />
       <File FileName="Assets/Scripts/Maps/Wall.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="99" Column="2" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="73" Column="42" />
       <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/UI/UISprite.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
@@ -28,8 +29,10 @@
       <File FileName="Assets/Scripts/Maps/LevelTheme.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/SerpentUtils.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/SerpentExtensions.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="146" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" Line="70" Column="22" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="79" Column="19" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" Line="183" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="40" Column="13" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="107" Column="41" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -40,9 +43,8 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" line="23" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Snakes/Snake.cs" line="355" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Snakes/Snake.cs" line="391" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" line="72" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Snakes/Snake.cs" line="358" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" line="80" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

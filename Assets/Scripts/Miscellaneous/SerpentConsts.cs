@@ -106,6 +106,8 @@ public static class SerpentConsts
 	public static int SmallEnemySnakeLength = 3;
 	public static int PlayerSnakeLength = 3;
 	
+	public static int ScoreForBonusLife = 10000;
+	
 	public static class SceneNames
 	{
 		public const string Loading = "LoadingScene";
