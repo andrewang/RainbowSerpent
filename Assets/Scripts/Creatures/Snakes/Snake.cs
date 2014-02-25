@@ -172,14 +172,14 @@ public class Snake : MobileCreature
 		// its current position.
 		if (this.head == null)
 		{
-			this.head = SerpentUtils.SerpentInstantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
+			this.head = SerpentUtils.Instantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
 			this.head.Colour = this.colour;
 			this.head.Visible = this.visible;
 			this.head.Snake = this;
 		}
 		else
 		{
-			SnakeBody newSegment = SerpentUtils.SerpentInstantiate<SnakeBody>(this.config.BodyPrefab, this.transform);
+			SnakeBody newSegment = SerpentUtils.Instantiate<SnakeBody>(this.config.BodyPrefab, this.transform);
 			newSegment.Colour = this.colour;
 			newSegment.Visible = this.visible;
 			newSegment.Snake = this;
@@ -319,9 +319,31 @@ public class Snake : MobileCreature
 	{
 		float displacement =  this.Speed * Time.smoothDeltaTime;
 		
+		/*
+		float remainingStepDisplacement = 0.0f;
+		
+		int steps = 5;
+		float stepDisplacement = displacement / (float)steps;
+		bool arrived = false;
+		int loop;
+		for (loop = 0; loop < steps; ++loop)
+		{
+			arrived = this.head.MoveForward( stepDisplacement, out remainingStepDisplacement );
+			if (arrived)
+			{
+				break;
+			}
+		}
+		float remainingDisplacement = remainingStepDisplacement + stepDisplacement * (float)(steps - loop);
+
+		*/
+		
 		float remainingDisplacement = 0.0f;
 		bool arrived = this.head.MoveForward( displacement, out remainingDisplacement );
+		
+				
 		this.trail.UpdateHeadPosition(this.head.transform.localPosition);
+		
 		PositionBodySegments();
 		if (arrived == false) { return; }
 		

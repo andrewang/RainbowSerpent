@@ -12,10 +12,17 @@ public class SnakeHead : SnakeSegment
 	public bool MoveForward(float displacement, out float remainingDisplacement)
 	{
 		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
-		if (displacement <= toDest.sqrMagnitude)
+		
+		Vector3 nextPos = this.transform.localPosition + (this.CurrentDirectionVector * displacement);
+		Vector3 afterMoveToDest = this.CurrentDestination - nextPos;
+		
+		if (Vector3.Dot(toDest, afterMoveToDest) > 0)
+		//if (displacement * displacement < toDest.sqrMagnitude)
+		//if (displacement < toDest.sqrMagnitude)
 		{
 			// Have not reached current destionation so just move.
-			this.transform.localPosition += (this.CurrentDirectionVector * displacement);
+			//this.transform.localPosition += (this.CurrentDirectionVector * displacement);
+			this.transform.localPosition = nextPos;
 			
 			// Did not arrive at destination
 			remainingDisplacement = 0.0f;
@@ -25,9 +32,8 @@ public class SnakeHead : SnakeSegment
 		// Update the head position to exactly be the destination
 		this.transform.localPosition = this.CurrentDestination;
 		
-		float distToDest = toDest.magnitude;		
-		
-		remainingDisplacement = displacement - distToDest;
+		// Return how much movement wasn't used.		
+		remainingDisplacement = displacement - toDest.magnitude;
 		return true;
 	}	
 }

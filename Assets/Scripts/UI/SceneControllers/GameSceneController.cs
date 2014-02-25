@@ -114,7 +114,7 @@ public class GameSceneController : RSSceneController
 	
 	private Snake CreateSnake(SnakeConfig config, int length)
 	{
-		Snake snake = SerpentUtils.SerpentInstantiate<Snake>(this.snakePrefab, this.mazeController.transform);
+		Snake snake = SerpentUtils.Instantiate<Snake>(this.snakePrefab, this.mazeController.transform);
 		snake.SetUp(this.mazeController, config, length);
 		snake.SnakeSegmentsChanged += this.NumSnakeSegmentsChanged;
 		return snake;
@@ -131,7 +131,7 @@ public class GameSceneController : RSSceneController
 	
 	private Egg CreateEgg()
 	{
-		Egg egg = SerpentUtils.SerpentInstantiate<Egg>(this.eggPrefab, this.mazeController.transform);
+		Egg egg = SerpentUtils.Instantiate<Egg>(this.eggPrefab, this.mazeController.transform);
 		egg.Hatched += EggHatched;
 		return egg;
 	}
@@ -172,7 +172,7 @@ public class GameSceneController : RSSceneController
 	
 	private void CreateFrog()
 	{
-		Frog frog = SerpentUtils.SerpentInstantiate<Frog>(this.frogPrefab, this.mazeController.transform);
+		Frog frog = SerpentUtils.Instantiate<Frog>(this.frogPrefab, this.mazeController.transform);
 		if (frog == null) { return; }
 		
 		int x = 5;

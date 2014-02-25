@@ -29,7 +29,7 @@ public class GameState
 		set
 		{
 			int numBonusLives = this.score / SerpentConsts.ScoreForBonusLife;
-			this.score += value;
+			this.score = value;
 			// Handle bonus lives here.
 			int newBonusLives = this.score / SerpentConsts.ScoreForBonusLife;
 			if (newBonusLives > numBonusLives)
