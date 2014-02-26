@@ -155,6 +155,7 @@
      <Compile Include="Assets\Scripts\Miscellaneous\IntVector2.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\MiniJSON.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\ScreenShotTaker.cs" />
+     <Compile Include="Assets\Scripts\Miscellaneous\ScriptCache.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentConsts.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentExtensions.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentUtils.cs" />

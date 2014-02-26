@@ -7,7 +7,7 @@ public class Managers : MonoBehaviour
 	[SerializeField] GameObject sceneManagerPrefab = null;
 	
 	public static GameState GameState;
-
+	
 	void Start()
 	{
 		GameObject inst = (GameObject) Instantiate(this.sceneManagerPrefab);

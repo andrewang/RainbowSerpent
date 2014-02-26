@@ -74,7 +74,7 @@ public class GameSceneController : RSSceneController
 		
 		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
 		
-		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		for (int i = 0; i < this.maxNumEnemySnakes - 1; ++i)
 		{
 			CreateEnemySnake(SerpentConsts.NormalEnemySnakeLength);
 		}
@@ -89,7 +89,7 @@ public class GameSceneController : RSSceneController
 	{
 		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
 		
-		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		for (int i = 0; i < this.enemySnakes.Count; ++i)
 		{		
 			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
 			yield return new WaitForSeconds(5.0f);
@@ -142,6 +142,7 @@ public class GameSceneController : RSSceneController
 		// place egg in the map cell of the snake segment
 		egg.transform.parent = this.mazeController.transform;
 		egg.transform.localPosition = segment.transform.localPosition;
+		egg.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 	}
 	
 	private void EggHatched( Egg egg )

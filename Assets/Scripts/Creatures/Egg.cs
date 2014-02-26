@@ -9,7 +9,6 @@ public class Egg : Creature
 	private DateTime grownTime;
 	private DateTime hatchingTime;
 	private bool fullyGrown = false;
-			
 
 	void Start()
 	{
@@ -17,14 +16,24 @@ public class Egg : Creature
 		this.hatchingTime = this.grownTime + SerpentConsts.EnemyEggHatchingTime;
 		
 		// Begin animation of scaling up
-		this.transform.localScale = new Vector3(0.01f, 0.01f);
-		Vector3 finalScale = new Vector3(1.0f, 1.0f);
-		TweenScale.Begin(this.gameObject, (float)SerpentConsts.TimeToLayEgg.TotalSeconds, finalScale);
+		this.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+		Vector3 finalScale = new Vector3(1.0f, 1.0f, 1.0f);
+		TweenScale scaleTween = TweenScale.Begin(this.gameObject, (float)SerpentConsts.TimeToLayEgg.TotalSeconds, finalScale);
+		
+		EventDelegate tweenFinished = new EventDelegate(this, "ScaledUp");
+		scaleTween.onFinished.Add ( tweenFinished );
+	}
+	
+	private void ScaledUp()
+	{
+		this.fullyGrown = true;
+		this.FullyGrown();	
 	}
 	
 	// Hatching behavior?
 	void Update()
 	{
+		/*
 		if (this.fullyGrown == false)
 		{
 			if (DateTime.Now > this.grownTime)
@@ -33,7 +42,9 @@ public class Egg : Creature
 				this.FullyGrown();
 			}
 		}
-		else if (DateTime.Now > this.hatchingTime)
+		else 
+		*/
+		if (this.fullyGrown && DateTime.Now > this.hatchingTime)
 		{
 			this.Hatched(this);
 		}		
