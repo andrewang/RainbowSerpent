@@ -28,7 +28,9 @@ public class Door : Wall
 		if (this.open) { return; }
 		
 		this.open = true;
-		// do quick opening animation? 
+		
+		// do quick opening animation
+		TweenScale.Begin(this.Sprite.gameObject, 0.1f, new UnityEngine.Vector3(0.01f, 1.0f));				
 	}
 	
 	public void Close()
@@ -36,7 +38,9 @@ public class Door : Wall
 		if (this.open == false) { return; }
 		
 		this.open = false;
-		// do quick closing animation?
+		// do quick closing animation
+		TweenScale.Begin(this.Sprite.gameObject, 0.1f, new UnityEngine.Vector3(1.0f, 1.0f));				
+		
 	}
 }
 

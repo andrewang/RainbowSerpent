@@ -47,7 +47,7 @@ public class MazeCell
 		if (wall is Door)
 		{
 			Door door = wall as Door;
-			return door.OpenableFrom(direction);
+			return !(door.OpenableFrom(direction));
 		}
 		else
 		{

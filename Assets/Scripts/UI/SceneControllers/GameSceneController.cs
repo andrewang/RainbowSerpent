@@ -72,7 +72,7 @@ public class GameSceneController : RSSceneController
 		
 		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
 		
-		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
+		this.maxNumEnemySnakes = 0; // SerpentConsts.MaxNumEnemySnakes;
 		
 		for (int i = 0; i < this.maxNumEnemySnakes - 1; ++i)
 		{
@@ -275,7 +275,7 @@ public class GameSceneController : RSSceneController
 			
 			int i = UnityEngine.Random.Range( 0, qualifiedSnakes.Count );
 			Snake enemySnake = qualifiedSnakes[i];	
-			SnakeSegment lastSegment = enemySnake.LastSegment;
+			SnakeSegment lastSegment = enemySnake.Tail;
 			Egg e = CreateEgg();
 			this.enemyEgg = e;			
 			lastSegment.BeginToCreateEgg(e, EggFullyGrown, EggDestroyed);			

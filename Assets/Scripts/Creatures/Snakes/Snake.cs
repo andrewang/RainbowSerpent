@@ -45,7 +45,7 @@ public class Snake : MobileCreature
 	
 	public float Speed { get; set; }
 
-	public SnakeSegment LastSegment
+	public SnakeSegment Tail
 	{
 		get
 		{
@@ -184,7 +184,7 @@ public class Snake : MobileCreature
 			newSegment.Visible = this.visible;
 			newSegment.Snake = this;
 			
-			SnakeSegment last = this.LastSegment;
+			SnakeSegment last = this.Tail;
 			
 			last.NextSegment = newSegment;
 			
@@ -319,29 +319,9 @@ public class Snake : MobileCreature
 	{
 		float displacement =  this.Speed * Time.smoothDeltaTime;
 		
-		/*
-		float remainingStepDisplacement = 0.0f;
-		
-		int steps = 5;
-		float stepDisplacement = displacement / (float)steps;
-		bool arrived = false;
-		int loop;
-		for (loop = 0; loop < steps; ++loop)
-		{
-			arrived = this.head.MoveForward( stepDisplacement, out remainingStepDisplacement );
-			if (arrived)
-			{
-				break;
-			}
-		}
-		float remainingDisplacement = remainingStepDisplacement + stepDisplacement * (float)(steps - loop);
-
-		*/
-		
 		float remainingDisplacement = 0.0f;
 		bool arrived = this.head.MoveForward( displacement, out remainingDisplacement );
-		
-				
+			
 		this.trail.UpdateHeadPosition(this.head.transform.localPosition);
 		
 		PositionBodySegments();
@@ -362,10 +342,11 @@ public class Snake : MobileCreature
 		
 		bool directionChanged = (newDirection != this.CurrentDirection);
 		
-		// Change the current direction if it's possible to go that way.
+		// Change the current direction if it's possible to go that way.  If not, check the current direction - keep moving
+		// in that direction if possible, or stop if it's blocked.
 		if (!IsMotionBlocked( newDirection ))
 		{
-			this.CurrentDirection = newDirection;
+			this.CurrentDirection = newDirection;	
 		}
 		else if (IsMotionBlocked( this.CurrentDirection ))
 		{
@@ -373,6 +354,9 @@ public class Snake : MobileCreature
 			this.CurrentDirection = SerpentConsts.Dir.None;
 			return;
 		}
+		
+		// Open any door between the current position and the next one. 
+		OpenDoor( this.CurrentDirection );
 		
 		if (directionChanged)
 		{			
@@ -387,6 +371,9 @@ public class Snake : MobileCreature
 		this.head.MoveForward( remainingDisplacement, out dummyOutput );	
 		this.trail.UpdateHeadPosition(this.head.transform.localPosition);		
 		PositionBodySegments();
+		
+		// Close any door that can now be closed.
+		CloseDoor();		
 	}	
 	
 	#endregion Update
@@ -431,6 +418,54 @@ public class Snake : MobileCreature
 		return this.MazeController.IsMotionBlocked( this.head.transform.localPosition, direction );		
 	}
 	
+	private void OpenDoor( SerpentConsts.Dir direction )
+	{
+		this.MazeController.OpenDoor( this.head.transform.localPosition, direction );
+	}
+	
+	private void CloseDoor()
+	{
+		SnakeSegment tail = this.Tail;
+		SerpentConsts.Dir tailDir = DetermineTailDirection();
+		this.MazeController.CloseDoor( tail.transform.localPosition, tailDir );
+	}
+	
+	private SerpentConsts.Dir DetermineTailDirection()
+	{
+		SnakeSegment previousSegment = this.head;
+		SnakeSegment segment = previousSegment.NextSegment;
+		while (segment.NextSegment != null)
+		{
+			previousSegment = segment;
+			segment = segment.NextSegment;
+		}
+		
+		Vector3 toTail = segment.transform.localPosition - previousSegment.transform.localPosition;
+		float xDelta = toTail.x;
+		float yDelta = toTail.y;
+		if ( Mathf.Abs(xDelta) > Mathf.Abs(yDelta) )
+		{
+			if (xDelta < 0.0f)
+			{
+				return SerpentConsts.Dir.W;
+			}
+			else
+			{
+				return SerpentConsts.Dir.E;
+			}
+		}
+		else
+		{
+			if (yDelta < 0.0f)
+			{
+				return SerpentConsts.Dir.S;				
+			}
+			else
+			{
+				return SerpentConsts.Dir.N;
+			}
+		}
+	}
 	
 	/// <summary>
 	/// Updates the destination of the snake in the direction it's facing

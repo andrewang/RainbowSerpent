@@ -109,9 +109,11 @@ public class MazeController : MonoBehaviour
 			newWallSprite.color = this.wallColour;			
 			
 			// Configure as horizontal.
-			Vector3 pos = GetCellSideCentre( (float)(startX + endX) * 0.5f, y, intSide);
-			newWall.transform.localPosition = pos;			
 			newWallSprite.width = SerpentConsts.CellWidth * (endX - startX + 1);
+			float x = (float)(startX + endX) * 0.5f;			
+			Vector3 pos = GetCellSideCentre( x, y, intSide);
+			pos.x -= newWallSprite.width * 0.5f;
+			newWall.transform.localPosition = pos;			
 			
 			return newWallSprite;		
 		};
@@ -152,7 +154,7 @@ public class MazeController : MonoBehaviour
 		};
 		
 		//
-		// This function creates a horizontal wall sprite stretching from startY to 
+		// This function creates a vertical wall sprite stretching from startY to 
 		// endY in maze coordinates.  
 		//
 		Func<int, int, UISprite> createSpriteFunction = delegate( int startY, int endY )
@@ -165,11 +167,13 @@ public class MazeController : MonoBehaviour
 			}
 			newWallSprite.color = this.wallColour;			
 			
-			// Configure as vertical.
-			Vector3 pos = GetCellSideCentre( x, (float)(startY + endY) * 0.5f, intSide);			
-			newWall.transform.localPosition = pos;			
-			// Horizontal - set the width		
 			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1);
+			
+			float y = (float)(startY + endY) * 0.5f;
+			Vector3 pos = GetCellSideCentre( x, y, intSide);			
+			pos.y -= newWallSprite.width * 0.5f;
+			newWall.transform.localPosition = pos;			
+
 			// Rotate the sprite to be vertical
 			newWallSprite.transform.Rotate(Vector3.forward * 90.0f);
 			
@@ -383,6 +387,32 @@ public class MazeController : MonoBehaviour
 		if (cell == null) { return true; }
 		
 		return cell.IsMotionBlocked(direction);
+	}
+	
+	public void OpenDoor(Vector3 position, SerpentConsts.Dir direction)
+	{
+		MazeCell cell = GetCellForPosition(position);
+		if (cell == null) { return; }
+		
+		Wall w = cell.Walls[ (int) direction ];
+		if (w is Door)
+		{
+			Door d = w as Door;
+			d.Open();
+		}
+	}
+	
+	public void CloseDoor(Vector3 position, SerpentConsts.Dir direction)
+	{
+		MazeCell cell = GetCellForPosition(position);
+		if (cell == null) { return; }
+		
+		Wall w = cell.Walls[ (int) direction ];
+		if (w is Door)
+		{
+			Door d = w as Door;
+			d.Close();
+		}
 	}
 	
 	public List<SerpentConsts.Dir> GetValidDirections(Vector3 position, bool allowOffscreen)
