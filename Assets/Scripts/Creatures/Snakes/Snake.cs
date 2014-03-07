@@ -179,7 +179,12 @@ public class Snake : MobileCreature
 		}
 		else
 		{
-			SnakeBody newSegment = SerpentUtils.Instantiate<SnakeBody>(this.config.BodyPrefab, this.transform);
+			SnakeBody newSegment = Managers.SnakeBodyCache.GetObject<SnakeBody>();
+			// Change transform parentage
+			newSegment.transform.parent = this.transform;
+			// Fix scale
+			newSegment.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+						
 			newSegment.Colour = this.colour;
 			newSegment.Visible = this.visible;
 			newSegment.Snake = this;
@@ -251,8 +256,9 @@ public class Snake : MobileCreature
 			// error!
 			return false;
 		}
-		
-		// destroy this and all subsequent segments		
+
+		// Return eaten/destroyed segments to the cache.
+				
 		SnakeSegment nextSegment = seg.NextSegment;
 		
 		// Sever connection to destroyed segments prior to calling destroy but AFTER hanging a pointer to the next 
@@ -261,7 +267,7 @@ public class Snake : MobileCreature
 		
 		do
 		{
-			Destroy( seg.gameObject );
+			Managers.SnakeBodyCache.AddObject(seg.gameObject);
 			seg = nextSegment;
 			if (seg == null)
 			{
