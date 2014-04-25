@@ -113,6 +113,13 @@ public class SnakeSegment : MonoBehaviour
 	
 	#endregion Properties
 	
+	public virtual void ResetProperties()
+	{
+		// Should reset all the segment's properties.
+		this.NextSegment = null;
+		this.egg = null;  //TODO what if egg is set?
+	}
+	
 	public bool TouchesSegment( SnakeSegment otherSegment )
 	{
 		Vector3 positionDiff = this.transform.localPosition - otherSegment.transform.localPosition;

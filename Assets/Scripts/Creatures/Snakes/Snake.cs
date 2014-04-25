@@ -73,6 +73,7 @@ public class Snake : MobileCreature
 	private SnakeTrail trail;
 	
 	public event Action<Snake> SnakeSegmentsChanged = null;
+	public event Action<Vector3> SnakeSegmentEaten = null;
 	
 	#region Set Up
 	
@@ -112,15 +113,17 @@ public class Snake : MobileCreature
 		
 		this.CurrentDirection = SerpentConsts.Dir.None;
 
-		// IF the snake died (and only then) restore the initial number of segments.		
+		// Restore segments
 		int numSegments = this.NumSegments;
-		if (numSegments == 0)
+		for (int i = numSegments; i < this.initialNumSegments; ++i)	
 		{
-			for (int i = numSegments; i < this.initialNumSegments; ++i)	
-			{
-				AddSegment();
-			}
+			Debug.Log ("Adding snake segment to " + this);
+			AddSegment();
 		}
+		// Make sure the head's gameObject is active
+		this.head.gameObject.SetActive(true);
+		
+		// NOTE: if an enemy snake ate the player then it will have an extra segment.  Do we need to remove it?
 	}
 	
 	private void UpdateSpeed()
@@ -180,11 +183,12 @@ public class Snake : MobileCreature
 		else
 		{
 			SnakeBody newSegment = Managers.SnakeBodyCache.GetObject<SnakeBody>();
-			// Change transform parentage
+			newSegment.ResetProperties();
+			
+			// Change transform parentage and reset scale to 1.
 			newSegment.transform.parent = this.transform;
-			// Fix scale
-			newSegment.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-						
+			newSegment.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);			
+			
 			newSegment.Colour = this.colour;
 			newSegment.Visible = this.visible;
 			newSegment.Snake = this;
@@ -237,6 +241,7 @@ public class Snake : MobileCreature
 		{
 			seg = this.head;		
 			previousSeg = seg;	
+			this.head.gameObject.SetActive(false);
 		}
 		else
 		{
@@ -265,9 +270,15 @@ public class Snake : MobileCreature
 		// segment, in case previousSeg and seg are the same.
 		previousSeg.NextSegment = null;		
 		
+		// NOTE: Can't return snake head to the snake body cache.
 		do
 		{
-			Managers.SnakeBodyCache.AddObject(seg.gameObject);
+			SnakeSegmentEaten(seg.gameObject.transform.localPosition);
+			if (seg != this.head)
+			{
+				Managers.SnakeBodyCache.ReturnObject<SnakeBody>(seg.gameObject);
+				Debug.Log("Returned segment to snake body cache");
+			}
 			seg = nextSegment;
 			if (seg == null)
 			{
@@ -438,6 +449,10 @@ public class Snake : MobileCreature
 	
 	private SerpentConsts.Dir DetermineTailDirection()
 	{
+		if (this.head.NextSegment == null)
+		{
+			Debug.Log("Snake without a body!");
+		}
 		SnakeSegment previousSegment = this.head;
 		SnakeSegment segment = previousSegment.NextSegment;
 		while (segment.NextSegment != null)

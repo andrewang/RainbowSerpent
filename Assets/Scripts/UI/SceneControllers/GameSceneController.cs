@@ -6,19 +6,29 @@ using System.Collections.Generic;
 public class GameSceneController : RSSceneController
 {
 	#region Serialized Fields
+	// Main component systems
 	[SerializeField] private MazeController mazeController = null;
-	[SerializeField] private UISprite background = null;
+	[SerializeField] private AnimationManager animationManager = null;
+	[SerializeField] private InputController inputController = null; 
+	
+	// Prefabs used to instantiate creatures
 	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject eggPrefab = null;
 	[SerializeField] private GameObject frogPrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
 	[SerializeField] private GameObject enemySnakeConfig = null;
+
+	// (Temp) the colour theme to be used with the level
 	[SerializeField] private LevelTheme theme = null;
+	
+	// UI elements
+	[SerializeField] private UISprite background = null;	
 	[SerializeField] private UILabel[] labels;
 	[SerializeField] private UILabel levelLabel;
 	[SerializeField] private UILabel scoreLabel;
-	[SerializeField] private UILabel livesLabel;
+	[SerializeField] private UILabel livesLabel;	
 	
+	// Instantiated player configurations
 	private SnakeConfig playerSnakeConf;
 	private SnakeConfig enemySnakeConf;
 	
@@ -29,11 +39,12 @@ public class GameSceneController : RSSceneController
 	private int maxNumEnemySnakes;	
 	private bool updateSnakeColours = false;
 
-	private DateTime playerEggTimer;
 	private Egg playerEgg;
-	private DateTime enemyEggTimer;
 	private Egg enemyEgg;
-
+	// Egg timers are used for when an egg is next laid
+	private DateTime playerEggTimer;
+	private DateTime enemyEggTimer;
+	
 	#region Verify Serialize Fields
 
 	override public void VerifySerializeFields()
@@ -45,7 +56,6 @@ public class GameSceneController : RSSceneController
 
 	override public void OnLoad()
 	{
-		Debug.Log("Game scene finally loaded");
 		LoadGameLevel(Managers.GameState.Level);
 	}
 
@@ -53,20 +63,47 @@ public class GameSceneController : RSSceneController
 	{
 		// TODO Clear the map
 		
-		// Empty creature dict
+		// TODO Empty creature dict (is it still a dictionary?)
 
 		// Load in new map data.
-		TextAsset mazeTextAsset = Resources.Load("level1") as TextAsset;
-		this.mazeController.SetUp(mazeTextAsset, this.theme.WallColour);
-		
-		// Set some initial colours
+		LoadMapData(levelNum);
+		ConfigureUI();
+		SetTimers();
+		CreateSnakes();
+		ConfigureInput();	
+		//StartCoroutine( PlaceSnakes() );
+		PlaceSnakesInstantly();
+	}
+	
+	private void LoadMapData(int levelNum)
+	{
+		TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
+		this.mazeController.SetUp(mazeTextAsset, this.theme.WallColour);		
+	}
+
+	private void ConfigureUI()
+	{
+		// Set initial colours
 		foreach( UILabel label in this.labels )
 		{
 			label.color = this.theme.TextColour;
 		}
 		this.background.color = this.theme.BackgroundColour;
-		
-		// Create creatures
+	}
+	
+	private void ConfigureInput()
+	{
+		this.inputController.PlayerSnake = this.playerSnake;
+	}
+	
+	private void SetTimers()
+	{		
+		this.enemyEggTimer = new DateTime(0);
+		this.playerEggTimer = new DateTime(0);
+	}
+	
+	private void CreateSnakes()
+	{
 		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
 		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
 		
@@ -78,31 +115,14 @@ public class GameSceneController : RSSceneController
 		{
 			CreateEnemySnake(SerpentConsts.NormalEnemySnakeLength);
 		}
-		
-		this.enemyEggTimer = new DateTime(0);
-		this.playerEggTimer = new DateTime(0);
-		
-		StartCoroutine( PlaceSnakes() );
-	}
-	
-	private IEnumerator PlaceSnakes()
-	{
-		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
-		
-		for (int i = 0; i < this.enemySnakes.Count; ++i)
-		{		
-			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
-			yield return new WaitForSeconds(5.0f);
-		}	
 	}
 	
 	private void CreatePlayerSnake(int length)
 	{
 		this.playerSnake = CreateSnake(this.playerSnakeConf, length);
 		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
-		
 	}
-		
+	
 	private Snake CreateEnemySnake(int length)
 	{
 		Snake enemySnake = CreateSnake(this.enemySnakeConf, length);
@@ -117,8 +137,31 @@ public class GameSceneController : RSSceneController
 		Snake snake = SerpentUtils.Instantiate<Snake>(this.snakePrefab, this.mazeController.transform);
 		snake.SetUp(this.mazeController, config, length);
 		snake.SnakeSegmentsChanged += this.NumSnakeSegmentsChanged;
+		snake.SnakeSegmentEaten += this.SnakeSegmentEaten;
 		return snake;
+	}	
+	
+	private void PlaceSnakesInstantly()
+	{
+		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
+		
+		for (int i = 0; i < this.enemySnakes.Count; ++i)
+		{		
+			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
+		}	
 	}
+	
+	private IEnumerator PlaceSnakes()
+	{
+		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
+		
+		for (int i = 0; i < this.enemySnakes.Count; ++i)
+		{		
+			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
+			yield return new WaitForSeconds(5.0f);
+		}	
+	}
+
 	
 	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction)
 	{
@@ -226,16 +269,6 @@ public class GameSceneController : RSSceneController
 			}
 		}
 		
-		/*
-		foreach( Creature.CreatureCategory category in this.creaturesDict.Keys )
-		{
-			List<Creature> creatures = this.creaturesDict[category];
-			for (Creature creature in creatures)
-			{
-			}
-		}
-		*/
-		
 		if (this.updateSnakeColours)
 		{
 			UpdateEnemySnakeColours();
@@ -246,12 +279,12 @@ public class GameSceneController : RSSceneController
 		{
 			HandleEnemyEggs();
 		}
-		/*
+		
 		if (this.playerEgg == null && this.playerSnake != null)
 		{		
 			HandlePlayerEggs();
 		}
-		*/
+		
 		UpdateText();
 	}
 	
@@ -295,6 +328,9 @@ public class GameSceneController : RSSceneController
 	
 	private void HandlePlayerEggs()
 	{
+		// TEMP
+		return;
+		
 		if (this.playerEggTimer.Ticks == 0)
 		{
 			// set the timer.
@@ -318,22 +354,30 @@ public class GameSceneController : RSSceneController
 
 	private void NumSnakeSegmentsChanged(Snake snake)
 	{
+		// Player snake changed in size, or an enemy did.  We need to check whether any snake colours should change
+		// (to indicate whether the player can eat that snake or not).
 		this.updateSnakeColours = true;
+	}
+	
+	private void SnakeSegmentEaten(Vector3 position)
+	{
+		this.animationManager.PlayRandomAnimation(position);
 	}
 	
 	private void EnemySnakeAdded()
 	{
+		// We should update snake colours again so the enemy snake is painted the right colour
 		this.updateSnakeColours = true;
 	}
 	
 	private void PlayerSnakeDied(Snake snake)
-	{		
+	{		 
 		snake.Dead = true;
 		
 		if (Managers.GameState.ExtraSnakes > 0)
 		{			
 			// Trigger post-death sequence
-			StartCoroutine(PostDeathSequence());
+			StartCoroutine(PlayerDeathSequence());
 		}
 		else
 		{
@@ -343,13 +387,14 @@ public class GameSceneController : RSSceneController
 		
 	private void EnemySnakeDied(Snake snake)
 	{
-		// Note: don't bother to set Dead to true, just remove it from the list of snakes and destroy it.
+		// We don't bother to set Dead to true, just remove it from the list of snakes and destroy it.  That way the snake
+		// becomes inaccessible, and the Dead value is irrelevant
 		snake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
 		this.enemySnakes.Remove(snake);
 		Destroy(snake);
 	}
 	
-	private IEnumerator PostDeathSequence()
+	private IEnumerator PlayerDeathSequence()
 	{
 		yield return new WaitForSeconds(3.0f);
 		
@@ -397,39 +442,6 @@ public class GameSceneController : RSSceneController
 	#endregion Update
 	
 	
-	#region Input
-
-	private void OnPressUp()
-	{
-		OnPressDirection(SerpentConsts.Dir.N);
-	}
-		
-	private void OnPressDown()
-	{
-		OnPressDirection(SerpentConsts.Dir.S);
-	}
-	
-	private void OnPressLeft()
-	{
-		OnPressDirection(SerpentConsts.Dir.W);
-	}
-	
-	private void OnPressRight()
-	{
-		OnPressDirection(SerpentConsts.Dir.E);
-	}
-		
-	private void OnPressDirection(SerpentConsts.Dir direction)
-	{
-		if (this.playerSnake.Dead) { return; }
-		PlayerSnakeController controller = this.playerSnake.Controller as PlayerSnakeController;
-		if (controller == null) { return; }
-		
-		controller.StartMoving(direction);
-	}
-
-	#endregion Input
-		
 	public List<Creature> GetSnakes()
 	{
 		List<Creature> snakes = new List<Creature>();
