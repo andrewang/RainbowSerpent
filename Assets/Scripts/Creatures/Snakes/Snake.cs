@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using SerpentExtensions;
 
 public class Snake : MobileCreature
 {
@@ -185,9 +186,7 @@ public class Snake : MobileCreature
 			SnakeBody newSegment = Managers.SnakeBodyCache.GetObject<SnakeBody>();
 			newSegment.ResetProperties();
 			
-			// Change transform parentage and reset scale to 1.
-			newSegment.transform.parent = this.transform;
-			newSegment.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);			
+			newSegment.SetParent(this);
 			
 			newSegment.Colour = this.colour;
 			newSegment.Visible = this.visible;

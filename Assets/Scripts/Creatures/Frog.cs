@@ -6,16 +6,16 @@ public class Frog : MobileCreature
 {
 	private DateTime moveTime;
 	
-	private GameSceneController sceneController;
+	private GameManager gameManager;
 	
 	private void Start ()
 	{
 		UpdateTimer();
 	}
 	
-	public void SetUp( GameSceneController sceneController )
+	public void SetUp( GameManager gameManager )
 	{
-		this.sceneController = sceneController;
+		this.gameManager = gameManager;
 	}
 	
 	private void Update ()
@@ -57,13 +57,13 @@ public class Frog : MobileCreature
 	
 	private Snake GetNearestSnake()
 	{		
-		List<Creature> snakes = this.sceneController.GetSnakes();
+		List<Creature> snakes = this.gameManager.GetSnakes();
 		return GetNearestCreature( snakes ) as Snake;
 	}
 	
 	private Egg GetNearestEgg()
 	{
-		List<Creature> eggs = this.sceneController.GetEggs();		
+		List<Creature> eggs = this.gameManager.GetEggs();		
 		return GetNearestCreature( eggs ) as Egg;
 	}
 	

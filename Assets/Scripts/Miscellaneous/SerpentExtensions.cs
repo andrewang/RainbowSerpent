@@ -1,3 +1,4 @@
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 
@@ -55,6 +56,18 @@ namespace SerpentExtensions
 			if (dict.ContainsKey(key) == false)	{ return null; }
 			object o = dict[key];
 			return o;
+		}
+		
+		/// <summary>
+		/// Sets the parent of one monobehavior to another.  This can cause the scale of the child to be distorted,
+		/// so after the assignment we reset it to 1,1,1.
+		/// </summary>
+		/// <param name="child">Child.</param>
+		/// <param name="newParent">New parent.</param>
+		static public void SetParent(this MonoBehaviour child, MonoBehaviour newParent)
+		{
+			child.transform.parent = newParent.transform;
+			child.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);			
 		}
 	}
 

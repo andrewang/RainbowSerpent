@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SerpentExtensions;
 
 /// <summary>
 /// The snake segment is the base class for the snake body (segment) and head (segment) containing 
@@ -141,7 +142,8 @@ public class SnakeSegment : MonoBehaviour
 	public void BeginToCreateEgg(Egg egg, Action<SnakeSegment,Egg> eggFullyGrown, Action<Egg> eggDestroyed)
 	{
 		// Attach the egg to this segment
-		egg.transform.parent = this.transform;
+		egg.SetParent(this);
+		
 		// Make sure egg is displayed on top of the segment
 		egg.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
 		egg.SetSpriteDepth(5);

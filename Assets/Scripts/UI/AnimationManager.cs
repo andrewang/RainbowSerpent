@@ -55,7 +55,6 @@ public class AnimationManager : MonoBehaviour
 		foreach( AnimatedSprite sprite in sprites )
 		{
 			sprite.transform.Rotate( 0.0f, 0.0f, currRotation );
-			Vector3 eulerAngles = sprite.transform.localRotation.eulerAngles;
 			currRotation += degreesRotationPerSprite;
 			if (currRotation > 360.0f) { currRotation -= 360.0f; }
 		}
