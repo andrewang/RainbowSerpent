@@ -57,8 +57,13 @@ public class Frog : MobileCreature
 	
 	private Snake GetNearestSnake()
 	{		
-		List<Creature> snakes = this.gameManager.GetSnakes();
-		return GetNearestCreature( snakes ) as Snake;
+		List<Snake> snakes = this.gameManager.GetSnakes();
+		List<Creature> creatures = new List<Creature>();
+		foreach( Snake s in snakes )
+		{
+			creatures.Add( s );
+		}
+		return GetNearestCreature( creatures ) as Snake;
 	}
 	
 	private Egg GetNearestEgg()

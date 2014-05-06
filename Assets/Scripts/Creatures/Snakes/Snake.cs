@@ -46,7 +46,7 @@ public class Snake : MobileCreature
 	
 	public float Speed { get; set; }
 
-	public SnakeSegment Tail
+	public SnakeBody Tail
 	{
 		get
 		{
@@ -55,7 +55,7 @@ public class Snake : MobileCreature
 			{
 				segment = segment.NextSegment;
 			}
-			return segment;
+			return segment as SnakeBody;
 		}
 	}
 
@@ -109,10 +109,17 @@ public class Snake : MobileCreature
 		this.Visible = false;
 		this.Dead = false;
 		
-		// Clear the trail	
 		this.trail.Reset();
+		this.Controller.Reset();
 		
 		this.CurrentDirection = SerpentConsts.Dir.None;
+		
+		// TODO: check for any egg in the last segment and remove it.
+		SnakeBody tail = this.Tail;
+		if (tail != null)
+		{
+			tail.RemoveEgg();
+		}
 
 		// Restore segments
 		int numSegments = this.NumSegments;
@@ -124,8 +131,14 @@ public class Snake : MobileCreature
 		// Make sure the head's gameObject is active
 		this.head.gameObject.SetActive(true);
 		
-		// NOTE: if an enemy snake ate the player then it will have an extra segment.  Do we need to remove it?
+		// NOTE: if an enemy snake ate the player then it will have an extra segment.  Do we need to remove it?		
 	}
+	
+	override public void Die()
+	{
+		base.Die();
+	}
+	
 	
 	private void UpdateSpeed()
 	{
@@ -193,6 +206,7 @@ public class Snake : MobileCreature
 			newSegment.Snake = this;
 			
 			SnakeSegment last = this.Tail;
+			if (last == null) { last = this.head; }
 			
 			last.NextSegment = newSegment;
 			
@@ -203,7 +217,9 @@ public class Snake : MobileCreature
 				SnakeBody lastBodySegment = last as SnakeBody;
 				distance += lastBodySegment.DistanceFromHead;
 			}
-			newSegment.DistanceFromHead = distance;			
+			newSegment.DistanceFromHead = distance;
+			
+				
 		}
 		
 		if (this.SnakeSegmentsChanged != null)
@@ -297,11 +313,6 @@ public class Snake : MobileCreature
 		
 	}
 	
-	private void Die()
-	{
-		Destroy(this);
-	}
-
 	#endregion Segments
 	
 	#region Update
@@ -454,7 +465,7 @@ public class Snake : MobileCreature
 		}
 		SnakeSegment previousSegment = this.head;
 		SnakeSegment segment = previousSegment.NextSegment;
-		while (segment.NextSegment != null)
+ 			while (segment.NextSegment != null)
 		{
 			previousSegment = segment;
 			segment = segment.NextSegment;
@@ -514,6 +525,9 @@ public class Snake : MobileCreature
 			{
 				this.AddSegment();
 			}
+			otherCreature.Die();
+			
+			// returning true may now be irrelevant.
 			return true;
 		}
 		
@@ -531,6 +545,7 @@ public class Snake : MobileCreature
 			{
 				Managers.GameState.Score += 300;
 			}
+			otherSnake.Die();
 			return true;		
 		}
 		
@@ -544,6 +559,7 @@ public class Snake : MobileCreature
 				if (willDie)
 				{
 					AddSegment();
+					otherSnake.Die();					
 				}
 				
 				if (this.Controller is PlayerSnakeController)

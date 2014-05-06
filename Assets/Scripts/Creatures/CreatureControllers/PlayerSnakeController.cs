@@ -12,6 +12,11 @@ public class PlayerSnakeController : SnakeController
 	{
 	}
 	
+	public override void Reset()
+	{
+		this.desiredDirection = SerpentConsts.Dir.None;
+	}
+	
 	public override void StartMoving(SerpentConsts.Dir direction)
 	{
 		if (direction == this.desiredDirection) { return; }

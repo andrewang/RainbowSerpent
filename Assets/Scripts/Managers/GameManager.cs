@@ -24,19 +24,19 @@ public class GameManager : MonoBehaviour
 	
 	// Instantiated player configurations
 	private SnakeConfig playerSnakeConf;
+		
+	private List<Snake> snakes = new List<Snake>();
+	
 	private Snake playerSnake = null; 
 
 	private SnakeConfig enemySnakeConf;	
-	private List<Snake> enemySnakes = new List<Snake>();
+	//private List<Snake> enemySnakes = new List<Snake>();
 	private int maxNumEnemySnakes;	
 	
 	private bool updateSnakeColours = false;
-	
-	private Egg playerEgg;
-	private Egg enemyEgg;
-	// Egg timers are used for when an egg is next laid
-	private DateTime playerEggTimer;
-	private DateTime enemyEggTimer;
+		
+	private Egg[] eggs = new Egg[2];
+	private DateTime[] eggTimers = new DateTime[2];
 	
 	private LevelTheme theme;
 	
@@ -95,38 +95,151 @@ public class GameManager : MonoBehaviour
 	
 	private void SetTimers()
 	{		
-		this.enemyEggTimer = new DateTime(0);
-		this.playerEggTimer = new DateTime(0);
-	}
-	
-	private void CreateSnakes()
-	{
-		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();
-		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();	
-		
-		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
-		
-		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
-		
-		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		for (int i = 0; i < this.eggs.Length; ++i)
 		{
-			CreateEnemySnake(SerpentConsts.NormalEnemySnakeLength);
+			this.eggTimers[i] = new DateTime(0);
 		}
 	}
 	
-	private void CreatePlayerSnake(int length)
-	{
-		this.playerSnake = CreateSnake(this.playerSnakeConf, length);
-		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
+	private void PlaceCreature(Creature creature, int x, int y, SerpentConsts.Dir direction)
+	{		
+		Vector3 position = this.mazeController.GetCellCentre(x, y);
+		creature.SetInitialLocation(position, direction);		
 	}
 	
+	#endregion Setup
+	
+	
+	#region Update
+	
+	private void Update()
+	{
+		if (this.playerSnake.Dead) { return; }
+		
+		UpdateSnakes();
+				
+		if (this.updateSnakeColours)
+		{
+			UpdateEnemySnakeColours();
+			this.updateSnakeColours = false;
+		}
+		
+		if (GetEgg(SerpentConsts.Side.Enemy) == null)
+		{
+			List<Snake> enemySnakes = GetEnemySnakes();
+			if (enemySnakes.Count < this.maxNumEnemySnakes)
+			{
+				HandleEggs(SerpentConsts.Side.Enemy);
+			}
+		}
+		
+		if (GetEgg(SerpentConsts.Side.Player) == null && this.playerSnake != null)
+		{		
+			HandleEggs(SerpentConsts.Side.Player);
+		}		
+	}
+	
+	private void UpdateSnakes()
+	{
+		Egg playerEgg = GetEgg( SerpentConsts.Side.Player );
+		
+		// Test for snake interactions, based on enemies first
+		List<Snake> enemySnakes = GetEnemySnakes();
+		for (int i = 0; i < enemySnakes.Count;)
+		{		
+			Snake enemySnake = enemySnakes[i];
+			if (enemySnake.Visible == false) 
+			{ 
+				++i;
+				continue; 
+			}
+			
+			// Do reciprocal tests for snake interaction
+			bool enemyDies = this.playerSnake.TestForInteraction(enemySnake);
+			if (enemyDies)
+			{
+				// By removing a snake from enemySnakes, we move all the snakes after it up one in the list
+				// So we continue the loop by reiterating with the same 'i' value as before.
+				continue;
+			}
+			
+			// TODO: snake death should be triggered by the head so that any reason for a snake to die, works.  Currently
+			// PlayerSnakeDied is not invoked if the player dies due to egg-laying. 
+			bool playerDies = enemySnake.TestForInteraction(playerSnake);
+			if (playerDies)
+			{
+				// stop everything!
+				return;
+			}
+			
+			// Test for eating player egg
+			if (playerEgg != null)
+			{
+				enemySnake.TestForInteraction(playerEgg);				
+			}
+			
+			++i;
+		}
+		
+		// Check for player eating enemy egg
+		Egg enemyEgg = GetEgg( SerpentConsts.Side.Enemy );
+		if (enemyEgg != null)
+		{
+			this.playerSnake.TestForInteraction(enemyEgg);
+		}	
+	}
+	
+	private void UpdateFrog()
+	{
+		// if there is a frog, test against player egg, and test against enemy egg.
+	}
+	
+	#endregion Update
+	
+	#region Snakes
+	
+	private void CreateSnakes()
+	{
+		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();		
+		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
+		
+		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();			
+		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
+		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		{
+			CreateEnemySnake(SerpentConsts.EnemySnakeLength);
+		}
+	}
+	
+	private Snake CreatePlayerSnake(int length)
+	{
+		// Player snake is added to array and also assigned to direct pointer.
+		// TODO does this need to be changed for player baby snake and player snake being onscreen at the same time? 
+		// can they be together on map at the same time or not?
+		Snake s = CreateSnake(this.playerSnakeConf, length);
+		s.Side = SerpentConsts.Side.Player;
+		s.CreatureDied += PlayerSnakeDied;
+		this.snakes.Add( s );
+		this.playerSnake = s;
+			
+		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
+		return this.playerSnake;
+	}
+		
 	private Snake CreateEnemySnake(int length)
 	{
 		Snake enemySnake = CreateSnake(this.enemySnakeConf, length);
+		enemySnake.CreatureDied += EnemySnakeDied;
 		enemySnake.ChangeColour(this.theme.EnemySnakeColour);
-		this.enemySnakes.Add(enemySnake);
+		this.snakes.Add(enemySnake);
 		EnemySnakeAdded();
 		return enemySnake;
+	}
+	
+	private void EnemySnakeAdded()
+	{
+		// We should update snake colours again so the enemy snake is painted the right colour
+		this.updateSnakeColours = true;
 	}
 	
 	private Snake CreateSnake(SnakeConfig config, int length)
@@ -155,13 +268,13 @@ public class GameManager : MonoBehaviour
 	{
 		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
 		
-		for (int i = 0; i < this.enemySnakes.Count; ++i)
+		List<Snake> enemySnakes = GetEnemySnakes();
+		for (int i = 0; i < enemySnakes.Count; ++i)
 		{		
-			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
+			PlaceSnake(enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
 			yield return new WaitForSeconds(5.0f);
 		}	
 	}
-	
 	
 	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction)
 	{
@@ -172,46 +285,9 @@ public class GameManager : MonoBehaviour
 		snake.Controller.StartMoving(direction);		
 	}
 	
-	private Egg CreateEgg()
-	{
-		Egg egg = SerpentUtils.Instantiate<Egg>(this.eggPrefab, this.mazeController.transform);
-		egg.Hatched += EggHatched;
-		return egg;
-	}
+	#endregion Snakes
 	
-	
-	private void EggFullyGrown( SnakeSegment segment, Egg egg )
-	{
-		// place egg in the map cell of the snake segment
-		egg.SetParent( this.mazeController );
-		egg.transform.localPosition = segment.transform.localPosition;
-	}
-	
-	private void EggHatched( Egg egg )
-	{
-		MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
-		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;
-		int randomIndex = UnityEngine.Random.Range (0, availableDirections.Count);
-		SerpentConsts.Dir dir = availableDirections[randomIndex];
-		
-		Snake newSnake = null;
-		if (egg == this.enemyEgg)
-		{
-			newSnake = CreateEnemySnake(SerpentConsts.SmallEnemySnakeLength);
-			
-			Destroy (egg.gameObject);
-			this.enemyEgg = null;
-		}
-		
-		PlaceSnake(newSnake, cell.X, cell.Y, dir);
-		
-	}
-	
-	private void PlaceCreature(Creature creature, int x, int y, SerpentConsts.Dir direction)
-	{		
-		Vector3 position = this.mazeController.GetCellCentre(x, y);
-		creature.SetInitialLocation(position, direction);		
-	}
+	#region Frogs
 	
 	private void CreateFrog()
 	{
@@ -224,75 +300,137 @@ public class GameManager : MonoBehaviour
 		PlaceCreature(frog, x, y, SerpentConsts.Dir.N);
 	}
 	
-	#endregion Setup
+	#endregion Frogs
 	
-	#region Update
+	#region Snake Eggs	
+
 	
-	
-	
-	private void HandleEnemyEggs()
+	private void HandleEggs(SerpentConsts.Side side)
 	{
-		if (this.enemyEggTimer.Ticks == 0)
+		int intSide = (int) side;
+		if (this.eggTimers[intSide].Ticks == 0)
 		{
-			// set the timer.
-			this.enemyEggTimer = DateTime.Now + SerpentConsts.EnemyEggFrequency;				
+			SetEggTimer(side);
 		}
-		else if (DateTime.Now > this.enemyEggTimer)
+		else if (DateTime.Now > this.eggTimers[intSide])
 		{
 			// time for a random enemy snake to start laying an egg.  But we need a snake with 3+ segments.
-			List<Snake> qualifiedSnakes = this.enemySnakes.FindAll( s => s.NumSegments >= 3 );
+			List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.NumSegments >= 3 );
 			if (qualifiedSnakes.Count == 0)
 			{
 				// Can't spawn an egg.  Reset the timer.
-				this.enemyEggTimer = DateTime.Now + SerpentConsts.EnemyEggFrequency;								
+				SetEggTimer(side);
 				return;
 			}
 			
 			int i = UnityEngine.Random.Range( 0, qualifiedSnakes.Count );
-			Snake enemySnake = qualifiedSnakes[i];	
-			SnakeSegment lastSegment = enemySnake.Tail;
-			Egg e = CreateEgg();
-			this.enemyEgg = e;			
-			lastSegment.BeginToCreateEgg(e, EggFullyGrown, EggDestroyed);			
+			Snake snake = qualifiedSnakes[i];
+			Egg e = LayEgg(snake);
+			SetEgg( side, e );		
+			
+			// Enemy snakes have a timed hatching period, while player snakes hatch at the end of the level.
+			if (side == SerpentConsts.Side.Enemy)
+			{
+				e.SetHatchingTime( SerpentConsts.EnemyEggHatchingTime );			                
+			}
 			
 			// reset the timer for next time.
-			this.enemyEggTimer = new DateTime(0);
-		}	
-	}
-	
-	private void EggDestroyed(Egg e)
-	{
-		if (e == this.enemyEgg)
-		{
-			this.enemyEgg = null;
-		}
-	}
-	
-	private void HandlePlayerEggs()
-	{
-		// TEMP
-		return;
-		
-		if (this.playerEggTimer.Ticks == 0)
-		{
-			// set the timer.
-			this.playerEggTimer = DateTime.Now + SerpentConsts.PlayerEggFrequency;				
-		}
-		else if (DateTime.Now > this.playerEggTimer)
-		{
-			// initial test: just put the egg at the centre of the location of the snake's tail.
-			/*
-			MazeCell cell = this.mazeController.GetCellForPosition( this.playerSnake.LastSegment.transform.localPosition );
-			int x = cell.X;
-			int y = cell.Y;
-			Egg e = CreateEgg(x, y, SerpentConsts.Dir.N);
-			this.playerEgg = e;
-			
-			// reset the timer for next time.
-			this.playerEggTimer = new DateTime(0);
-			*/
+			ResetEggTimer(side);
 		}		
 	}
+	
+	private void SetEggTimer(SerpentConsts.Side side)
+	{
+		this.eggTimers[(int)side] = DateTime.Now + SerpentConsts.GetEggLayingFrequency(side);				
+	}
+	
+	private void ResetEggTimer(SerpentConsts.Side side)
+	{
+		this.eggTimers[(int)side] = new DateTime(0);				
+	}
+	
+	private Egg LayEgg(Snake snake)
+	{
+		Egg e = CreateEgg();
+		
+		e.Side = snake.Side;
+		e.CreatureDied += EggDied;
+		SnakeBody lastSegment = snake.Tail;
+		lastSegment.BeginToCreateEgg(e);			
+		return e;
+	}
+	
+	private Egg CreateEgg()
+	{
+		Egg egg = SerpentUtils.Instantiate<Egg>(this.eggPrefab, this.mazeController.transform);
+		egg.Hatched += EggHatched;
+		egg.FullyGrown += EggFullyGrown;		
+		return egg;
+	}
+	
+	private void EggFullyGrown( Egg egg )
+	{			
+		egg.SetParent( this.mazeController );
+	}
+	
+	private void EggHatched( Egg egg )
+	{
+		MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
+		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;
+		int randomIndex = UnityEngine.Random.Range (0, availableDirections.Count);
+		SerpentConsts.Dir dir = availableDirections[randomIndex];
+		
+		Snake newSnake = null;
+		int length = SerpentConsts.GetNewlyHatchedSnakeLength( egg.Side );
+		if (egg.Side == SerpentConsts.Side.Enemy)
+		{
+			newSnake = CreateEnemySnake(length);
+		}
+		else
+		{
+			newSnake = CreatePlayerSnake(length);
+		}
+		EggDied( egg );
+		
+		PlaceSnake(newSnake, cell.X, cell.Y, dir);	
+	}
+	
+	private void EggDied(Creature creature)
+	{
+		Egg e = creature as Egg;
+		if (e == null) { return; }
+		
+		e.FullyGrown -= this.EggFullyGrown;
+		e.Hatched -= this.EggHatched;
+		
+		SetEgg(e.Side, null);
+	}
+	
+	
+	public List<Creature> GetEggs()
+	{
+		List<Creature> eggs = new List<Creature>();
+		
+		for (int i = 0; i < this.eggs.Length; ++i)
+		{
+			eggs.Add( this.eggs[i] );
+		}
+		return eggs;
+	}
+	
+	public Egg GetEgg( SerpentConsts.Side side )
+	{
+		return this.eggs[ (int) side ];
+	}
+	
+	private void SetEgg( SerpentConsts.Side side, Egg e )
+	{
+		this.eggs[ (int) side ] = e;
+	}
+	
+	#endregion Snake Eggs
+	
+	#region Snake Changes
 	
 	private void NumSnakeSegmentsChanged(Snake snake)
 	{
@@ -306,14 +444,20 @@ public class GameManager : MonoBehaviour
 		this.animationManager.PlayRandomAnimation(position);
 	}
 	
-	private void EnemySnakeAdded()
-	{
-		// We should update snake colours again so the enemy snake is painted the right colour
-		this.updateSnakeColours = true;
-	}
 	
-	private void PlayerSnakeDied(Snake snake)
-	{		 
+	#endregion Snake Changes
+	
+	#region Snake Death
+	
+	/// <summary>
+	/// Handle player snake death
+	/// </summary>
+	/// <param name="snake">Snake.</param>
+	private void PlayerSnakeDied(Creature creature)
+	{
+		Snake snake = creature as Snake;
+		if (snake == null) { return; }
+		
 		snake.Dead = true;
 		
 		if (Managers.GameState.ExtraSnakes > 0)
@@ -327,30 +471,39 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	
-	private void EnemySnakeDied(Snake snake)
+	/// <summary>
+	/// Handle death of an enemy snake
+	/// </summary>
+	/// <param name="snake">Snake.</param>
+	private void EnemySnakeDied(Creature creature)
 	{
-		// We don't bother to set Dead to true, just remove it from the list of snakes and destroy it.  That way the snake
-		// becomes inaccessible, and the Dead value is irrelevant
+		Snake snake = creature as Snake;
+		if (snake == null) { return; }
+		snake.Dead = true;
+		
 		snake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
-		this.enemySnakes.Remove(snake);
-		Destroy(snake);
+		this.snakes.Remove(snake);
 	}
 	
 	private IEnumerator PlayerDeathSequence()
 	{
+		// Remove any eggs?
+		
 		yield return new WaitForSeconds(3.0f);
 		
 		Managers.GameState.ExtraSnakes--;		
 		
-		for( int i = 0; i < this.enemySnakes.Count; ++i )
+		for( int i = 0; i < this.snakes.Count; ++i )
 		{
-			this.enemySnakes[i].Reset();
+			this.snakes[i].Reset();
 		}
-		
-		this.playerSnake.Reset();
-		
+				
 		StartCoroutine( PlaceSnakes() );
 	}
+	
+	#endregion Snake Death
+	
+	#region Snake Colours 
 	
 	private void UpdateEnemySnakeColours()
 	{
@@ -358,9 +511,10 @@ public class GameManager : MonoBehaviour
 		
 		int playerLength = this.playerSnake.NumSegments;
 		
-		for( int i = 0; i < this.enemySnakes.Count; ++i)
+		List<Snake> enemySnakes = GetEnemySnakes();
+		for( int i = 0; i < enemySnakes.Count; ++i)
 		{
-			Snake enemySnake = this.enemySnakes[i];
+			Snake enemySnake = enemySnakes[i];
 			if (enemySnake.NumSegments >= playerLength)
 			{
 				// dangerous colour
@@ -373,69 +527,14 @@ public class GameManager : MonoBehaviour
 			}
 		}		
 	}
-	private void Update()
-	{
-		if (this.playerSnake.Dead) { return; }
-		
-		// Test for snake interactions, based on player first
-		for( int i = 0; i < this.enemySnakes.Count; )
-		{		
-			Snake enemySnake = this.enemySnakes[i];
-			if (enemySnake.Visible == false) 
-			{ 
-				++i;
-				continue; 
-			}
-			
-			bool enemyDies = this.playerSnake.TestForInteraction(enemySnake);
-			if (enemyDies)
-			{
-				EnemySnakeDied(enemySnake);
-				// By removing a snake from enemySnakes, we move all the snakes after it up one in the list
-				// So we continue the loop by reiterating with the same 'i' value as before.
-				continue;
-			}
-			bool playerDies = enemySnake.TestForInteraction(playerSnake);
-			if (playerDies)
-			{
-				PlayerSnakeDied(playerSnake);
-				break;
-			}
-			++i;
-		}
-		
-		// Check for player eating enemy egg
-		if (this.enemyEgg != null)
-		{
-			bool ateEgg = this.playerSnake.TestForInteraction(this.enemyEgg);
-			if (ateEgg)
-			{
-				Destroy(this.enemyEgg.gameObject);
-				this.enemyEgg = null;
-			}
-		}
-		
-		if (this.updateSnakeColours)
-		{
-			UpdateEnemySnakeColours();
-			this.updateSnakeColours = false;
-		}
-		
-		if (this.enemyEgg == null && this.enemySnakes.Count < this.maxNumEnemySnakes)
-		{
-			HandleEnemyEggs();
-		}
-		
-		if (this.playerEgg == null && this.playerSnake != null)
-		{		
-			HandlePlayerEggs();
-		}		
-	}
 	
-	#endregion Update
+	#endregion Snake Colours
 	
-	public List<Creature> GetSnakes()
+	#region External accessors for AI
+	
+	public List<Snake> GetSnakes()
 	{
+		/*
 		List<Creature> snakes = new List<Creature>();
 		if (this.playerSnake != null)
 		{
@@ -446,20 +545,16 @@ public class GameManager : MonoBehaviour
 			snakes.Add( this.enemySnakes[i] );
 		}
 		return snakes;
+		*/
+		return this.snakes;
 	}
 	
-	public List<Creature> GetEggs()
+	public List<Snake> GetEnemySnakes()
 	{
-		List<Creature> eggs = new List<Creature>();
-		
-		if (this.enemyEgg != null)
-		{
-			eggs.Add(this.enemyEgg);
-		}
-		return eggs;
+		List<Snake> enemies = this.snakes.FindAll( s => s.Side == SerpentConsts.Side.Enemy );
+		return enemies;
 	}
-	
+
+	#endregion External accessors for AI
 	
 }
-
-

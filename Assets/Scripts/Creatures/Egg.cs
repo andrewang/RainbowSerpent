@@ -3,18 +3,44 @@ using System;
 
 public class Egg : Creature
 {	
-	public event Action FullyGrown;
+	public SnakeBody ContainingBody
+	{
+		get; set; 
+	}
+	
+	public event Action<Egg> FullyGrown;
 	public event Action<Egg> Hatched;
 	
 	private DateTime grownTime;
 	private DateTime hatchingTime;
 	private bool fullyGrown = false;
+	private bool shouldHatch = false;
 
 	void Start()
 	{
 		this.grownTime = DateTime.Now + SerpentConsts.TimeToLayEgg;		
-		this.hatchingTime = this.grownTime + SerpentConsts.EnemyEggHatchingTime;
+		this.shouldHatch = false;
 		
+		Grow();
+	}
+	
+	public void SetHatchingTime(TimeSpan hatchingTime)
+	{
+		this.hatchingTime = this.grownTime + hatchingTime;
+		this.shouldHatch = true;		
+	}
+	
+	/// <summary>
+	/// Make this egg hatch right away (for player eggs at the end of the level).
+	/// </summary>
+	public void Hatch()
+	{
+		this.shouldHatch = true;
+		this.hatchingTime = DateTime.MinValue;
+	}
+	
+	private void Grow()
+	{
 		// Begin animation of scaling up
 		this.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 		Vector3 finalScale = new Vector3(1.0f, 1.0f, 1.0f);
@@ -27,27 +53,25 @@ public class Egg : Creature
 	private void ScaledUp()
 	{
 		this.fullyGrown = true;
-		this.FullyGrown();	
+		this.FullyGrown(this);	
 	}
 	
-	// Hatching behavior?
+	// Hatching behavior.  TODO Could this be handled in a different way than polling time?
 	void Update()
 	{
-		/*
-		if (this.fullyGrown == false)
-		{
-			if (DateTime.Now > this.grownTime)
-			{
-				this.fullyGrown = true;
-				this.FullyGrown();
-			}
-		}
-		else 
-		*/
-		if (this.fullyGrown && DateTime.Now > this.hatchingTime)
+		if (this.fullyGrown && this.shouldHatch && DateTime.Now > this.hatchingTime)
 		{
 			this.Hatched(this);
 		}		
+	}
+	
+	override public void Die()
+	{
+		// eggs are totally destroyed on death
+		base.Die();
+		
+		Destroy(this.gameObject);
+		Destroy(this);
 	}
 	
 	public void SetSpriteDepth(int depth)

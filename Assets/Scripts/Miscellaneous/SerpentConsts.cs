@@ -96,15 +96,49 @@ public static class SerpentConsts
 		SerpentConsts.Dir.None		
 	};
 	
-	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 45);
-	public static TimeSpan EnemyEggFrequency = new TimeSpan(0, 0, 5);
+	public enum Side
+	{
+		Player,
+		Enemy,
+		Frog,
+	}
+	
+	
+	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 1); // 60);
+	public static TimeSpan EnemyEggFrequency = new TimeSpan(0, 0, 15);
 	public static TimeSpan TimeToLayEgg = new TimeSpan(0, 0, 10);
 	public static TimeSpan EnemyEggHatchingTime = new TimeSpan(0, 0, 30);
 	
+	public static TimeSpan GetEggLayingFrequency( Side side )
+	{
+		if (side == Side.Player)
+		{
+			return PlayerEggFrequency;
+		}
+		else
+		{
+			return EnemyEggFrequency;
+		}
+	}
+	
+	public static int GetNewlyHatchedSnakeLength( Side side )
+	{
+		if (side == Side.Player)
+		{
+			return SmallPlayerSnakeLength;
+		}
+		else
+		{
+			return SmallEnemySnakeLength;
+		}
+	}
+	
 	public static int MaxNumEnemySnakes = 3;
-	public static int NormalEnemySnakeLength = 5;
+	public static int EnemySnakeLength = 5;
 	public static int SmallEnemySnakeLength = 3;
 	public static int PlayerSnakeLength = 3;
+	public static int SmallPlayerSnakeLength = 2;
+	
 	
 	public static int ScoreForBonusLife = 10000;
 	

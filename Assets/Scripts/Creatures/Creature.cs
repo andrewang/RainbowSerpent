@@ -16,6 +16,13 @@ public class Creature : MonoBehaviour
 		}
 	}
 	
+	public SerpentConsts.Side Side
+	{
+		get; set;
+	}
+	
+	public event Action<Creature> CreatureDied;
+		
 	public MazeController MazeController
 	{
 		get; set; 
@@ -24,6 +31,10 @@ public class Creature : MonoBehaviour
 	public void SetUp(MazeController mazeController)
 	{
 		this.MazeController = mazeController;
+		
+		// default side is enemy
+		this.Side = SerpentConsts.Side.Enemy;
+		
 	}
 
 	/// <summary>
@@ -34,6 +45,11 @@ public class Creature : MonoBehaviour
 	public virtual bool TestForInteraction(Creature otherCreature)
 	{		
 		return false;
+	}
+	
+	public virtual void Die()
+	{
+		CreatureDied(this);
 	}
 	
 	public virtual void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)

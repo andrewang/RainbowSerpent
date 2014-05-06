@@ -107,20 +107,14 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
-	// The final segment of a snake may have an egg that it is creating.
-	private Egg egg;
-	private event Action<SnakeSegment,Egg> eggFullyGrown;	
-	private event Action<Egg> eggDestroyed;
-	
 	#endregion Properties
 	
 	public virtual void ResetProperties()
 	{
 		// Should reset all the segment's properties.
 		this.NextSegment = null;
-		this.egg = null;  //TODO what if egg is set?
 	}
-	
+		
 	public bool TouchesSegment( SnakeSegment otherSegment )
 	{
 		Vector3 positionDiff = this.transform.localPosition - otherSegment.transform.localPosition;
@@ -139,45 +133,13 @@ public class SnakeSegment : MonoBehaviour
 		return (distanceSq <= radiiSq);		
 	}
 	
-	public void BeginToCreateEgg(Egg egg, Action<SnakeSegment,Egg> eggFullyGrown, Action<Egg> eggDestroyed)
-	{
-		// Attach the egg to this segment
-		egg.SetParent(this);
-		
-		// Make sure egg is displayed on top of the segment
-		egg.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-		egg.SetSpriteDepth(5);
-		
-		egg.FullyGrown += this.EggFullyGrown;
-		this.egg = egg;
-		
-		this.eggFullyGrown += eggFullyGrown;
-		this.eggDestroyed += eggDestroyed;
-	}
 	
-	private void EggFullyGrown()
-	{
-		egg.SetSpriteDepth(0);
-		this.eggFullyGrown(this, this.egg);
-		this.egg = null;
-		
-		// this snake segment needs to be removed from its snake.		
-		this.Snake.SeverAtSegment(this);
-		
-	}
-	
-	public void OnDestroy()
+	public virtual void OnDestroy()
 	{
 		if (this.sprite != null)
 		{
 			Destroy(this.sprite);
 			this.sprite = null;
-		}
-		if (this.egg != null)
-		{
-			this.eggDestroyed(this.egg);
-			Destroy(this.egg.gameObject);
-			this.egg = null;
 		}
 	}
 }
