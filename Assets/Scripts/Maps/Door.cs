@@ -5,6 +5,8 @@ public class Door : Wall
 	private SerpentConsts.Dir openableSide;
 	private bool open;
 	
+	public SerpentConsts.LevelState LevelStateRequired { get; set; }
+	
 	// Doors need a reference to their sprite to do animations.
 	public UISprite Sprite
 	{
@@ -14,12 +16,23 @@ public class Door : Wall
 	
 	public Door (SerpentConsts.Dir dir)
 	{
+		this.LevelStateRequired = SerpentConsts.LevelState.None;
 		this.open = false;
 		this.openableSide = dir;
 	}
 	
 	public bool OpenableFrom( SerpentConsts.Dir direction )
 	{
+		if (this.LevelStateRequired != SerpentConsts.LevelState.None)
+		{
+			SerpentConsts.LevelState currentState = Managers.GameState.LevelState;
+			if (currentState != this.LevelStateRequired)
+			{
+				return false;
+			}
+		}
+	
+		// Check for level state requirement
 		return (direction == this.openableSide);
 	}
 	

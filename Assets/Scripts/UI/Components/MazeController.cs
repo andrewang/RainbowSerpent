@@ -124,15 +124,6 @@ public class MazeController : MonoBehaviour
 		{
 			CreateWalls(this.maze.Width, getWallFunction, createSpriteFunction);
 		}
-		
-		// create the top and bottom borders
-		y = 0;
-		intSide = (int)SerpentConsts.Dir.S;
-		createSpriteFunction(0, this.maze.Width - 1);
-		
-		y = this.maze.Height - 1;
-		intSide = (int)SerpentConsts.Dir.N;
-		createSpriteFunction(0, this.maze.Width - 1);		
 	}
 	
 	
@@ -186,16 +177,6 @@ public class MazeController : MonoBehaviour
 		{
 			CreateWalls(this.maze.Height, getWallFunction, createSpriteFunction);
 		}
-		
-		// create the left and right borders
-		x = 0;
-		intSide = (int)SerpentConsts.Dir.W;
-		createSpriteFunction(0, this.maze.Height - 1);
-		
-		x = this.maze.Width - 1;
-		intSide = (int)SerpentConsts.Dir.E;
-		createSpriteFunction(0, this.maze.Height - 1);
-		
 	}
 	
 	/// <summary>
@@ -463,6 +444,29 @@ public class MazeController : MonoBehaviour
 
 		Vector3 pos = GetCellCentre(fx, fy);
 		return pos;
+	}
+	
+	public void PlaceSnake(Snake snake, bool player)
+	{
+		IntVector2 cellPosition;
+		SerpentConsts.Dir direction;
+		if (player)
+		{
+			cellPosition = this.maze.PlayerStartPosition;
+			direction = this.maze.PlayerStartFacing;
+		}
+		else
+		{
+			cellPosition = this.maze.EnemyStartPosition;
+			direction = this.maze.EnemyStartFacing;
+		}
+		
+		Vector3 position = this.GetCellCentre(cellPosition.x, cellPosition.y);
+		Debug.Log("Adding snake at (" + cellPosition.x + "," + cellPosition.y + "): " + position.x + "," + position.y);
+		snake.SetInitialLocation(position, direction);
+		snake.Visible = true;
+		snake.Controller.StartMoving(direction);
+		// Something should be added to the snake trail		
 	}
 }
 

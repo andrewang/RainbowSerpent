@@ -8,8 +8,13 @@ public class PlayerSnakeController : SnakeController
 	/// </summary>
 	private SerpentConsts.Dir desiredDirection = SerpentConsts.Dir.None;
 	
+	public bool PlayerControlled { get; set; }
+	
+	// Destination for snake when not player controlled?
+	
 	public PlayerSnakeController( Creature creature, MazeController mazeController ) : base( creature, mazeController )
 	{
+		this.PlayerControlled = true;
 	}
 	
 	public override void Reset()
@@ -34,6 +39,10 @@ public class PlayerSnakeController : SnakeController
 	/// </summary>
 	public override SerpentConsts.Dir OnArrival()	
 	{
+		if (this.PlayerControlled == false)
+		{
+		}
+		
 		return this.desiredDirection;
 	}
 	

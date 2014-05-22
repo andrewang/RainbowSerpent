@@ -46,6 +46,8 @@ public class GameState
 	/// </summary>
 	/// <value>The number of extra snakes.</value>
 	public int ExtraSnakes { get; set; }
+	
+	public SerpentConsts.LevelState LevelState { get; set; }
 
 	public GameState ()
 	{
@@ -60,6 +62,7 @@ public class GameState
 		this.Level = 1;
 		this.Score = 0;
 		this.ExtraSnakes = 2;
+		this.LevelState = SerpentConsts.LevelState.LevelStart;
 	}
 }
 

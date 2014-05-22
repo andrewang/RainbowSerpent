@@ -50,7 +50,7 @@ public class GameSceneController : RSSceneController
 		this.gameManager.Setup(levelNum);		
 		ConfigureUI();
 		ConfigureInput();
-		this.gameManager.Begin ();
+		this.gameManager.Begin();
 	}
 
 	private void ConfigureUI()

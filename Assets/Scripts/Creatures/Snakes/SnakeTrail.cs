@@ -106,6 +106,75 @@ public class SnakeTrail
 		
 	}
 	
+	// Loop through all segments and set their positions.
+	public void PositionSegments( SnakeHead head )
+	{
+		int positionIndex = 0;
+		SnakeBody bodySegment = head.NextSegment;
+		while( bodySegment != null )
+		{
+			positionIndex = SetSegmentPositionAndRotation( bodySegment, positionIndex );
+			bodySegment = bodySegment.NextSegment;
+		}
+	}
+	
+	private int SetSegmentPositionAndRotation( SnakeBody bodySegment, int startingIndex )
+	{
+		// get the last position index in the trail, prior to the location of the specified body segment 
+		int indexBefore = GetPositionIndexBefore( bodySegment.DistanceFromHead, startingIndex );
+		if (indexBefore == -1) 
+		{
+			// position specified is not contained in the trail
+			// extrapolate based on last position in the trail, if possible.
+			// return the last position in the trail.
+			SnakePosition position = this.positions[ this.positions.Count - 1 ];
+			if (position.UnitVectorToPreviousPosition.magnitude > 0.0f)
+			{
+				indexBefore = this.positions.Count - 1;
+			}
+			else
+			{
+				// no unit vector available
+				bodySegment.transform.localPosition = position.Position;
+				// don't try to set rotation.				
+				return 0;
+			}
+		}
+		
+		SnakePosition posBefore = this.positions[indexBefore];
+		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (bodySegment.DistanceFromHead - posBefore.DistanceFromHead);
+		bodySegment.transform.localPosition = posBefore.Position + displacement;
+		
+		SetSegmentRotation( bodySegment, posBefore );
+		return indexBefore;
+	}
+	
+	private void SetSegmentRotation( SnakeSegment bodySegment, SnakePosition position )
+	{
+		SerpentConsts.Dir dir = SerpentConsts.GetDirectionForVector( position.UnitVectorToPreviousPosition );
+		if (dir == SerpentConsts.Dir.None)
+		{
+			return;
+		}
+		
+		SerpentConsts.Dir oppositeDir = SerpentConsts.OppositeDirection[ (int)dir ];
+		bodySegment.CurrentDirection = oppositeDir;
+	}
+	
+	private int GetPositionIndexBefore( float distanceFromHead, int startingIndex = 0 )
+	{
+		for (int i = startingIndex; i < this.positions.Count; ++i)
+		{
+			float d = this.positions[i].DistanceFromHead;
+			if (d > distanceFromHead)
+			{
+				return i - 1;
+			}
+		}
+		
+		return -1;
+	}
+	
 	/*
 	
 	public Vector3 GetSegmentPosition( float distanceFromHead )
@@ -125,58 +194,6 @@ public class SnakeTrail
 	}
 	
 	*/
-	
-	public void SetSegmentPositions( SnakeHead head )
-	{
-		int index = 0;
-		SnakeBody bodySegment = head.NextSegment;
-		while( bodySegment != null )
-		{
-			index = SetSegmentPosition( bodySegment, index );
-			bodySegment = bodySegment.NextSegment;
-		}
-	}
-	
-	public int SetSegmentPosition( SnakeBody bodySegment, int startingIndex )
-	{
-		int indexBefore = GetPositionIndexBefore( bodySegment.DistanceFromHead, startingIndex );
-		if (indexBefore == -1) 
-		{
-			// extrapolate based on last position in the trail, if possible.
-			// return the last position in the trail.
-			SnakePosition position = this.positions[ this.positions.Count - 1 ];
-			if (position.UnitVectorToPreviousPosition.magnitude > 0.0f)
-			{
-				indexBefore = this.positions.Count - 1;
-			}
-			else
-			{
-				bodySegment.transform.localPosition = position.Position;
-				return 0;
-			}
-		}
-		
-		SnakePosition posBefore = this.positions[indexBefore];
-		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (bodySegment.DistanceFromHead - posBefore.DistanceFromHead);
-		bodySegment.transform.localPosition = posBefore.Position + displacement;		
-		return indexBefore;
-	}
-	
-	
-	public int GetPositionIndexBefore( float distanceFromHead, int startingIndex = 0 )
-	{
-		for (int i = startingIndex; i < this.positions.Count; ++i)
-		{
-			float d = this.positions[i].DistanceFromHead;
-			if (d > distanceFromHead)
-			{
-				return i - 1;
-			}
-		}
-		
-		return -1;
-	}
-	
 }
 
 

@@ -3,12 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using SerpentExtensions;
 using MiniJSON;
+using System;
 
 public class Maze : MonoBehaviour 
 {
 	public int Width { get; set; }
 	public int Height { get; set; }
+	
+	public IntVector2 PlayerStartPosition
+	{ 
+		get; private set;
+	}
+	public SerpentConsts.Dir PlayerStartFacing
+	{
+		get; private set;
+	}
 
+	public IntVector2 EnemyStartPosition
+	{ 
+		get; private set;
+	}
+	public SerpentConsts.Dir EnemyStartFacing
+	{
+		get; private set;
+	}
+	
 	public MazeCell[,] Cells;
 
 	// Use this for initialization
@@ -53,9 +72,13 @@ public class Maze : MonoBehaviour
 			return; 
 		}
 
+		// Add 2 to the width and height of the map in order to have room outside the maze for frogs to 
+		// actually be tracked.
+		width = width + 2;
+		height = height + 2;
+		Debug.Log("Maze width " + width + " and height " + height);
 		this.Width = width;
 		this.Height = height;
-		Debug.Log("Maze width " + width + " and height " + height);
 
 		// Create all the cells
 		this.Cells = new MazeCell[width,height];
@@ -67,68 +90,107 @@ public class Maze : MonoBehaviour
 			}
 		}
 
-		CreateOutsideWalls();
-		CreateWalls(wallData);
+		CreateWalls(wallData, doorData);
 		
-		if (doorData != null)
+	}
+
+	private void CreateWalls(List<object> wallData, List<object> doorData)
+	{		
+		// Create walls. NOTE: the wall data comes in, with the rows ordered top to bottom.
+		// But for ease of working with Unity, in memory these will be organized so that
+		// so that 0,0 is the lower left corner of the map, not the top left.
+		int y = (this.Height) - 2;
+		bool horizontal = true;
+		foreach (object rowData in wallData)
 		{
-			CreateDoors(doorData);
+			string rowDataString = rowData as string;
+			if (rowDataString == null) 
+			{
+				Debug.Log ("Wall data is not a string, it's " + rowData.GetType().ToString () );
+				continue;
+			}
+			
+			// Alternate reading data for horizontal and vertical walls. Only go to the next y after
+			// reading in the vertical data
+			if (horizontal)
+			{
+				ReadHorizontalWalls(rowDataString, doorData, y);
+				horizontal = false;
+			}
+			else
+			{
+				ReadVerticalWalls(rowDataString, doorData, y);
+				--y;
+				if (y < 0) { break; }
+				horizontal = true;
+			}
+			
 		}
 	}
 	
-	private void CreateOutsideWalls()
-	{
-		IntVector2 position = new IntVector2(0, 0);
-		for (int x = 0; x < this.Width; ++x)
-		{
-			position.x = x;
-			position.y = 0;
-			CreateWall(position, SerpentConsts.Dir.S);
-			position.y = (this.Height - 1);
-			CreateWall(position, SerpentConsts.Dir.N);
-		}
-		
-		for (int y = 0; y < this.Height; ++y)
-		{
-			position.y = y;
-			position.x = 0;
-			CreateWall(position, SerpentConsts.Dir.W);
-			position.x = (this.Width - 1);
-			CreateWall(position, SerpentConsts.Dir.E);
-		}
-	}
-
-	private void CreateWalls(List<object> wallData)
+	private void ReadHorizontalWalls(string wallData, List<object> doorData, int y)
 	{		
-		// Create walls. NOTE: the wall data comes in, with the rows ordered top to bottom.
-		// But for ease of working with Unity we're going to assign these from bottom to top,
-		// so that 0,0 is the lower left corner of the map.
-		int y = (this.Height) - 1;
-		foreach (object rowWallData in wallData)
+		// Look at every second character in wallData, starting with the second.
+		// If there is a -, add a vertical wall
+		// If there is a D, add a door
+		
+		int wallDataSize = wallData.Length;
+		for (int x = 1; x < this.Width - 1; ++x)
 		{
-			string cellsWallData = rowWallData as string;
-			if (cellsWallData == null) 
+			int wallDataLoc = (x - 1) * 2 + 1;
+			if (wallDataLoc >= wallDataSize)
 			{
-				Debug.Log ("Wall data is not a string, it's " + rowWallData.GetType().ToString () );
-				continue;
-			}
-			for (int x = 0; x < cellsWallData.Length; ++x)
-			{
-				char c = cellsWallData[x];
-				IntVector2 position = new IntVector2(x, y);
-				
-				if (SerpentConsts.DirectionIndexes.ContainsKey(c)) 
-				{				
-					List<SerpentConsts.Dir> sides = SerpentConsts.DirectionIndexes[c];
-					foreach( SerpentConsts.Dir side in sides )
-					{
-						CreateWall(position, side);	
-					}
-				}
+				break;
 			}
 			
-			--y;
-			if (y < 0) { break; }
+			char wallInfo = wallData[wallDataLoc];
+			if (wallInfo == '-')
+			{
+				// Add a wall on the west side of this cell
+				IntVector2 position = new IntVector2(x, y);
+				// Does position need to be deleted or will it be GC'd?
+				CreateWall(position, SerpentConsts.Dir.N);
+			}
+			else if (wallInfo == 'D')
+			{
+				IntVector2 position = new IntVector2(x, y);				
+				int doorIndex = GetDoorIndex( wallData[wallDataLoc+1] );
+				CreateDoor(position, doorData, doorIndex ); 
+			}
+		}				
+	}
+	
+	
+	private void ReadVerticalWalls(string wallData, List<object> doorData, int y)
+	{
+		// Look at every second character in wallData, starting with the first.
+		// If there is a |, add a vertical wall
+		// If there is a D, add a door
+		int wallDataSize = wallData.Length;
+		for (int x = 1; x < this.Width; ++x)
+		{
+			int wallDataLoc = (x - 1) * 2;
+			if (wallDataLoc >= wallDataSize)
+			{
+				break;
+			}
+			
+			char wallInfo = wallData[wallDataLoc];
+			if (wallInfo == '|')
+			{
+				// Add a wall on the west side of this cell
+				IntVector2 position = new IntVector2(x, y);
+				// Does position need to be deleted or will it be GC'd?
+				CreateWall(position, SerpentConsts.Dir.W);
+			}
+			else if (wallInfo == 'D')
+			{
+				// is this -1 predicated on an east facing door? If so, it's really being hardcoded... and i think it is.
+				IntVector2 position = new IntVector2(x, y);				
+				int doorIndex = GetDoorIndex( wallData[wallDataLoc+1] );
+				CreateDoor(position, doorData, doorIndex ); 				
+			}
+			
 		}
 	}
 
@@ -145,57 +207,138 @@ public class Maze : MonoBehaviour
 		SetupWallLinks(wall, position, side);
 	}
 	
-	private void CreateDoors(List<object> doorsData)
-	{		
-		// doorData should be a list, each element of which is a list with 3 values - two integers for x,y and a string for direction.
-		foreach( object o in doorsData )
+	private void CreateDoor(IntVector2 position, List<object> doorData, int doorIndex)
+	{
+		if (doorIndex < 0 || doorIndex >= doorData.Count)
 		{
-			Dictionary<string,object> doorData = o as Dictionary<string,object>;
-			if (doorData == null) 
-			{ 
-				continue; 
-			}
-			
-			int x = doorData.GetInt(SerpentConsts.XKey);
-			int y = doorData.GetInt(SerpentConsts.YKey);
-			string directionString = doorData.GetString (SerpentConsts.DirectionKey);
-			if (string.IsNullOrEmpty(directionString)) 
-			{
-				continue;
-			}
-
-			IntVector2 position = new IntVector2(x, y);
-			
-			// Read the first character out of the string.  It should be a recognizable mapping to side data.  There
-			// should only be one side in question, but the code is stronger handling all cases.
-			char c = directionString[0];			
-			if (SerpentConsts.DirectionIndexes.ContainsKey(c)) 
-			{				
-				List<SerpentConsts.Dir> sides = SerpentConsts.DirectionIndexes[c];
-				foreach( SerpentConsts.Dir side in sides )
-				{
-					CreateDoor(position, side);
-				}
-			}
-			
+			return;
+		}
+		
+		object door = doorData[doorIndex];
+		SerpentConsts.Dir dir = GetDoorDirection( door );
+		string special = GetSpecialDoorInfo( door );
+		SerpentConsts.LevelState levelStateRequired = GetDoorLevelStateRequired( door );
+		
+		// Use the door direction to offset the placement of the door so that it appears in the correct place.
+		// In the case of a south-facing door, the y position must be 1 less.
+		// In the case of an east-facing door, the x position must be 1 less.
+		if (dir == SerpentConsts.Dir.S)
+		{
+			position.y += 1;
+		}
+		else if (dir == SerpentConsts.Dir.E)
+		{
+			position.x -= 1;
+		}
+		
+		Door d = CreateDoor(position, dir);
+		d.LevelStateRequired = levelStateRequired;
+		if (special == "PlayerStart")
+		{
+			this.PlayerStartFacing = dir;
+			this.PlayerStartPosition = position;
+		}
+		else if (special == "EnemyStart")
+		{
+			this.EnemyStartFacing = dir;
+			this.EnemyStartPosition = position;
 		}
 	}
 	
-	private void CreateDoor(IntVector2 position, SerpentConsts.Dir side)
+	private int GetDoorIndex(char doorInfoChar)
 	{
-		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height) 
+		int val = -1;
+		if (doorInfoChar != ' ')
 		{
-			Debug.Log("Bad position given for door");
-			return; 
+			string doorInfoStr = doorInfoChar.ToString();
+			// NOTE: doors are numbered starting with 1 in the level data
+			val = Convert.ToInt32(doorInfoStr) - 1;
+		}
+		return val;
+	}
+	
+	// Extract any specified door direction from the object doorInfo
+	private SerpentConsts.Dir GetDoorDirection(object doorInfo)
+	{
+		Dictionary<string,object> doorDict = doorInfo as Dictionary<string,object>;
+		if (doorDict == null)
+		{
+			return SerpentConsts.Dir.None;
 		}
 		
-		Door door = new Door(side);
+		string dirStr = doorDict.GetString("direction");
 		
-		SetupWallLinks(door, position, side);
+		if (dirStr.Length == 0)
+		{
+			return SerpentConsts.Dir.None;
+		}
+		
+		char c = dirStr[0];
+		List<SerpentConsts.Dir> sides = SerpentConsts.DirectionIndexes[c];
+		
+		return sides[0];
+	}
+	
+	private string GetSpecialDoorInfo(object doorInfo)
+	{
+		Dictionary<string,object> doorDict = doorInfo as Dictionary<string,object>;
+		if (doorDict == null)
+		{
+			return "";
+		}
+		
+		string outStr = doorDict.GetString("special");
+		return outStr;		
+	}	
+		
+	private SerpentConsts.LevelState GetDoorLevelStateRequired(object doorInfo)
+	{
+		Dictionary<string,object> doorDict = doorInfo as Dictionary<string,object>;
+		if (doorDict == null)
+		{
+			return SerpentConsts.LevelState.None;
+		}
+		
+		string str = doorDict.GetString("levelStateRequired");	
+		if (str == null)
+		{
+			return SerpentConsts.LevelState.None;
+		}
+		
+		// We have to turn this string into an enum value
+		try
+		{
+			SerpentConsts.LevelState state = (SerpentConsts.LevelState) Enum.Parse(typeof(SerpentConsts.LevelState), str);        
+			return state;
+		}
+		catch( ArgumentException )
+		{
+			Console.WriteLine("'{0}' is not a member of the LevelState enumeration.", str);			
+			return SerpentConsts.LevelState.None;
+		}
+	}
+	
+	private Door CreateDoor(IntVector2 position, SerpentConsts.Dir side)
+	{
+		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height || side == SerpentConsts.Dir.None) 
+		{
+			Debug.Log("Bad position given for door");
+			return null;
+		}
+		
+		Door door = new Door(side);		
+		SetupWallLinks(door, position, side);		
+		return door;
 	}
 	
 	private void SetupWallLinks( Wall wall, IntVector2 position, SerpentConsts.Dir side)
 	{
+		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height)
+		{
+			Debug.Log("Bad position in SetupWallLinks!");
+			return;
+		}
+		
 		this.Cells[position.x,position.y].Walls[(int)side] = wall;
 		
 		// Connect the other side of the wall as well, provided the other side of the wall is not "out of bounds"

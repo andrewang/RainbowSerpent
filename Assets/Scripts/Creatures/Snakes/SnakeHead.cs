@@ -17,11 +17,8 @@ public class SnakeHead : SnakeSegment
 		Vector3 afterMoveToDest = this.CurrentDestination - nextPos;
 		
 		if (Vector3.Dot(toDest, afterMoveToDest) > 0)
-		//if (displacement * displacement < toDest.sqrMagnitude)
-		//if (displacement < toDest.sqrMagnitude)
 		{
 			// Have not reached current destionation so just move.
-			//this.transform.localPosition += (this.CurrentDirectionVector * displacement);
 			this.transform.localPosition = nextPos;
 			
 			// Did not arrive at destination

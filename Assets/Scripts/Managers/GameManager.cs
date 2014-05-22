@@ -109,6 +109,16 @@ public class GameManager : MonoBehaviour
 	
 	#endregion Setup
 	
+	#region Game State
+	
+	//this.LevelState = SerpentConsts.LevelState.LevelStart;
+	private void StartPlay()
+	{
+		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
+		//this.playerS		
+	}
+	
+	#endregion Game State
 	
 	#region Update
 	
@@ -266,18 +276,30 @@ public class GameManager : MonoBehaviour
 	
 	private IEnumerator PlaceSnakes()
 	{
-		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
+		Managers.GameState.LevelState = SerpentConsts.LevelState.LevelStart;
+		
+		this.mazeController.PlaceSnake(this.playerSnake, true);
+		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
+		psc.PlayerControlled = false;		
+		// Player snake should now be entering the start area?
+		
+		yield return new WaitForSeconds(2.0f);		
+		psc.PlayerControlled = true;
+		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
+		
+		// TODO: set level state to LevelEnd if the player wins.
 		
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
-		{		
-			PlaceSnake(enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
+		{	
+			this.mazeController.PlaceSnake(enemySnakes[i], false);	
 			yield return new WaitForSeconds(5.0f);
-		}	
+		}		
 	}
 	
 	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction)
 	{
+		// NOTE, now we've got this one and the one in maze controller.  This one is needed for spawning from eggs.
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
 		Debug.Log("Adding snake at (" + x + "," + y + "): " + position.x + "," + position.y);
 		snake.SetInitialLocation(position, direction);

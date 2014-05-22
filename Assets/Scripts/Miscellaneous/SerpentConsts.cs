@@ -96,6 +96,19 @@ public static class SerpentConsts
 		SerpentConsts.Dir.None		
 	};
 	
+	public static SerpentConsts.Dir GetDirectionForVector( Vector3 v )
+	{
+		for(int i = 0; i < DirectionVector3.Length; ++i)
+		{
+			if (v == DirectionVector3[i])
+			{
+				return (SerpentConsts.Dir)i;
+			}
+		}
+		
+		return SerpentConsts.Dir.None;
+	}
+	
 	public enum Side
 	{
 		Player,
@@ -103,8 +116,16 @@ public static class SerpentConsts
 		Frog,
 	}
 	
+	public enum LevelState
+	{
+		None,
+		LevelStart,
+		Playing,
+		LevelEnd
+	}
 	
-	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 1); // 60);
+	
+	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 60);
 	public static TimeSpan EnemyEggFrequency = new TimeSpan(0, 0, 15);
 	public static TimeSpan TimeToLayEgg = new TimeSpan(0, 0, 10);
 	public static TimeSpan EnemyEggHatchingTime = new TimeSpan(0, 0, 30);
