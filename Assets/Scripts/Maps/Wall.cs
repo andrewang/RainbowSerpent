@@ -6,11 +6,6 @@ public class Wall
 	{
 	}
 
-	/*
-	public bool Visible 
-	{ 
-		get; set; 
-	}
-	*/	
+
 }
 

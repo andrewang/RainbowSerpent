@@ -10,25 +10,18 @@ public class Maze : MonoBehaviour
 	public int Width { get; set; }
 	public int Height { get; set; }
 	
-	public IntVector2 PlayerStartPosition
-	{ 
-		get; private set;
-	}
-	public SerpentConsts.Dir PlayerStartFacing
-	{
-		get; private set;
-	}
-
-	public IntVector2 EnemyStartPosition
-	{ 
-		get; private set;
-	}
-	public SerpentConsts.Dir EnemyStartFacing
-	{
-		get; private set;
-	}
+	public IntVector2 PlayerStartPosition { get; private set; }
+	public SerpentConsts.Dir PlayerStartFacing { get; private set; }
+	
+	public IntVector2 PlayerZoneExit { get; private set; }
+	public IntVector2 PlayerZoneEntrance { get; private set; }
+	
+	public IntVector2 EnemyStartPosition { get; private set; }
+	public SerpentConsts.Dir EnemyStartFacing { get; private set; }
 	
 	public MazeCell[,] Cells;
+	
+	private List<Door> doors = new List<Door>();
 
 	// Use this for initialization
 	void Start () 
@@ -243,6 +236,14 @@ public class Maze : MonoBehaviour
 			this.EnemyStartFacing = dir;
 			this.EnemyStartPosition = position;
 		}
+		else if (special == "PlayerZoneExit")
+		{
+			this.PlayerZoneExit = position;
+		}
+		else if (special == "PlayerZoneEntrance")
+		{
+			this.PlayerZoneEntrance = position;
+		}
 	}
 	
 	private int GetDoorIndex(char doorInfoChar)
@@ -327,7 +328,8 @@ public class Maze : MonoBehaviour
 		}
 		
 		Door door = new Door(side);		
-		SetupWallLinks(door, position, side);		
+		SetupWallLinks(door, position, side);
+		this.doors.Add(door);	
 		return door;
 	}
 	
@@ -347,6 +349,22 @@ public class Maze : MonoBehaviour
 		
 		int oppositeSide = (int)SerpentConsts.OppositeDirection[(int)side];
 		this.Cells[newPosition.x,newPosition.y].Walls[ oppositeSide ] = wall;		
+	}
+	
+	public void ShowDoors()
+	{
+		foreach (Door door in this.doors)
+		{
+			door.Show();
+		}
+	}
+	
+	public void HideDoors()
+	{
+		foreach (Door door in this.doors)
+		{
+			door.Hide();
+		}
 	}
 }
 

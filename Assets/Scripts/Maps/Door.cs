@@ -55,6 +55,16 @@ public class Door : Wall
 		TweenScale.Begin(this.Sprite.gameObject, 0.1f, new UnityEngine.Vector3(1.0f, 1.0f));				
 		
 	}
+	
+	public void Hide()
+	{
+		this.Sprite.alpha = 0.0f;
+	}
+	
+	public void Show()
+	{
+		this.Sprite.alpha = 1.0f;
+	}
 }
 
 

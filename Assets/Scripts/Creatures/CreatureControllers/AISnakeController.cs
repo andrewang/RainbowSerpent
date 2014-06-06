@@ -26,14 +26,10 @@ public class AISnakeController : SnakeController
 		// Get our current direction first.  We want to turn in a random direction but not do a reverse turn.
 		// So assemble a list of all the directions, excluding the opposite direction to the current, and also
 		// excluding directions where motion is blocked.		
-		Snake snake = this.snake;
-		SnakeHead head = snake.Head;
-		SerpentConsts.Dir currentDirection = head.CurrentDirection;
+		SerpentConsts.Dir currentDirection = this.snake.Head.CurrentDirection;
 		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) currentDirection ];
-		Vector3 position = head.CurrentDestination;
-		MazeCell cell = this.mazeController.GetCellForPosition( position );
 		
-		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;
+		List<SerpentConsts.Dir> availableDirections = GetAvailableDirections();
 		availableDirections.Remove(oppositeDirection);
 			
 		if (availableDirections.Count == 0) 
@@ -45,6 +41,7 @@ public class AISnakeController : SnakeController
 		SerpentConsts.Dir randomDir = availableDirections[randomIndex];
 		return randomDir;
 	}
+	
 	
 	
 }

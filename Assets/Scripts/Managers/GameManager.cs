@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour
 	private Snake playerSnake = null; 
 
 	private SnakeConfig enemySnakeConf;	
-	//private List<Snake> enemySnakes = new List<Snake>();
 	private int maxNumEnemySnakes;	
 	
 	private bool updateSnakeColours = false;
@@ -127,6 +126,12 @@ public class GameManager : MonoBehaviour
 		if (this.playerSnake.Dead) { return; }
 		
 		UpdateSnakes();
+		
+		if (Managers.GameState.LevelState != SerpentConsts.LevelState.Playing) 
+		{
+			// NB make player eggs hatch...?
+			return;
+		}
 				
 		if (this.updateSnakeColours)
 		{
@@ -153,6 +158,7 @@ public class GameManager : MonoBehaviour
 	{
 		Egg playerEgg = GetEgg( SerpentConsts.Side.Player );
 		
+		bool enemySnakeDied = false;
 		// Test for snake interactions, based on enemies first
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count;)
@@ -170,6 +176,8 @@ public class GameManager : MonoBehaviour
 			{
 				// By removing a snake from enemySnakes, we move all the snakes after it up one in the list
 				// So we continue the loop by reiterating with the same 'i' value as before.
+				enemySnakeDied = true;
+				enemySnakes.RemoveAt(i);
 				continue;
 			}
 			
@@ -196,7 +204,14 @@ public class GameManager : MonoBehaviour
 		if (enemyEgg != null)
 		{
 			this.playerSnake.TestForInteraction(enemyEgg);
-		}	
+		}
+		
+		if (enemySnakeDied && enemySnakes.Count == 0)
+		{
+			// all enemy snakes are dead.
+			// what if an enemy egg still exists?
+			Managers.GameState.LevelState = SerpentConsts.LevelState.LevelEnd;
+		}
 	}
 	
 	private void UpdateFrog()
@@ -280,10 +295,9 @@ public class GameManager : MonoBehaviour
 		
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
-		psc.PlayerControlled = false;		
-		// Player snake should now be entering the start area?
+		psc.PlayerControlled = false;				
+		yield return new WaitForSeconds(5.0f);		
 		
-		yield return new WaitForSeconds(2.0f);		
 		psc.PlayerControlled = true;
 		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
 		
@@ -463,7 +477,7 @@ public class GameManager : MonoBehaviour
 	
 	private void SnakeSegmentEaten(Vector3 position)
 	{
-		this.animationManager.PlayRandomAnimation(position);
+		//this.animationManager.PlayRandomAnimation(position);
 	}
 	
 	

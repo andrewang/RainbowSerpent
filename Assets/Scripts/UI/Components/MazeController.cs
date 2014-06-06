@@ -5,9 +5,8 @@ using System.Collections.Generic;
 
 public class MazeController : MonoBehaviour
 {
-	[SerializeField] private Maze maze = null;
+	[SerializeField] public Maze Maze = null;
 	[SerializeField] private GameObject wallSpritePrefab = null;
-	[SerializeField] private ScreenShotTaker screenShotTaker = null; 
 	[SerializeField] private UIPanel panel = null;
 	private Color wallColour; 
 
@@ -15,7 +14,7 @@ public class MazeController : MonoBehaviour
 	/// The centre position of the lower leftmost cell in the maze
 	/// </summary>
 	private Vector3 lowerLeftCellCentre = new Vector3(0,0,0);
-
+	
 	#region Verify Serialize Fields
 
 	public void Start()
@@ -25,7 +24,7 @@ public class MazeController : MonoBehaviour
 	
 	public void VerifySerializeFields()
 	{
-		if (this.maze == null) { Debug.LogError("GameSceneController: maze is null"); }
+		if (this.Maze == null) { Debug.LogError("GameSceneController: maze is null"); }
 	}
 	
 	#endregion Verify Serialize Fields
@@ -37,11 +36,11 @@ public class MazeController : MonoBehaviour
 	public void SetUp(TextAsset mazeTextAsset, Color wallColour)
 	{
 		this.wallColour = wallColour;
-		this.maze.SetUp(mazeTextAsset);
+		this.Maze.SetUp(mazeTextAsset);
 		DetermineMazeScale();		
 		CreateMazeSprites();
 	}
-	
+		
 	/// <summary>
 	// DetermineSpriteScale compares the size of a cell with what is available on-screen and
 	// determines how much the whole maze needs to be scaled down.
@@ -54,8 +53,8 @@ public class MazeController : MonoBehaviour
 		float maxHeight = spriteBounds.w;
 	
 		// add a bit to the dimensions so that the outside walls don't get clipped
-		float q = maxWidth / ((this.maze.Width + 0.2f) * SerpentConsts.CellWidth);
-		float x = maxHeight / ((this.maze.Height + 0.2f) * SerpentConsts.CellHeight);
+		float q = maxWidth / ((this.Maze.Width + 0.2f) * SerpentConsts.CellWidth);
+		float x = maxHeight / ((this.Maze.Height + 0.2f) * SerpentConsts.CellHeight);
 		float scale = Mathf.Min(q, x);
 		this.transform.localScale = new Vector3(scale, scale, 0.0f);
 	}
@@ -65,8 +64,14 @@ public class MazeController : MonoBehaviour
 	/// </summary>
 	private void CreateMazeSprites()
 	{
-		int width = this.maze.Width;
-		int height = this.maze.Height;
+		// If a screenshot for the level exists, then just load that?
+		// DOORS need to be separate sprites.  So in order to create a screenshot, we would need to 
+		// create the maze without doors.
+		// The screenshot should be version-stamped so that when I update the version number, the old
+		// screenshots are removed and new ones are generated
+	
+		int width = this.Maze.Width;
+		int height = this.Maze.Height;
 		if (width == 0 || height == 0) { return; }
 
 		// Determine the lower left corner of the map.
@@ -89,7 +94,7 @@ public class MazeController : MonoBehaviour
 		//
 		Func<int, Wall> getWallFunction = delegate( int x )
 		{
-			MazeCell cell = this.maze.Cells[x,y];			
+			MazeCell cell = this.Maze.Cells[x,y];			
 			Wall wall = cell.Walls[intSide];
 			return wall;		
 		};
@@ -120,9 +125,9 @@ public class MazeController : MonoBehaviour
 		
 		// Create south walls along all rows.
 		intSide = (int) SerpentConsts.Dir.S;
-		for (y = 0; y < this.maze.Height; ++y)
+		for (y = 0; y < this.Maze.Height; ++y)
 		{
-			CreateWalls(this.maze.Width, getWallFunction, createSpriteFunction);
+			CreateWalls(this.Maze.Width, getWallFunction, createSpriteFunction);
 		}
 	}
 	
@@ -139,7 +144,7 @@ public class MazeController : MonoBehaviour
 		//
 		Func<int, Wall> getWallFunction = delegate( int y )
 		{
-			MazeCell cell = this.maze.Cells[x,y];			
+			MazeCell cell = this.Maze.Cells[x,y];			
 			Wall wall = cell.Walls[intSide];
 			return wall;		
 		};
@@ -173,9 +178,9 @@ public class MazeController : MonoBehaviour
 		
 		// Create east walls along all columns.
 		intSide = (int) SerpentConsts.Dir.E;
-		for (x = 0; x < this.maze.Width; ++x)
+		for (x = 0; x < this.Maze.Width; ++x)
 		{
-			CreateWalls(this.maze.Height, getWallFunction, createSpriteFunction);
+			CreateWalls(this.Maze.Height, getWallFunction, createSpriteFunction);
 		}
 	}
 	
@@ -243,68 +248,6 @@ public class MazeController : MonoBehaviour
 		
 		return newWallSprite;
 	}
-	
-	/*
-	private void CreateVerticalWallSprites()
-	{
-		int width = this.maze.Width;
-		for (int x = 0; x < width; ++x)
-		{
-			CreateVerticalWallSpritesForColumn( x, (int) SerpentConsts.Dir.E );
-		}		
-		CreateVerticalWallSpritesForColumn( width - 1, (int) SerpentConsts.Dir.W );	
-	}
-	
-	private void CreateVerticalWallSpritesForColumn( int x, int intSide )
-	{
-		int start = -1;
-		for (int y = 0; y < this.maze.Height; ++y)
-		{
-			MazeCell cell = this.maze.Cells[x,y];
-			
-			if (cell.Walls[intSide] != null)
-			{
-				if (start == -1)
-				{
-					// start of a wall
-					start = y;
-				}
-			}
-			else if (start >= 0)
-			{
-				// end of a wall
-				CreateVerticalWallSprite( start, y - 1, x, intSide);
-				start = -1;
-			}
-		}	
-	}
-	
-	
-	private UISprite CreateVerticalWallSprite( int y0, int y1, int x, int intSide )
-	{		
-		GameObject newWall = (GameObject) Instantiate(this.wallSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
-		newWall.transform.parent = this.transform;
-		
-		Vector3 pos = GetCellSideCentre( x, (float)(y1 + y0) * 0.5f, intSide);
-		newWall.transform.localPosition = pos;
-		newWall.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		
-		UISprite newWallSprite = newWall.GetComponent<UISprite>();
-		if (newWallSprite == null) 
-		{ 
-			return null; 
-		}
-		newWallSprite.color = this.wallColour;
-		
-		// Horizontal - set the width		
-		newWallSprite.width = SerpentConsts.CellHeight * (y1 - y0 + 1);
-		// Rotate the sprite to be vertical
-		newWallSprite.transform.Rotate(Vector3.forward * 90.0f);
-		
-		return newWallSprite;
-	}	
-	
-	*/	
 
 	/// <summary>
 	/// Gets the centre position of a cell
@@ -330,8 +273,8 @@ public class MazeController : MonoBehaviour
 		Vector3 displacement = position - this.lowerLeftCellCentre;		
 		int x = (int) (displacement.x / SerpentConsts.CellWidth + 0.5f);
 		int y = (int) (displacement.y / SerpentConsts.CellHeight + 0.5f);
-		if (x >= this.maze.Width || y >= this.maze.Height) { return null; }
-		return this.maze.Cells[x,y];
+		if (x >= this.Maze.Width || y >= this.Maze.Height) { return null; }
+		return this.Maze.Cells[x,y];
 	}
 	
 	public Vector3 GetNextCellCentre(Vector3 position, SerpentConsts.Dir direction)
@@ -415,7 +358,7 @@ public class MazeController : MonoBehaviour
 		{
 			availableDirections.Add( SerpentConsts.Dir.W ); 
 		}
-		if (cell.X < this.maze.Width)
+		if (cell.X < this.Maze.Width)
 		{
 			availableDirections.Add( SerpentConsts.Dir.E ); 
 		}
@@ -423,7 +366,7 @@ public class MazeController : MonoBehaviour
 		{
 			availableDirections.Add( SerpentConsts.Dir.S );
 		}
-		if (cell.Y < this.maze.Height)
+		if (cell.Y < this.Maze.Height)
 		{
 			availableDirections.Add( SerpentConsts.Dir.N );
 		}
@@ -452,13 +395,13 @@ public class MazeController : MonoBehaviour
 		SerpentConsts.Dir direction;
 		if (player)
 		{
-			cellPosition = this.maze.PlayerStartPosition;
-			direction = this.maze.PlayerStartFacing;
+			cellPosition = this.Maze.PlayerStartPosition;
+			direction = this.Maze.PlayerStartFacing;
 		}
 		else
 		{
-			cellPosition = this.maze.EnemyStartPosition;
-			direction = this.maze.EnemyStartFacing;
+			cellPosition = this.Maze.EnemyStartPosition;
+			direction = this.Maze.EnemyStartFacing;
 		}
 		
 		Vector3 position = this.GetCellCentre(cellPosition.x, cellPosition.y);

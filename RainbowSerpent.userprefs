@@ -1,44 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Data/Resources/level1.txt">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Miscellaneous/ScreenShotTaker.cs">
     <Files>
-      <File FileName="Assets/Scripts/UI/SceneControllers/SplashSceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Maps/Door.cs" Line="31" Column="1" />
-      <File FileName="Assets/NGUI/Scripts/Tweening/TweenColor.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="50" Column="22" />
-      <File FileName="Assets/NGUI/Scripts/UI/UISprite.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Managers/SceneManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/NGUI/Scripts/Internal/UIWidget.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/MobileCreature.cs" Line="1" Column="1" />
-      <File FileName="Assets/NGUI/Scripts/Tweening/TweenScale.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/AISnakeController.cs" Line="37" Column="29" />
-      <File FileName="Assets/Scripts/Maps/LevelTheme.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentUtils.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/IntVector2.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/MiniJSON.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/CreatureController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" Line="75" Column="1" />
+      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="212" Column="41" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/SnakeController.cs" Line="1" Column="1" />
-      <File FileName="Assets/NGUI/Scripts/Interaction/UIPopupList.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/AnimatedSprite.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/ScriptCache.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/AnimationManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Creature.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Frog.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentExtensions.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeBody.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="164" Column="2" />
-      <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Maps/Wall.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Maps/MazeCell.cs" Line="50" Column="18" />
-      <File FileName="Assets/Scripts/Maps/Maze.cs" Line="225" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="370" Column="15" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="290" Column="59" />
-      <File FileName="Assets/Data/Resources/level1.txt" Line="6" Column="19" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentUtils.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/CreatureControllers/AISnakeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/CreatureControllers/SnakeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" Line="26" Column="3" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -48,10 +21,9 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Miscellaneous/ScriptCache.cs" line="37" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="311" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="312" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="316" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Managers/GameManager.cs" line="179" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" line="33" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" line="24" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

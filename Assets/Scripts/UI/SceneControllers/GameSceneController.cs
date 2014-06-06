@@ -13,6 +13,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private InputController inputController = null; 
 	
 	// UI elements
+	[SerializeField] private UIPanel uiPanel = null;
 	[SerializeField] private UISprite background = null;	
 	[SerializeField] private UILabel[] labels;
 	[SerializeField] private UILabel levelLabel = null;
