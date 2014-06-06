@@ -46,8 +46,8 @@ public class ScaleDimensions : MonoBehaviour
 	
 	private void DetermineScales()
 	{
-		this.widthScale = Screen.width / this.baseWidth ;
-		this.heightScale = Screen.height / this.baseHeight ;
+		this.widthScale = Screen.width / this.baseWidth;
+		this.heightScale = Screen.height / this.baseHeight;
 		
 		if (this.maintainProportions)
 		{
@@ -70,6 +70,9 @@ public class ScaleDimensions : MonoBehaviour
 		{
 			scale.y = this.heightScale;
 		}
+		Debug.Log ("Scale clipping " + this.widthScale + " " + this.heightScale);
+		Debug.Log (scale.x + " " + scale.y);
+		
 		this.transform.localScale = scale;
 	}
 	

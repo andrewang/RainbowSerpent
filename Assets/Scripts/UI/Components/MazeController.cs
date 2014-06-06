@@ -8,6 +8,8 @@ public class MazeController : MonoBehaviour
 	[SerializeField] public Maze Maze = null;
 	[SerializeField] private GameObject wallSpritePrefab = null;
 	[SerializeField] private UIPanel panel = null;
+	[SerializeField] private ScreenShotTaker screenShotTaker = null; 
+	
 	private Color wallColour; 
 
 	/// <summary>
@@ -248,6 +250,36 @@ public class MazeController : MonoBehaviour
 		
 		return newWallSprite;
 	}
+		
+	#region Screenshots
+	
+	// A couple of screenshots can replace many wall sprites!  One for the outside walls and snake entry points, and
+	// one for everything.	
+	
+	public void CreateScreenshot()
+	{
+		Vector3 relativePosition = GetLocalPositionSum( this.screenShotTaker.transform );
+		                                               
+		this.screenShotTaker.TakeScreenShot("Maze.png", 
+			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w, 
+			(int) relativePosition.x, (int) relativePosition.y);
+	}
+	
+	private Vector3 GetLocalPositionSum(Transform relativeToTransform)
+	{
+		Vector3 relativePosition = this.transform.localPosition;
+		Transform temp = this.transform.parent;
+		
+		while( temp != relativeToTransform && temp != null )
+		{
+			relativePosition += temp.localPosition;
+			temp = temp.parent;
+		}
+		
+		return relativePosition;
+	}
+	
+	#endregion Screenshots
 
 	/// <summary>
 	/// Gets the centre position of a cell
@@ -297,7 +329,8 @@ public class MazeController : MonoBehaviour
 		// Get the centre position of this cell, and return it.		
 		Vector3 newPos = GetCellCentre(intCellPos.x, intCellPos.y);
 		return newPos;
-	}	
+	}
+	
 	
 	/// <summary>
 	/// Return whether motion is blocked from a given position, in a given direction.

@@ -255,7 +255,7 @@ public class UIPanel : MonoBehaviour
 	/// Clipping position (XY) and size (ZW).
 	/// </summary>
 
-	public Vector4 clipRange
+		public Vector4 clipRange
 	{
 		get
 		{

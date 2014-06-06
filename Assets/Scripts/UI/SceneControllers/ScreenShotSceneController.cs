@@ -55,30 +55,6 @@ public class ScreenShotSceneController : RSSceneController
 		this.mazeController.SetUp(mazeTextAsset, this.theme.WallColour);		
 		// but then hide the doors
 		this.mazeController.Maze.HideDoors();
-		Application.CaptureScreenshot("Maze" + levelNum + ".png");
-		
+		this.mazeController.CreateScreenshot();		
 	}
-	
-	public void LateUpdate()
-	{
-		if (screenshotTaken == false)
-		{
-			this.shotTaker.TakeScreenShot(1);
-//			HandScreenshot();
-		}
-	}
-	
-	/*
-	private IEnumerator HandScreenshot()
-	{
-		yield return new WaitForEndOfFrame();
-		Texture2D tex = new Texture2D(Screen.width, Screen.height);
-		tex.ReadPixels(new Rect(0,0,Screen.width,Screen.height),0,0);
-		tex.Apply();
-		byte[] bytes = tex.EncodeToPNG();
-		File.WriteAllBytes("DiffMaze.png", bytes);
-		yield return null;
-		
-	}
-	*/
 }
