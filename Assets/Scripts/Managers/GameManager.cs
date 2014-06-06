@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
 	public void LoadMapData(int levelNum)
 	{
 		TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
-		this.mazeController.SetUp(mazeTextAsset, this.theme.WallColour);		
+		this.mazeController.SetUp(levelNum, mazeTextAsset, this.theme.WallColour);		
 	}
 	
 	private void SetTimers()

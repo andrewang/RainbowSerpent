@@ -52,9 +52,10 @@ public class ScreenShotSceneController : RSSceneController
 	public void LoadMapData(int levelNum)
 	{
 		TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
-		this.mazeController.SetUp(mazeTextAsset, this.theme.WallColour);		
+		this.mazeController.SetUp(levelNum, mazeTextAsset, this.theme.WallColour);		
 		// but then hide the doors
 		this.mazeController.Maze.HideDoors();
+		// In reality this should only occur if the screenshot doesn't exist.
 		this.mazeController.CreateScreenshot();		
 	}
 }

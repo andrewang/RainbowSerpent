@@ -2,15 +2,19 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public class MazeController : MonoBehaviour
 {
 	[SerializeField] public Maze Maze = null;
 	[SerializeField] private GameObject wallSpritePrefab = null;
+	[SerializeField] private GameObject screenShotPrefab = null;	
 	[SerializeField] private UIPanel panel = null;
 	[SerializeField] private ScreenShotTaker screenShotTaker = null; 
 	
-	private Color wallColour; 
+	private int levelNumber;
+	private Color wallColour;
+	private bool screenShotLoaded = false;
 
 	/// <summary>
 	/// The centre position of the lower leftmost cell in the maze
@@ -35,8 +39,9 @@ public class MazeController : MonoBehaviour
 	/// Sets up the maze controller
 	/// </summary>
 	/// <param name="mazeTextAsset">Maze text asset.</param>
-	public void SetUp(TextAsset mazeTextAsset, Color wallColour)
+	public void SetUp(int levelNum, TextAsset mazeTextAsset, Color wallColour)
 	{
+		this.levelNumber = levelNum;
 		this.wallColour = wallColour;
 		this.Maze.SetUp(mazeTextAsset);
 		DetermineMazeScale();		
@@ -79,6 +84,13 @@ public class MazeController : MonoBehaviour
 		// Determine the lower left corner of the map.
 		this.lowerLeftCellCentre.x = -1.0f * ((width - 1) * SerpentConsts.CellWidth) * 0.5f;
 		this.lowerLeftCellCentre.y = -1.0f * ((height - 1) * SerpentConsts.CellHeight) * 0.5f;
+		
+		// If a screenshot for this level already exists then use that.
+		if (ScreenShotExists())
+		{
+			LoadScreenShot();
+			this.screenShotLoaded = true;
+		}
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
@@ -108,7 +120,7 @@ public class MazeController : MonoBehaviour
 		Func<int, int, UISprite> createSpriteFunction = delegate( int startX, int endX )
 		{
 			GameObject newWall = CreateWallObject();
-			UISprite newWallSprite = GetWallSprite(newWall);
+			UISprite newWallSprite = GetUISpriteComponent(newWall);
 			if (newWallSprite == null) 
 			{ 
 				return null; 
@@ -158,7 +170,7 @@ public class MazeController : MonoBehaviour
 		Func<int, int, UISprite> createSpriteFunction = delegate( int startY, int endY )
 		{
 			GameObject newWall = CreateWallObject();
-			UISprite newWallSprite = GetWallSprite(newWall);
+			UISprite newWallSprite = GetUISpriteComponent(newWall);
 			if (newWallSprite == null) 
 			{ 
 				return null; 
@@ -199,7 +211,7 @@ public class MazeController : MonoBehaviour
 		{
 			Wall wall = getWallFunction(loop);
 			bool wallEnds = (start >= 0 && (wall == null || wall is Door));
-			if (wallEnds)
+			if (wallEnds && !this.screenShotLoaded)
 			{
 				createWallFunction(start, loop - 1);
 				start = -1;			
@@ -219,12 +231,11 @@ public class MazeController : MonoBehaviour
 		}
 		
 		// Any final wall at the end?
-		if (start != -1)
+		if (start != -1 && !this.screenShotLoaded)
 		{
 			createWallFunction(start, loopLimit - 1);
 		}
 	}
-	
 	
 	/// <summary>
 	/// Creates a wall object with default parentage and scale
@@ -239,16 +250,43 @@ public class MazeController : MonoBehaviour
 	}
 	
 	/// <summary>
-	/// Gets the wall sprite component from a newly created game object.
+	/// Gets the sprite component from a newly created game object.
 	/// </summary>
-	/// <returns>The wall sprite.</returns>
+	/// <returns>The sprite.</returns>
 	/// <param name="obj">Object.</param>
-	private UISprite GetWallSprite(GameObject obj)
+	private UISprite GetUISpriteComponent(GameObject obj)
 	{
-		UISprite newWallSprite = obj.GetComponent<UISprite>();
-		if (newWallSprite == null) { return null; }
+		UISprite sprite = obj.GetComponent<UISprite>();
+		if (sprite == null) { return null; }
 		
-		return newWallSprite;
+		return sprite;
+	}
+	
+	//screenShotPrefab
+	
+	/// <summary>
+	/// Creates a container object for a screenshot with default parentage and scale
+	/// </summary>
+	/// <returns>The new wall object.</returns>
+	private GameObject CreateScreenshotObject()
+	{
+		GameObject newObj = (GameObject) Instantiate(this.screenShotPrefab, new Vector3(0,0,0), Quaternion.identity);
+		newObj.transform.parent = this.transform;
+		newObj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		return newObj;
+	}
+	
+	/// <summary>
+	/// Gets the texture component from a newly created game object.
+	/// </summary>
+	/// <returns>The texture.</returns>
+	/// <param name="obj">Object.</param>
+	private UITexture GetUITextureComponent(GameObject obj)
+	{
+		UITexture texture = obj.GetComponent<UITexture>();
+		if (texture == null) { return null; }
+		
+		return texture;
 	}
 		
 	#region Screenshots
@@ -258,10 +296,15 @@ public class MazeController : MonoBehaviour
 	
 	public void CreateScreenshot()
 	{
+		if (ScreenShotExists ()) 
+		{
+			return;
+		}
+		
 		Vector3 relativePosition = GetLocalPositionSum( this.screenShotTaker.transform );
 		                                               
-		this.screenShotTaker.TakeScreenShot("Maze.png", 
-			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w, 
+		this.screenShotTaker.TakeScreenShot(ScreenShotPath(), 
+			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w	, 
 			(int) relativePosition.x, (int) relativePosition.y);
 	}
 	
@@ -277,6 +320,47 @@ public class MazeController : MonoBehaviour
 		}
 		
 		return relativePosition;
+	}
+	
+	private void LoadScreenShot()
+	{
+		string path = ScreenShotPath();
+		byte[] byteArray = File.ReadAllBytes(path);
+		
+		Texture2D tex = new Texture2D(4, 4);
+		tex.LoadImage(byteArray);
+		
+		GameObject gameObj = CreateScreenshotObject();
+		UITexture texture = GetUITextureComponent(gameObj);		
+		if (texture)
+		{
+			// since we created a separate object outside the panel and brought it inside, we need to reset its position
+			texture.transform.localPosition = new Vector3(0,0);
+
+			texture.mainTexture = tex;
+			texture.MakePixelPerfect();
+			// NOTE: the maze itself is being shown at a reduced scale.  The screenshot was taken of images which had
+			// already been scaled down.  So at this point we need to divide by the maze's scale to compensate for the
+			// application of the current maze object's scale value on the ALREADY scaled-down maze.
+			Vector3 mazeScale = this.transform.localScale;
+			Vector3 textureScale = gameObj.transform.localScale;
+			textureScale.x /= mazeScale.x;
+			textureScale.y /= mazeScale.y;
+			gameObj.transform.localScale = textureScale;
+		}
+	}
+	
+	private string ScreenShotPath()
+	{
+		string dataPath = Application.dataPath;
+		dataPath = Path.Combine(dataPath, "Maze." + this.levelNumber + ".png");
+		return dataPath;
+	}
+	
+	private bool ScreenShotExists()
+	{
+		string path = ScreenShotPath();
+		return File.Exists(path);
 	}
 	
 	#endregion Screenshots
