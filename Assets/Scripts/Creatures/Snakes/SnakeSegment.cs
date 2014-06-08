@@ -133,7 +133,6 @@ public class SnakeSegment : MonoBehaviour
 		return (distanceSq <= radiiSq);		
 	}
 	
-	
 	public virtual void OnDestroy()
 	{
 		if (this.sprite != null)

@@ -242,7 +242,10 @@ public class Maze : MonoBehaviour
 		}
 		else if (special == "PlayerZoneEntrance")
 		{
-			this.PlayerZoneEntrance = position;
+			// In order to be useful we want this position to be beyond the actual door, INSIDE the player zone, rather 
+			// than the position right in front of the player zone. 
+			IntVector2 otherSideOfDoor = GetNextCellPosition(position, dir);
+			this.PlayerZoneEntrance = otherSideOfDoor;
 		}
 	}
 	
@@ -349,6 +352,14 @@ public class Maze : MonoBehaviour
 		
 		int oppositeSide = (int)SerpentConsts.OppositeDirection[(int)side];
 		this.Cells[newPosition.x,newPosition.y].Walls[ oppositeSide ] = wall;		
+	}
+	
+	private IntVector2 GetNextCellPosition(IntVector2 intCellPos, SerpentConsts.Dir direction)
+	{
+		IntVector2 newPos = intCellPos;
+		IntVector2 step = SerpentConsts.DirectionVector[ (int)direction ];
+		newPos += step;
+		return newPos;
 	}
 	
 	public void ShowDoors()

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using SerpentExtensions;
 
 public class ScriptCache: MonoBehaviour
 {
@@ -55,8 +56,10 @@ public class ScriptCache: MonoBehaviour
 		if (test == null)
 		{
 			Debug.Log("Adding game object of wrong type to script cache!");
+			return;
 		}
 	
+		test.SetParent(this);
 		o.SetActive(false);
 		this.objects.Add(o);
 	}

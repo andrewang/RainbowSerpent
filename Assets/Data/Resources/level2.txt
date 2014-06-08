@@ -31,9 +31,9 @@
   "doors": [ 
     {"direction":"W","special":"EnemyStart"},
     {"direction":"W"},
-    {"direction":"S","levelStateRequired":"LevelEnd"},
+    {"direction":"S","levelStateRequired":"LevelEnd","special":"PlayerZoneEntrance"},
     {"direction":"E","special":"PlayerStart"},
-    {"direction":"E","special":"PlayerGate"},   
+    {"direction":"E","special":"PlayerZoneExit"},   
   ],
   "width": 11,
   "height": 13,

@@ -110,11 +110,9 @@ public class GameManager : MonoBehaviour
 	
 	#region Game State
 	
-	//this.LevelState = SerpentConsts.LevelState.LevelStart;
 	private void StartPlay()
 	{
 		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
-		//this.playerS		
 	}
 	
 	#endregion Game State
@@ -123,7 +121,7 @@ public class GameManager : MonoBehaviour
 	
 	private void Update()
 	{
-		if (this.playerSnake.Dead) { return; }
+		if (this.playerSnake == null || this.playerSnake.Dead) { return; }
 		
 		UpdateSnakes();
 		
@@ -201,15 +199,15 @@ public class GameManager : MonoBehaviour
 		
 		// Check for player eating enemy egg
 		Egg enemyEgg = GetEgg( SerpentConsts.Side.Enemy );
+		bool enemyEggDied = false;
 		if (enemyEgg != null)
 		{
-			this.playerSnake.TestForInteraction(enemyEgg);
+			enemyEggDied = this.playerSnake.TestForInteraction(enemyEgg);
 		}
 		
-		if (enemySnakeDied && enemySnakes.Count == 0)
+		if ( (enemySnakeDied || enemyEggDied) && enemySnakes.Count == 0 && enemyEgg == null)
 		{
-			// all enemy snakes are dead.
-			// what if an enemy egg still exists?
+			// all enemy snakes are dead and no egg exists
 			Managers.GameState.LevelState = SerpentConsts.LevelState.LevelEnd;
 		}
 	}
@@ -245,9 +243,13 @@ public class GameManager : MonoBehaviour
 		s.Side = SerpentConsts.Side.Player;
 		s.CreatureDied += PlayerSnakeDied;
 		this.snakes.Add( s );
+
 		this.playerSnake = s;
-			
 		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
+		
+		PlayerSnakeController psc = s.Controller as PlayerSnakeController;
+		psc.SnakeReturnedToStart += PlayerReturnedToStart;
+				
 		return this.playerSnake;
 	}
 		
@@ -319,6 +321,16 @@ public class GameManager : MonoBehaviour
 		snake.SetInitialLocation(position, direction);
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);		
+	}
+	
+	private void PlayerReturnedToStart(Snake playerSnake)
+	{
+		// time to go to the next level.
+		this.playerSnake.ReturnToCache();
+		this.playerSnake.Visible = false;
+		this.playerSnake = null;
+		Managers.GameState.Level += 1;
+		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
 	}
 	
 	#endregion Snakes
@@ -570,18 +582,6 @@ public class GameManager : MonoBehaviour
 	
 	public List<Snake> GetSnakes()
 	{
-		/*
-		List<Creature> snakes = new List<Creature>();
-		if (this.playerSnake != null)
-		{
-			snakes.Add(this.playerSnake);
-		}
-		for (int i = 0; i < this.enemySnakes.Count; ++i)
-		{
-			snakes.Add( this.enemySnakes[i] );
-		}
-		return snakes;
-		*/
 		return this.snakes;
 	}
 	

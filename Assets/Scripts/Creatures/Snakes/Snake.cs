@@ -218,8 +218,6 @@ public class Snake : MobileCreature
 				distance += lastBodySegment.DistanceFromHead;
 			}
 			newSegment.DistanceFromHead = distance;
-			
-				
 		}
 		
 		if (this.SnakeSegmentsChanged != null)
@@ -277,8 +275,7 @@ public class Snake : MobileCreature
 			return false;
 		}
 
-		// Return eaten/destroyed segments to the cache.
-				
+		// Return eaten/destroyed segments to the cache.				
 		SnakeSegment nextSegment = seg.NextSegment;
 		
 		// Sever connection to destroyed segments prior to calling destroy but AFTER hanging a pointer to the next 
@@ -302,7 +299,6 @@ public class Snake : MobileCreature
 			nextSegment = seg.NextSegment;
 		} while ( true );
 
-
 		if ( this.SnakeSegmentsChanged != null )
 		{
 			SnakeSegmentsChanged( this );
@@ -310,6 +306,40 @@ public class Snake : MobileCreature
 		UpdateSpeed();
 		
 		return willDie;
+	}
+	
+	// Method to call on player snake when transitioning levels
+	public void ReturnToCache()
+	{
+		// Return eaten/destroyed segments to the cache.				
+		SnakeSegment seg = this.head;
+		SnakeSegment previousSeg = seg;		
+		SnakeSegment nextSegment = seg.NextSegment;
+		
+		// Sever connection to destroyed segments prior to calling destroy but AFTER hanging a pointer to the next 
+		// segment, in case previousSeg and seg are the same.
+		previousSeg.NextSegment = null;		
+		
+		// NOTE: Can't return snake head to the snake body cache.
+		do
+		{
+			if (seg != this.head)
+			{
+				Managers.SnakeBodyCache.ReturnObject<SnakeBody>(seg.gameObject);
+				Debug.Log("Returned segment to snake body cache");
+			}
+			seg = nextSegment;
+			if (seg == null)
+			{
+				break;
+			}
+			nextSegment = seg.NextSegment;
+		} while ( true );
+	
+		this.head = null;
+		
+	//	this.head.gameObject.SetActive(false);
+		UpdateSpeed();
 		
 	}
 	
@@ -332,7 +362,6 @@ public class Snake : MobileCreature
 		}
 		else
 		{
-			// testing. (???)
 			PositionBodySegments();			
 		}
 	}		
