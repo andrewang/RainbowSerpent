@@ -142,6 +142,7 @@ public class Snake : MobileCreature
 	
 	private void UpdateSpeed()
 	{
+		// Should level factor into this?
 		this.Speed = this.config.BaseSpeed - this.config.SpeedPenaltyPerSegment * this.NumSegments;
 	}
 	

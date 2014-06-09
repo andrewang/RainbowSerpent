@@ -68,6 +68,14 @@ public class GameManager : MonoBehaviour
 	
 	public void Setup(int levelNum)
 	{
+		// Cap levelNum according to the maximum number of levels.
+		// We don't want a zero so calculate this with a loop and subtraction, only
+		// considering values greater than NumLevels as a problem.
+		while (levelNum > Managers.GameState.NumLevels)
+		{
+			levelNum -= Managers.GameState.NumLevels;
+		}
+		
 		LoadTheme(levelNum);
 		LoadMapData(levelNum);
 		SetTimers();

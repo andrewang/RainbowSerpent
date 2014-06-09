@@ -4,6 +4,9 @@ using System;
 /// Game state.  The game state class tracks the state of "the player's game" - what level they are on, what their score is,
 /// and how many extra snakes they have left.
 /// </summary>
+using UnityEngine;
+
+
 public class GameState
 {
 	/// <summary>
@@ -11,6 +14,8 @@ public class GameState
 	/// </summary>
 	/// <value>The level.</value>
 	public int Level { get; set; }
+	
+	public int NumLevels { get; private set; }
 	
 	/// <summary>
 	/// The player's score (private storage)
@@ -52,6 +57,7 @@ public class GameState
 	public GameState ()
 	{
 		Reset();
+		CountLevels();
 	}
 	
 	/// <summary>
@@ -63,6 +69,21 @@ public class GameState
 		this.Score = 0;
 		this.ExtraSnakes = 2;
 		this.LevelState = SerpentConsts.LevelState.LevelStart;
+	}
+	
+	public void CountLevels()
+	{
+		int levelNum = 1;
+		while( true )
+		{
+			TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
+			if (mazeTextAsset == null)
+			{
+				break;
+			}
+			levelNum++;			
+		}
+		this.NumLevels = levelNum - 1;
 	}
 }
 
