@@ -14,8 +14,8 @@ public class PlayerSnakeController : SnakeController
 	public bool PlayerControlled { get; set; }
 	
 	public event Action<Snake> SnakeReturnedToStart = null;
+	public event Action<Snake> SnakeExitedStart = null;
 	
-	// Destination for snake when not player controlled?
 	
 	public PlayerSnakeController( Creature creature, MazeController mazeController ) : base( creature, mazeController )
 	{
@@ -52,7 +52,17 @@ public class PlayerSnakeController : SnakeController
 		
 		if (Managers.GameState.LevelState == SerpentConsts.LevelState.LevelStart)
 		{
-			return ExitPlayerZone();
+			// When the player has exited the player zone then change the level state and give the player control.
+			MazeCell headMazeCell = GetCellForHeadPosition();
+			if (headMazeCell.InPlayerZone == false)
+			{
+				this.PlayerControlled = true;
+				SnakeExitedStart(this.snake);
+			}
+			else
+			{			
+				return ExitPlayerZone();
+			}
 		}
 		
 		return this.desiredDirection;
@@ -62,7 +72,7 @@ public class PlayerSnakeController : SnakeController
 	private SerpentConsts.Dir GoToPlayerZone()
 	{
 		Maze maze = this.mazeController.Maze;
-		IntVector2 targetPos = maze.PlayerZoneEntrance;
+		IntVector2 targetPos = maze.PlayerStartZoneEntrance;
 		
 		SerpentConsts.Dir dir = SerpentConsts.Dir.None;
 		if (this.reachedPlayerZone == false)
@@ -76,7 +86,7 @@ public class PlayerSnakeController : SnakeController
 		
 		if (this.reachedPlayerZone == true)
 		{
-			dir = HeadTowards(maze.PlayerZoneExit);
+			dir = HeadTowards(maze.PlayerStartZoneExit);
 			if (dir == SerpentConsts.Dir.None)
 			{
 				// trigger game manager, and for now keep same direction
@@ -92,7 +102,7 @@ public class PlayerSnakeController : SnakeController
 	private SerpentConsts.Dir ExitPlayerZone()
 	{
 		Maze maze = this.mazeController.Maze;
-		IntVector2 targetPos = maze.PlayerZoneExit;
+		IntVector2 targetPos = maze.PlayerStartZoneExit;
 		SerpentConsts.Dir dir = HeadTowards(targetPos);
 		if (dir == SerpentConsts.Dir.None)
 		{

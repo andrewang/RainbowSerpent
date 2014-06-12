@@ -3,8 +3,9 @@ using System.Collections.Generic;
 
 public class MazeCell
 {
-	public int X { get; set; }
-	public int Y { get; set; }
+	public int X { get; private set; }
+	public int Y { get; private set; }
+	public bool InPlayerZone { get; private set; }
 
 	public Wall[] Walls; 
 	
@@ -31,7 +32,13 @@ public class MazeCell
 	{
 		this.X = x;
 		this.Y = y;
+		this.InPlayerZone = false;
 		this.Walls = new Wall[SerpentConsts.NumDirections];
+	}
+	
+	public void SetInPlayerZone(bool inZone)
+	{
+		this.InPlayerZone = inZone;
 	}
 	
 	public bool IsMotionBlocked(SerpentConsts.Dir direction)
@@ -41,6 +48,15 @@ public class MazeCell
 		{
 			// out of range.
 			return false;
+		}
+		
+		if (this.InPlayerZone)
+		{
+			// Check the level state
+			if (Managers.GameState.LevelState == SerpentConsts.LevelState.Playing)
+			{
+				return false;
+			}
 		}
 		
 		Wall wall = this.Walls[intDirection];

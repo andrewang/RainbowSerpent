@@ -12,13 +12,16 @@ public static class SerpentConsts
 	public const string CellsKey = "cells";
 	public const string WallsKey = "walls";
 	public const string DoorsKey = "doors";
-	public const string XKey = "x";
-	public const string YKey = "y";
+	public const string PlayerStartZoneKey = "playerStartZone";
+	public const string XKey = "X";
+	public const string YKey = "Y";
 	public const string DirectionKey = "dir";
 	
 	// Pixel sizes of cells.
 	public const int CellWidth = 64;
 	public const int CellHeight = 48;
+	
+	public const int BorderWidth = 1;
 	
 	public enum Dir
 	{

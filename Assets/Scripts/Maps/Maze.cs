@@ -13,8 +13,8 @@ public class Maze : MonoBehaviour
 	public IntVector2 PlayerStartPosition { get; private set; }
 	public SerpentConsts.Dir PlayerStartFacing { get; private set; }
 	
-	public IntVector2 PlayerZoneExit { get; private set; }
-	public IntVector2 PlayerZoneEntrance { get; private set; }
+	public IntVector2 PlayerStartZoneExit { get; private set; }
+	public IntVector2 PlayerStartZoneEntrance { get; private set; }
 	
 	public IntVector2 EnemyStartPosition { get; private set; }
 	public SerpentConsts.Dir EnemyStartFacing { get; private set; }
@@ -26,7 +26,6 @@ public class Maze : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-	
 	}
 
 	/// <summary>
@@ -50,41 +49,64 @@ public class Maze : MonoBehaviour
 	public void SetUp(Dictionary<string,object> mazeData)
 	{
 		// Parse dictionary data
-
 		int width = mazeData.GetInt(SerpentConsts.WidthKey);
 		int height = mazeData.GetInt(SerpentConsts.HeightKey);
-		object rawWallData = mazeData.GetObject(SerpentConsts.WallsKey);
-		object rawDoorsData = mazeData.GetObject(SerpentConsts.DoorsKey);
+		List<object> wallData = mazeData.GetObject(SerpentConsts.WallsKey) as List<object>;
+		List<object> doorData = mazeData.GetObject(SerpentConsts.DoorsKey) as List<object>;
+		List<object> playerStartZoneData = mazeData.GetObject(SerpentConsts.PlayerStartZoneKey) as List<object>;
 		
-		List<object> wallData = rawWallData as List<object>;
-		List<object> doorData = rawDoorsData as List<object>;
-		
-		// door data is optional so don't cancel if there isn't any
-		if (width == 0 || height == 0 || wallData == null) 
+		// Check data and abort if data is missing  Door data is optional so don't cancel if there isn't any
+		if (width == 0 || height == 0 || wallData == null || playerStartZoneData == null)
 		{ 
 			return; 
 		}
 
-		// Add 2 to the width and height of the map in order to have room outside the maze for frogs to 
-		// actually be tracked.
-		width = width + 2;
-		height = height + 2;
-		Debug.Log("Maze width " + width + " and height " + height);
+		// Add border width to the width and height of the map in order to have room around the edge of the maze
+		width = width + SerpentConsts.BorderWidth * 2;
+		height = height + SerpentConsts.BorderWidth * 2;		
+		Debug.Log("Maze width " + width + " and height " + height);	
 		this.Width = width;
 		this.Height = height;
 
 		// Create all the cells
-		this.Cells = new MazeCell[width,height];
-		for (int y = 0; y < height; ++y)
+		CreateCells();
+		FlagPlayerStartZone(playerStartZoneData);
+		
+		// Create walls
+		CreateWalls(wallData, doorData);
+		
+	}
+	
+	private void CreateCells()
+	{
+		this.Cells = new MazeCell[this.Width,this.Height];
+		for (int y = 0; y < this.Height; ++y)
 		{
-			for (int x = 0; x < width; ++x)
+			for (int x = 0; x < this.Width; ++x)
 			{
 				this.Cells[x,y] = new MazeCell(x, y);
 			}
+		}		
+	}
+	
+	private void FlagPlayerStartZone(List<object> playerStartZoneData)
+	{
+		// Each element in playerZoneData should be a dictionary with a value for "X" and a value for "Y".  Each
+		// position corresponds with a cell which should be set as part of the player starting zone. 
+		foreach( object o in playerStartZoneData )
+		{
+			Dictionary<string,object> dict = o as Dictionary<string,object>;
+			if (dict == null) { continue; }
+			
+			int x = dict.GetInt(SerpentConsts.XKey);
+			int y = dict.GetInt(SerpentConsts.YKey);
+			
+			if (x < this.Width && y < this.Height)
+			{
+				MazeCell cell = this.Cells[x,y];
+				cell.SetInPlayerZone(true);
+			}
 		}
-
-		CreateWalls(wallData, doorData);
-		
 	}
 
 	private void CreateWalls(List<object> wallData, List<object> doorData)
@@ -238,14 +260,14 @@ public class Maze : MonoBehaviour
 		}
 		else if (special == "PlayerZoneExit")
 		{
-			this.PlayerZoneExit = position;
+			this.PlayerStartZoneExit = position;
 		}
 		else if (special == "PlayerZoneEntrance")
 		{
 			// In order to be useful we want this position to be beyond the actual door, INSIDE the player zone, rather 
 			// than the position right in front of the player zone. 
 			IntVector2 otherSideOfDoor = GetNextCellPosition(position, dir);
-			this.PlayerZoneEntrance = otherSideOfDoor;
+			this.PlayerStartZoneEntrance = otherSideOfDoor;
 		}
 	}
 	

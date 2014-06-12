@@ -257,6 +257,7 @@ public class GameManager : MonoBehaviour
 		
 		PlayerSnakeController psc = s.Controller as PlayerSnakeController;
 		psc.SnakeReturnedToStart += PlayerReturnedToStart;
+		psc.SnakeExitedStart += PlayerExitedStart;
 				
 		return this.playerSnake;
 	}
@@ -306,10 +307,10 @@ public class GameManager : MonoBehaviour
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;				
-		yield return new WaitForSeconds(5.0f);		
 		
-		psc.PlayerControlled = true;
-		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
+		yield return new WaitForSeconds(3.0f);		
+		
+		//Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
 		
 		// TODO: set level state to LevelEnd if the player wins.
 		
@@ -329,6 +330,13 @@ public class GameManager : MonoBehaviour
 		snake.SetInitialLocation(position, direction);
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);		
+	}
+	
+	private void PlayerExitedStart(Snake playerSnake)
+	{
+		StartPlay();
+//		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
+		
 	}
 	
 	private void PlayerReturnedToStart(Snake playerSnake)
