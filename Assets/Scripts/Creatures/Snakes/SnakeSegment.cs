@@ -92,6 +92,12 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
+	public void SetGradatedColour(Color c1, Color c2)
+	{
+		this.sprite.type = UISprite.Type.VertexColoured;
+		this.sprite.SetVertexColours(c2, c1, c1, c2);		
+	}
+	
 	public bool Visible
 	{
 		get

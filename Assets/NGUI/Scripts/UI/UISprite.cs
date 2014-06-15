@@ -20,6 +20,7 @@ public class UISprite : UIWidget
 		Sliced,
 		Tiled,
 		Filled,
+		VertexColoured
 	}
 
 	public enum FillDirection
@@ -279,6 +280,18 @@ public class UISprite : UIWidget
 			return base.minHeight;
 		}
 	}
+	
+	BetterList<Color> vertexColours;
+	
+	public void SetVertexColours(Color c1, Color c2, Color c3, Color c4)
+	{
+		BetterList<Color> colourList = new BetterList<Color>();
+		colourList.Add(c1);
+		colourList.Add(c2);
+		colourList.Add(c3);
+		colourList.Add(c4);
+		this.vertexColours = colourList;
+	}
 
 	/// <summary>
 	/// Keep sane values.
@@ -430,6 +443,10 @@ public class UISprite : UIWidget
 			case Type.Tiled:
 			TiledFill(verts, uvs, cols);
 			break;
+			
+			case Type.VertexColoured:
+			VertexColouredFill(verts, uvs, cols);
+			break;
 		}
 	}
 
@@ -441,7 +458,7 @@ public class UISprite : UIWidget
 	/// It's used to achieve pixel-perfect sprites even when an odd dimension sprite happens to be centered.
 	/// </summary>
 
-	Vector4 drawingDimensions
+	protected Vector4 drawingDimensions
 	{
 		get
 		{
@@ -510,6 +527,36 @@ public class UISprite : UIWidget
 		cols.Add(col);
 		cols.Add(col);
 		cols.Add(col);
+	}
+	
+	/// <summary>
+	/// Vertex coloured sprite fill function is almost as simple.
+	/// </summary>
+	protected void VertexColouredFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+	{
+		Vector2 uv0 = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
+		Vector2 uv1 = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
+		
+		Vector4 v = drawingDimensions;
+		
+		verts.Add(new Vector3(v.x, v.y));
+		verts.Add(new Vector3(v.x, v.w));
+		verts.Add(new Vector3(v.z, v.w));
+		verts.Add(new Vector3(v.z, v.y));
+		
+		uvs.Add(uv0);
+		uvs.Add(new Vector2(uv0.x, uv1.y));
+		uvs.Add(uv1);
+		uvs.Add(new Vector2(uv1.x, uv0.y));
+	
+		foreach (Color vc in this.vertexColours)
+		{
+			Color colF = vc;
+			colF.a *= mPanel.alpha;
+			Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
+			
+			cols.Add(col);
+		}	
 	}
 
 	/// <summary>

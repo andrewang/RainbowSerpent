@@ -231,15 +231,14 @@ public class Snake : MobileCreature
 		newSegment.Visible = this.visible;		
 		
 		if (this.config.Player)
-		{
-			int colourIndex = this.NumSegments - 1;
-			if (colourIndex >= SerpentConsts.PlayerSegmentColours.Length)
-			{
-				// Make all remaining segements the same colour...?!
-				colourIndex = SerpentConsts.PlayerSegmentColours.Length;
-			}
+		{		
+			int firstColourIndex = (this.NumSegments - 1) % (SerpentConsts.PlayerSegmentColours.Length);
+			Color firstColor = SerpentConsts.PlayerSegmentColours[firstColourIndex];
 			
-			newSegment.Colour = SerpentConsts.PlayerSegmentColours[colourIndex];			
+			int secondColourIndex = (firstColourIndex + 1) % (SerpentConsts.PlayerSegmentColours.Length);
+			Color secondColor = SerpentConsts.PlayerSegmentColours[secondColourIndex];			
+
+			newSegment.SetGradatedColour(firstColor, secondColor);			
 		}
 		else
 		{

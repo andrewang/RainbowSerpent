@@ -1,16 +1,22 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/Components/MazeController.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Snakes/Snake.cs">
     <Files>
-      <File FileName="Assets/NGUI/Scripts/UI/UISprite.cs" Line="968" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="370" Column="18" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="165" Column="2" />
-      <File FileName="Assets/NGUI/Scripts/Internal/UIGeometry.cs" Line="38" Column="27" />
+      <File FileName="Assets/NGUI/Scripts/Internal/UIGeometry.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/UI/UIRoot.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="145" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/NGUI/Scripts/Internal/NGUITools.cs" Line="613" Column="34" />
+      <File FileName="Assets/NGUI/Scripts/UI/UISpriteData.cs" Line="11" Column="26" />
+      <File FileName="Assets/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1011" Column="41" />
+      <File FileName="Assets/NGUI/Scripts/Editor/NGUIMenu.cs" Line="108" Column="18" />
+      <File FileName="Assets/NGUI/Scripts/Editor/UICreateWidgetWizard.cs" Line="227" Column="36" />
+      <File FileName="Assets/NGUI/Scripts/Editor/UIToggleInspector.cs" Line="46" Column="36" />
+      <File FileName="Assets/NGUI/Scripts/Editor/UIImageButtonInspector.cs" Line="38" Column="41" />
+      <File FileName="Assets/NGUI/Scripts/Interaction/UIPopupList.cs" Line="393" Column="4" />
+      <File FileName="Assets/NGUI/Scripts/UI/UISprite.cs" Line="157" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="240" Column="78" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -21,7 +27,7 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" line="59" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/MazeController.cs" line="362" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/NGUI/Scripts/Internal/NGUITools.cs" line="609" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
