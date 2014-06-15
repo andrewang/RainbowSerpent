@@ -15,6 +15,7 @@ public class MazeController : MonoBehaviour
 	private int levelNumber;
 	private Color wallColour;
 	private bool screenShotLoaded = false;
+	private List<UISprite> wallSprites = new List<UISprite>();
 
 	/// <summary>
 	/// The centre position of the lower leftmost cell in the maze
@@ -86,11 +87,13 @@ public class MazeController : MonoBehaviour
 		this.lowerLeftCellCentre.y = -1.0f * ((height - 1) * SerpentConsts.CellHeight) * 0.5f;
 		
 		// If a screenshot for this level already exists then use that.
+		/*
 		if (ScreenShotExists())
 		{
 			LoadScreenShot();
 			this.screenShotLoaded = true;
 		}
+		*/
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
@@ -132,7 +135,7 @@ public class MazeController : MonoBehaviour
 			float x = (float)(startX + endX) * 0.5f;			
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
 			pos.x -= newWallSprite.width * 0.5f;
-			newWall.transform.localPosition = pos;			
+			newWall.transform.localPosition = pos;	
 			
 			return newWallSprite;		
 		};
@@ -203,8 +206,8 @@ public class MazeController : MonoBehaviour
 	/// </summary>
 	/// <param name="loopLimit">Loop limit.</param>
 	/// <param name="getWallAction">Get wall action.</param>
-	/// <param name="createWallAction">Create wall action.</param>
-	private void CreateWalls(int loopLimit, Func<int, Wall> getWallFunction, Func<int, int, UISprite> createWallFunction)
+	/// <param name="createSpriteFunction">Create sprite action.</param>
+	private void CreateWalls(int loopLimit, Func<int, Wall> getWallFunction, Func<int, int, UISprite> createSpriteFunction)
 	{
 		int start = -1;
 		for (int loop = 0; loop < loopLimit; ++loop)
@@ -213,14 +216,15 @@ public class MazeController : MonoBehaviour
 			bool wallEnds = (start >= 0 && (wall == null || wall is Door));
 			if (wallEnds && !this.screenShotLoaded)
 			{
-				createWallFunction(start, loop - 1);
+				UISprite sprite = createSpriteFunction(start, loop - 1);
+				this.wallSprites.Add(sprite);
 				start = -1;			
 			}
 			if (wall is Door)
 			{
 				Door door = wall as Door;
 				// Create a sprite for the door.
-				UISprite doorSprite = createWallFunction(loop, loop);	
+				UISprite doorSprite = createSpriteFunction(loop, loop);	
 				door.Sprite = doorSprite;			
 			}
 			else if (wall != null && start == -1)
@@ -233,7 +237,8 @@ public class MazeController : MonoBehaviour
 		// Any final wall at the end?
 		if (start != -1 && !this.screenShotLoaded)
 		{
-			createWallFunction(start, loopLimit - 1);
+			UISprite sprite = createSpriteFunction(start, loopLimit - 1);
+			this.wallSprites.Add(sprite);
 		}
 	}
 	
@@ -273,6 +278,7 @@ public class MazeController : MonoBehaviour
 		GameObject newObj = (GameObject) Instantiate(this.screenShotPrefab, new Vector3(0,0,0), Quaternion.identity);
 		newObj.transform.parent = this.transform;
 		newObj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		newObj.transform.localPosition = new Vector3(0,0);
 		return newObj;
 	}
 	
@@ -296,30 +302,20 @@ public class MazeController : MonoBehaviour
 	
 	public void CreateScreenshot()
 	{
+	/*
 		if (ScreenShotExists ()) 
 		{
 			return;
 		}
+		*/
+		
+		this.Maze.HideDoors();
 		
 		Vector3 relativePosition = GetLocalPositionSum( this.screenShotTaker.transform );
 		                                               
 		this.screenShotTaker.TakeScreenShot(ScreenShotPath(), 
-			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w	, 
-			(int) relativePosition.x, (int) relativePosition.y);
-	}
-	
-	private Vector3 GetLocalPositionSum(Transform relativeToTransform)
-	{
-		Vector3 relativePosition = this.transform.localPosition;
-		Transform temp = this.transform.parent;
-		
-		while( temp != relativeToTransform && temp != null )
-		{
-			relativePosition += temp.localPosition;
-			temp = temp.parent;
-		}
-		
-		return relativePosition;
+			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w, 
+		                                    (int) relativePosition.x, (int) relativePosition.y, UseScreenShot);
 	}
 	
 	private void LoadScreenShot()
@@ -327,27 +323,65 @@ public class MazeController : MonoBehaviour
 		string path = ScreenShotPath();
 		byte[] byteArray = File.ReadAllBytes(path);
 		
-		Texture2D tex = new Texture2D(4, 4);
-		tex.LoadImage(byteArray);
+		Texture2D screenshotTexture = new Texture2D(4, 4);
+		screenshotTexture.LoadImage(byteArray);
+		
+		UseScreenShot(screenshotTexture);
+	}
+	
+	private void UseScreenShot(Texture2D screenShotTexture)
+	{			
+		this.Maze.ShowDoors();
 		
 		GameObject gameObj = CreateScreenshotObject();
-		UITexture texture = GetUITextureComponent(gameObj);		
-		if (texture)
+		UITexture uiTexture = GetUITextureComponent(gameObj);		
+		if (uiTexture == null) { return; }		
+								
+		uiTexture.mainTexture = screenShotTexture;
+		uiTexture.MakePixelPerfect();	
+				
+		// TODO: it seems that accessing the transform during a coroutine callback is unsafe.	
+		
+		// NOTE: the maze itself is being shown at a reduced scale.  The screenshot was taken of images which had
+		// already been scaled down.  So at this point we need to divide by the maze's scale to compensate for the
+		// application of the current maze object's scale value on the ALREADY scaled-down maze.
+		Vector3 mazeScale = this.transform.localScale;
+		Vector3 textureScale = gameObj.transform.localScale;
+		textureScale.x /= mazeScale.x;
+		textureScale.y /= mazeScale.y;
+		gameObj.transform.localScale = textureScale;
+		
+		// set z position of the screenshot to further back.
+		int depth = uiTexture.depth;
+		uiTexture.depth = depth - 10;
+		
+		RemoveExistingWallSprites();
+	}
+	
+	private void RemoveExistingWallSprites()
+	{
+		// Remove existing wall sprites after creating a screenshot
+		foreach(UISprite sprite in this.wallSprites)
 		{
-			// since we created a separate object outside the panel and brought it inside, we need to reset its position
-			texture.transform.localPosition = new Vector3(0,0);
-
-			texture.mainTexture = tex;
-			texture.MakePixelPerfect();
-			// NOTE: the maze itself is being shown at a reduced scale.  The screenshot was taken of images which had
-			// already been scaled down.  So at this point we need to divide by the maze's scale to compensate for the
-			// application of the current maze object's scale value on the ALREADY scaled-down maze.
-			Vector3 mazeScale = this.transform.localScale;
-			Vector3 textureScale = gameObj.transform.localScale;
-			textureScale.x /= mazeScale.x;
-			textureScale.y /= mazeScale.y;
-			gameObj.transform.localScale = textureScale;
+			sprite.gameObject.transform.parent = null;
+			UnityEngine.Object.Destroy(sprite.gameObject);
 		}
+		this.wallSprites.Clear();
+	}
+	
+	// In the chain of transforms, calculate all the local offsets relative to the specified ancestor transform.
+	private Vector3 GetLocalPositionSum(Transform ancestorTransform)
+	{
+		Vector3 relativePosition = this.transform.localPosition;
+		Transform temp = this.transform.parent;
+		
+		while( temp != ancestorTransform && temp != null )
+		{
+			relativePosition += temp.localPosition;
+			temp = temp.parent;
+		}
+		
+		return relativePosition;
 	}
 	
 	private string ScreenShotPath()
@@ -365,70 +399,8 @@ public class MazeController : MonoBehaviour
 	
 	#endregion Screenshots
 
-	/// <summary>
-	/// Gets the centre position of a cell
-	/// </summary>
-	/// <returns>The cell centre.</returns>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	public Vector3 GetCellCentre(float x, float y)
-	{
-		Vector3 pos = this.lowerLeftCellCentre;
-		pos.x += x * SerpentConsts.CellWidth;
-		pos.y += y * SerpentConsts.CellHeight;
-		return pos;
-	}
-	
-	/// <summary>
-	/// Gets the maze cell containing the provided position.
-	/// </summary>
-	/// <returns>The cell for position.</returns>
-	/// <param name="position">Position.</param>
-	public MazeCell GetCellForPosition(Vector3 position)
-	{
-		Vector3 displacement = position - this.lowerLeftCellCentre;		
-		int x = (int) (displacement.x / SerpentConsts.CellWidth + 0.5f);
-		int y = (int) (displacement.y / SerpentConsts.CellHeight + 0.5f);
-		if (x >= this.Maze.Width || y >= this.Maze.Height) { return null; }
-		return this.Maze.Cells[x,y];
-	}
-	
-	public Vector3 GetNextCellCentre(Vector3 position, SerpentConsts.Dir direction)
-	{
-		// Convert the Vector3 position into a floating point position measured
-		// in cells.  Then adjust the position by a step in the direction specified,
-		// and then round off the position to determine which cell that is.
-		
-		Vector3 pos = position - this.lowerLeftCellCentre;
-		Vector3 cellPos = pos;
-		cellPos.x /= (float)SerpentConsts.CellWidth;
-		cellPos.y /= (float)SerpentConsts.CellHeight;
-		cellPos += SerpentConsts.DirectionVector3[(int) direction];
-		
-		// now round to nearest position		
-		IntVector2 intCellPos = new IntVector2(0,0);		
-		intCellPos.x = (int) (cellPos.x + 0.5f);
-		intCellPos.y = (int) (cellPos.y + 0.5f);
-		
-		// Get the centre position of this cell, and return it.		
-		Vector3 newPos = GetCellCentre(intCellPos.x, intCellPos.y);
-		return newPos;
-	}
-	
-	
-	/// <summary>
-	/// Return whether motion is blocked from a given position, in a given direction.
-	/// </summary>
-	/// <returns><c>true</c>, if motion was blocked, <c>false</c> otherwise.</returns>
-	/// <param name="position">Position.</param>
-	/// <param name="direction">Direction.</param>
-	public bool IsMotionBlocked(Vector3 position, SerpentConsts.Dir direction)
-	{
-		MazeCell cell = GetCellForPosition(position);
-		if (cell == null) { return true; }
-		
-		return cell.IsMotionBlocked(direction);
-	}
+
+	#region Movement related methods	
 	
 	public void OpenDoor(Vector3 position, SerpentConsts.Dir direction)
 	{
@@ -454,6 +426,20 @@ public class MazeController : MonoBehaviour
 			Door d = w as Door;
 			d.Close();
 		}
+	}
+	
+	/// <summary>
+	/// Return whether motion is blocked from a given position, in a given direction.
+	/// </summary>
+	/// <returns><c>true</c>, if motion was blocked, <c>false</c> otherwise.</returns>
+	/// <param name="position">Position.</param>
+	/// <param name="direction">Direction.</param>
+	public bool IsMotionBlocked(Vector3 position, SerpentConsts.Dir direction)
+	{
+		MazeCell cell = GetCellForPosition(position);
+		if (cell == null) { return true; }
+		
+		return cell.IsMotionBlocked(direction);
 	}
 	
 	public List<SerpentConsts.Dir> GetValidDirections(Vector3 position, bool allowOffscreen)
@@ -490,21 +476,10 @@ public class MazeController : MonoBehaviour
 		
 		return availableDirections;
 	}
-	/// <summary>
-	/// Gets the centre position for a cell side, to place a wall there
-	/// </summary>
-	/// <returns>The cell side's centre.</returns>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	/// <param name="side">Side.</param>
-	private Vector3 GetCellSideCentre(float x, float y, int intSide)
-	{
-		float fx = x + SerpentConsts.DirectionVector3[intSide].x * 0.5f;
-		float fy = y + SerpentConsts.DirectionVector3[intSide].y * 0.5f;
-
-		Vector3 pos = GetCellCentre(fx, fy);
-		return pos;
-	}
+	
+	#endregion Motion methods
+	
+	#region Snake placement
 	
 	public void PlaceSnake(Snake snake, bool player)
 	{
@@ -526,7 +501,79 @@ public class MazeController : MonoBehaviour
 		snake.SetInitialLocation(position, direction);
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);
-		// Something should be added to the snake trail		
+		// TODO Should something be added to the snake trail?
 	}
+	
+	#endregion Snake placement
+	
+	#region Utility methods
+	
+	/// <summary>
+	/// Gets the centre position of a cell
+	/// </summary>
+	/// <returns>The cell centre.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	public Vector3 GetCellCentre(float x, float y)
+	{
+		Vector3 pos = this.lowerLeftCellCentre;
+		pos.x += x * SerpentConsts.CellWidth;
+		pos.y += y * SerpentConsts.CellHeight;
+		return pos;
+	}
+	
+	/// <summary>
+	/// Gets the maze cell containing the provided position.
+	/// </summary>
+	/// <returns>The cell for position.</returns>
+	/// <param name="position">Position.</param>
+	public MazeCell GetCellForPosition(Vector3 position)
+	{
+		Vector3 displacement = position - this.lowerLeftCellCentre;		
+		int x = (int) (displacement.x / SerpentConsts.CellWidth + 0.5f);
+		int y = (int) (displacement.y / SerpentConsts.CellHeight + 0.5f);
+		if (x < 0 || y < 0 || x >= this.Maze.Width || y >= this.Maze.Height) { return null; }
+		return this.Maze.Cells[x,y];
+	}
+	
+	public Vector3 GetNextCellCentre(Vector3 position, SerpentConsts.Dir direction)
+	{
+		// Convert the Vector3 position into a floating point position measured
+		// in cells.  Then adjust the position by a step in the direction specified,
+		// and then round off the position to determine which cell that is.
+		Vector3 pos = position - this.lowerLeftCellCentre;
+		Vector3 cellPos = pos;
+		cellPos.x /= (float)SerpentConsts.CellWidth;
+		cellPos.y /= (float)SerpentConsts.CellHeight;
+		cellPos += SerpentConsts.DirectionVector3[(int) direction];
+		
+		// now round to nearest position		
+		IntVector2 intCellPos = new IntVector2(0,0);		
+		intCellPos.x = (int) (cellPos.x + 0.5f);
+		intCellPos.y = (int) (cellPos.y + 0.5f);
+		
+		// Get the centre position of this cell, and return it.		
+		Vector3 newPos = GetCellCentre(intCellPos.x, intCellPos.y);
+		return newPos;
+	}
+	
+	/// <summary>
+	/// Gets the centre position for a cell side, to place a wall there
+	/// </summary>
+	/// <returns>The cell side's centre.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="side">Side.</param>
+	private Vector3 GetCellSideCentre(float x, float y, int intSide)
+	{
+		float fx = x + SerpentConsts.DirectionVector3[intSide].x * 0.5f;
+		float fy = y + SerpentConsts.DirectionVector3[intSide].y * 0.5f;
+		
+		Vector3 pos = GetCellCentre(fx, fy);
+		return pos;
+	}
+	
+	#endregion Utility methods
+	
 }
 

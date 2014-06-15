@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Collections;
 using SerpentExtensions;
 
+// TODO REFACTOR
+
 public class GameManager : MonoBehaviour
 {
 	#region Serialized Fields
@@ -98,6 +100,8 @@ public class GameManager : MonoBehaviour
 	{
 		TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
 		this.mazeController.SetUp(levelNum, mazeTextAsset, this.theme.WallColour);		
+
+		this.mazeController.CreateScreenshot();		
 	}
 	
 	private void SetTimers()
@@ -253,7 +257,6 @@ public class GameManager : MonoBehaviour
 		this.snakes.Add( s );
 
 		this.playerSnake = s;
-		this.playerSnake.ChangeColour(this.theme.PlayerSnakeColour);
 		
 		PlayerSnakeController psc = s.Controller as PlayerSnakeController;
 		psc.SnakeReturnedToStart += PlayerReturnedToStart;
@@ -310,10 +313,6 @@ public class GameManager : MonoBehaviour
 		
 		yield return new WaitForSeconds(3.0f);		
 		
-		//Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
-		
-		// TODO: set level state to LevelEnd if the player wins.
-		
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
 		{	
@@ -334,9 +333,7 @@ public class GameManager : MonoBehaviour
 	
 	private void PlayerExitedStart(Snake playerSnake)
 	{
-		StartPlay();
-//		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
-		
+		StartPlay();		
 	}
 	
 	private void PlayerReturnedToStart(Snake playerSnake)
@@ -420,7 +417,8 @@ public class GameManager : MonoBehaviour
 		e.Side = snake.Side;
 		e.CreatureDied += EggDied;
 		SnakeBody lastSegment = snake.Tail;
-		lastSegment.BeginToCreateEgg(e);			
+		lastSegment.BeginToCreateEgg(e);
+		
 		return e;
 	}
 	

@@ -69,6 +69,7 @@ namespace SerpentExtensions
 			child.transform.parent = newParent.transform;
 			child.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);			
 		}
+		
 	}
 
 }

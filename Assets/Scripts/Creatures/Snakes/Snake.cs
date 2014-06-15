@@ -60,6 +60,8 @@ public class Snake : MobileCreature
 	}
 
 	private SnakeConfig config;
+	
+	// Snake colour now applies only to enemy snakes.
 	private Color colour;
 	
 	private SnakeHead head;
@@ -188,37 +190,60 @@ public class Snake : MobileCreature
 		// This method should add a new segment at the end of the snake.  It can be in the same position
 		// as the last segment and will appear when the now next-to-last segment moves away from
 		// its current position.
+		SnakeSegment newSegment = null;
+		
 		if (this.head == null)
 		{
 			this.head = SerpentUtils.Instantiate<SnakeHead>(this.config.HeadPrefab, this.transform);
-			this.head.Colour = this.colour;
-			this.head.Visible = this.visible;
-			this.head.Snake = this;
+			newSegment = this.head;		
+			newSegment.Snake = this;
 		}
 		else
 		{
-			SnakeBody newSegment = Managers.SnakeBodyCache.GetObject<SnakeBody>();
-			newSegment.ResetProperties();
+			SnakeBody newBodySegment = Managers.SnakeBodyCache.GetObject<SnakeBody>();
+			newSegment = newBodySegment;
 			
-			newSegment.SetParent(this);
+			newBodySegment.ResetProperties();			
+			newBodySegment.SetParent(this);
 			
-			newSegment.Colour = this.colour;
-			newSegment.Visible = this.visible;
-			newSegment.Snake = this;
+			newBodySegment.Snake = this;
 			
 			SnakeSegment last = this.Tail;
 			if (last == null) { last = this.head; }
 			
-			last.NextSegment = newSegment;
+			last.NextSegment = newBodySegment;
 			
 			// NOTE, assuming that the segments are the same width and height here.
-			float distance = last.Height * 0.5f + newSegment.Height * 0.5f;
-			if (last is SnakeBody)
+			SnakeBody lastBodySegment = last as SnakeBody;
+			float distance = last.Height * 0.5f + newBodySegment.Height * 0.5f;
+			if (lastBodySegment != null)
 			{
-				SnakeBody lastBodySegment = last as SnakeBody;
 				distance += lastBodySegment.DistanceFromHead;
 			}
-			newSegment.DistanceFromHead = distance;
+			newBodySegment.DistanceFromHead = distance;
+			
+			if (lastBodySegment != null)
+			{
+				lastBodySegment.MoveEgg(newBodySegment);
+			}
+		}
+		
+		newSegment.Visible = this.visible;		
+		
+		if (this.config.Player)
+		{
+			int colourIndex = this.NumSegments - 1;
+			if (colourIndex >= SerpentConsts.PlayerSegmentColours.Length)
+			{
+				// Make all remaining segements the same colour...?!
+				colourIndex = SerpentConsts.PlayerSegmentColours.Length;
+			}
+			
+			newSegment.Colour = SerpentConsts.PlayerSegmentColours[colourIndex];			
+		}
+		else
+		{
+			newSegment.Colour = this.colour;
 		}
 		
 		if (this.SnakeSegmentsChanged != null)

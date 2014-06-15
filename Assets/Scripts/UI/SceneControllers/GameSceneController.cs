@@ -53,7 +53,7 @@ public class GameSceneController : RSSceneController
 		ConfigureInput();
 		this.gameManager.Begin();
 	}
-
+	
 	private void ConfigureUI()
 	{
 		LevelTheme theme = this.gameManager.Theme;

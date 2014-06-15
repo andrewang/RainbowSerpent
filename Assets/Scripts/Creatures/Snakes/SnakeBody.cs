@@ -28,7 +28,8 @@ public class SnakeBody : SnakeSegment
 	
 	public void MoveEgg(SnakeBody otherSegment)
 	{
-		// When this method is called if this segment has an egg attached, the other segment should become the new owner of the egg.
+		// When this method is called, if this segment has an egg attached,
+		// the egg should be transferred to the other segment
 		if (this.Egg == null) { return; }
 				
 		otherSegment.BeginToCreateEgg(this.Egg);

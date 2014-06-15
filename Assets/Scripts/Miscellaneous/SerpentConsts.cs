@@ -163,8 +163,24 @@ public static class SerpentConsts
 	public static int PlayerSnakeLength = 3;
 	public static int SmallPlayerSnakeLength = 2;
 	
-	
 	public static int ScoreForBonusLife = 10000;
+		
+	public static Color[] PlayerSegmentColours = new Color[]
+	{
+		Color.green,	//0f, 1.0f, 0f
+		new Color		(0f, 1.0f, 0.5f),
+		new Color		(0f, 1.0f, 1.0f),
+		new Color		(0f, 0.5f, 1.0f),
+		Color.blue,		//0f, 0f, 1.0f
+		new Color		(0.5f, 0f, 1.0f),
+		new Color		(1.0f, 0f, 1.0f),
+		new Color		(1.0f, 0f, 0.5f),
+		Color.red,		//1.0f, 0f, 0f
+		new Color		(1.0f, 0.5f, 0f),
+		Color.yellow,
+		new Color   	(0.5f, 1.0f, 0f),
+	};
+	
 	
 	public static class SceneNames
 	{
