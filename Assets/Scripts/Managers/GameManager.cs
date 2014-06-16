@@ -79,13 +79,16 @@ public class GameManager : MonoBehaviour
 		}
 		
 		LoadTheme(levelNum);
+		
+		// NOTE: snakes need to be created before input can be configured.  So snakes need to be created here.
+		SetTimers();
+		CreateSnakes();		
+		
 		LoadMapData(levelNum);
 	}
 	
 	public void Begin()
 	{
-		SetTimers();
-		CreateSnakes();		
 		StartCoroutine( PlaceSnakes() );
 	}
 	

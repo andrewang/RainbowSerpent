@@ -90,13 +90,11 @@ public class MazeController : MonoBehaviour
 		this.lowerLeftCellCentre.y = -1.0f * ((height - 1) * SerpentConsts.CellHeight) * 0.5f;
 		
 		// If a screenshot for this level already exists then use that.
-		/*
 		if (ScreenShotExists())
 		{
 			LoadScreenShot();
 			this.screenShotLoaded = true;
 		}
-		*/
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
@@ -338,6 +336,7 @@ public class MazeController : MonoBehaviour
 		string path = ScreenShotPath();
 		byte[] byteArray = File.ReadAllBytes(path);
 		
+		// The texture will be resized by reading it in.
 		Texture2D screenshotTexture = new Texture2D(4, 4);
 		screenshotTexture.LoadImage(byteArray);
 		
@@ -354,9 +353,7 @@ public class MazeController : MonoBehaviour
 								
 		uiTexture.mainTexture = screenShotTexture;
 		uiTexture.MakePixelPerfect();	
-				
-		// TODO: it seems that accessing the transform during a coroutine callback is unsafe.	
-		
+						
 		// NOTE: the maze itself is being shown at a reduced scale.  The screenshot was taken of images which had
 		// already been scaled down.  So at this point we need to divide by the maze's scale to compensate for the
 		// application of the current maze object's scale value on the ALREADY scaled-down maze.
@@ -401,7 +398,7 @@ public class MazeController : MonoBehaviour
 	
 	private string ScreenShotPath()
 	{
-		string dataPath = Application.dataPath;
+		string dataPath = Application.persistentDataPath;
 		dataPath = Path.Combine(dataPath, "Maze." + this.levelNumber + ".png");
 		return dataPath;
 	}

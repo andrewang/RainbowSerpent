@@ -58,11 +58,15 @@ public class Door : Wall
 	
 	public void Hide()
 	{
+		if (this.Sprite == null) { return; }
+		
 		this.Sprite.alpha = 0.0f;
 	}
 	
 	public void Show()
 	{
+		if (this.Sprite == null) { return; }
+		
 		this.Sprite.alpha = 1.0f;
 	}
 }
