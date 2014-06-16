@@ -4,7 +4,7 @@ using System.IO;
 using System;
 
 public class ScreenShotTaker : MonoBehaviour 
-{
+{	
 	public void TakeScreenShot(string fileName, int width, int height, int centreX, int centreY, Action<Texture2D> completed)
 	{		
 		// incoming coordinates are based on a centre origin and need to be converted to pixel space

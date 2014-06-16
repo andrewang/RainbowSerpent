@@ -80,12 +80,12 @@ public class GameManager : MonoBehaviour
 		
 		LoadTheme(levelNum);
 		LoadMapData(levelNum);
-		SetTimers();
-		CreateSnakes();		
 	}
 	
 	public void Begin()
 	{
+		SetTimers();
+		CreateSnakes();		
 		StartCoroutine( PlaceSnakes() );
 	}
 	
@@ -101,7 +101,8 @@ public class GameManager : MonoBehaviour
 		TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
 		this.mazeController.SetUp(levelNum, mazeTextAsset, this.theme.WallColour);		
 
-		this.mazeController.CreateScreenshot();		
+		// Only place snakes once the map screenshot has been made.  So we pass a reference to the Begin method in here to be invoked when CreateScreenShot is done.
+		this.mazeController.CreateScreenshot(Begin);		
 	}
 	
 	private void SetTimers()

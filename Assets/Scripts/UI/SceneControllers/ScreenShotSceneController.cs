@@ -56,6 +56,6 @@ public class ScreenShotSceneController : RSSceneController
 		// but then hide the doors
 		this.mazeController.Maze.HideDoors();
 		// In reality this should only occur if the screenshot doesn't exist.
-		this.mazeController.CreateScreenshot();		
+		//this.mazeController.CreateScreenshot();		
 	}
 }

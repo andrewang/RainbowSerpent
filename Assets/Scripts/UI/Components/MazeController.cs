@@ -14,7 +14,10 @@ public class MazeController : MonoBehaviour
 	
 	private int levelNumber;
 	private Color wallColour;
+	
+	private Action screenShotCompletedAction;
 	private bool screenShotLoaded = false;
+	
 	private List<UISprite> wallSprites = new List<UISprite>();
 
 	/// <summary>
@@ -300,14 +303,15 @@ public class MazeController : MonoBehaviour
 	// A couple of screenshots can replace many wall sprites!  One for the outside walls and snake entry points, and
 	// one for everything.	
 	
-	public void CreateScreenshot()
+	public void CreateScreenshot(Action completedAction)
 	{
-	/*
 		if (ScreenShotExists ()) 
 		{
+			completedAction();
 			return;
 		}
-		*/
+		
+		this.screenShotCompletedAction = completedAction;
 		
 		this.Maze.HideDoors();
 		
@@ -315,7 +319,18 @@ public class MazeController : MonoBehaviour
 		                                               
 		this.screenShotTaker.TakeScreenShot(ScreenShotPath(), 
 			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w, 
-		                                    (int) relativePosition.x, (int) relativePosition.y, UseScreenShot);
+		                                    (int) relativePosition.x, (int) relativePosition.y, ScreenShotCreated);
+	}
+	
+	private void ScreenShotCreated(Texture2D screenShotTexture)
+	{
+		UseScreenShot(screenShotTexture);
+		if (this.screenShotCompletedAction != null)
+		{
+			this.screenShotCompletedAction();
+			this.screenShotCompletedAction = null;
+		}
+		
 	}
 	
 	private void LoadScreenShot()

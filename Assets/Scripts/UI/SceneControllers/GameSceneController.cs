@@ -45,13 +45,9 @@ public class GameSceneController : RSSceneController
 
 	private void LoadGameLevel(int levelNum)
 	{
-		// TODO Clear stuff?
-		// TODO load theme based on level number.
-
 		this.gameManager.Setup(levelNum);		
 		ConfigureUI();
 		ConfigureInput();
-		this.gameManager.Begin();
 	}
 	
 	private void ConfigureUI()

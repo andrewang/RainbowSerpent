@@ -119,6 +119,7 @@ public class SnakeSegment : MonoBehaviour
 	{
 		// Should reset all the segment's properties.
 		this.NextSegment = null;
+		this.sprite.type = UISprite.Type.Filled;
 	}
 		
 	public bool TouchesSegment( SnakeSegment otherSegment )
