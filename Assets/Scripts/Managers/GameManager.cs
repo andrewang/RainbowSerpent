@@ -294,23 +294,17 @@ public class GameManager : MonoBehaviour
 		return snake;
 	}	
 	
-	// testing method
-	/*
-	private void PlaceSnakesInstantly()
-	{
-		PlaceSnake(this.playerSnake, 1, 0, SerpentConsts.Dir.E);
-		
-		for (int i = 0; i < this.enemySnakes.Count; ++i)
-		{		
-			PlaceSnake(this.enemySnakes[i], 8, 12, SerpentConsts.Dir.W);
-		}	
-	}
-	*/
-	
 	private IEnumerator PlaceSnakes()
 	{
 		Managers.GameState.LevelState = SerpentConsts.LevelState.LevelStart;
 		
+		// For a subsequent level, in case playersnake has been cleared, reattach it.
+		FindPlayerSnake();
+		
+		if (this.playerSnake == null) 
+		{
+			Debug.Log("Player snake is still null");
+		}
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;				
@@ -323,6 +317,16 @@ public class GameManager : MonoBehaviour
 			this.mazeController.PlaceSnake(enemySnakes[i], false);	
 			yield return new WaitForSeconds(5.0f);
 		}		
+	}
+	
+	private void FindPlayerSnake()
+	{
+		if (this.playerSnake != null) { return; }
+		
+		List<Snake> playerSnakes = this.snakes.FindAll( s => s.Side == SerpentConsts.Side.Player );
+		if (playerSnakes.Count == 0) { return; }
+		
+		this.playerSnake = playerSnakes[0];	
 	}
 	
 	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction)

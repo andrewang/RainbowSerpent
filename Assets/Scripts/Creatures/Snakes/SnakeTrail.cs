@@ -67,9 +67,10 @@ public class SnakeTrail
 			lastPos = nextPos;
 		}
 		
-		if (removeElements)
+		if (removeElements && i + 1 < this.positions.Count)
 		{
-			this.positions = this.positions.GetRange( 0, i );
+			// The current point might not give us MaxLength of trail, so remove AFTER this element.
+			this.positions = this.positions.GetRange( 0, i + 1);
 		}
 	}
 	
@@ -174,26 +175,6 @@ public class SnakeTrail
 		
 		return -1;
 	}
-	
-	/*
-	
-	public Vector3 GetSegmentPosition( float distanceFromHead )
-	{
-		// Interpolate (distanceFromHead) units between the appropriate positions in the list.
-		int indexBefore = GetPositionIndexBefore( distanceFromHead );
-		if (indexBefore == -1) 
-		{
-			// return the last position in the trail.
-			SnakePosition position = this.positions[ this.positions.Count - 1 ];
-			return position.Position;
-		}
-		
-		SnakePosition posBefore = this.positions[indexBefore];
-		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (distanceFromHead - posBefore.DistanceFromHead);
-		return posBefore.Position + displacement;		
-	}
-	
-	*/
 }
 
 
