@@ -90,11 +90,13 @@ public class MazeController : MonoBehaviour
 		this.lowerLeftCellCentre.y = -1.0f * ((height - 1) * SerpentConsts.CellHeight) * 0.5f;
 		
 		// If a screenshot for this level already exists then use that.
+		/*
 		if (ScreenShotExists())
 		{
 			LoadScreenShot();
 			this.screenShotLoaded = true;
 		}
+		*/
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
@@ -512,8 +514,7 @@ public class MazeController : MonoBehaviour
 		Debug.Log("Adding snake at (" + cellPosition.x + "," + cellPosition.y + "): " + position.x + "," + position.y);
 		snake.SetInitialLocation(position, direction);
 		snake.Visible = true;
-		snake.Controller.StartMoving(direction);
-		// TODO Should something be added to the snake trail?
+		snake.Controller.StartMoving(direction);		
 	}
 	
 	#endregion Snake placement

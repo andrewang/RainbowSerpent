@@ -98,6 +98,11 @@ public class SnakeSegment : MonoBehaviour
 		this.sprite.SetVertexColours(c2, c1, c1, c2);		
 	}
 	
+	public void SetSpriteName(string spriteName)
+	{
+		this.sprite.spriteName = spriteName;
+	}
+	
 	public bool Visible
 	{
 		get

@@ -204,9 +204,11 @@ public class Snake : MobileCreature
 			newSegment = newBodySegment;
 			
 			newBodySegment.ResetProperties();			
-			newBodySegment.SetParent(this);
-			
+			newBodySegment.SetParent(this);			
 			newBodySegment.Snake = this;
+			
+			// Configure sprite with prefab.
+			newBodySegment.SetSpriteName(this.config.BodySprite.spriteName);
 			
 			SnakeSegment last = this.Tail;
 			if (last == null) { last = this.head; }

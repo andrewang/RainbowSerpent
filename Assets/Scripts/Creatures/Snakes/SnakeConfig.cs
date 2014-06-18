@@ -8,6 +8,8 @@ public class SnakeConfig : MonoBehaviour
 	public bool Player;
 	public int BaseSpeed;
 	public int SpeedPenaltyPerSegment;
+	
+	public UISprite BodySprite;
 }
 
 
