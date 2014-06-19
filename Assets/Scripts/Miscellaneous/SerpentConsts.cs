@@ -18,8 +18,8 @@ public static class SerpentConsts
 	public const string DirectionKey = "dir";
 	
 	// Pixel sizes of cells.
-	public const int CellWidth = 64;
-	public const int CellHeight = 48;
+	public const int CellWidth = 32;
+	public const int CellHeight = 24;
 	
 	public const int BorderWidth = 1;
 	

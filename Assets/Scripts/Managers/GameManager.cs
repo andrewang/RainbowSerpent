@@ -305,6 +305,10 @@ public class GameManager : MonoBehaviour
 		{
 			Debug.Log("Player snake is still null");
 		}
+		if (this.mazeController == null)
+		{
+			Debug.Log("Maze controller is null!");
+		}
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;				
