@@ -561,19 +561,42 @@ public class GameManager : MonoBehaviour
 	
 	private IEnumerator PlayerDeathSequence()
 	{
-		// Remove any eggs?
-		
 		yield return new WaitForSeconds(3.0f);
 		
 		Managers.GameState.ExtraSnakes--;		
 		
+		// Remove any player egg.  Create enemy snake if egg exists.
+		
+		HandleEggsAfterPlayerDeath();
+		
+		ResetSnakes();
+				
+		StartCoroutine( PlaceSnakes() );
+	}
+	
+	private void HandleEggsAfterPlayerDeath()
+	{
+		for( int side = 0; side <= (int) SerpentConsts.Side.Enemy; ++side )
+		{
+			Egg e = this.eggs[side];
+			if (e == null) { continue; }
+			
+			if (side == (int)SerpentConsts.Side.Enemy)
+			{				
+				EggHatched(e);
+			}
+			e.Die();
+		}
+	}
+	
+	private void ResetSnakes()
+	{
 		for( int i = 0; i < this.snakes.Count; ++i )
 		{
 			this.snakes[i].Reset();
 		}
-				
-		StartCoroutine( PlaceSnakes() );
 	}
+	
 	
 	#endregion Snake Death
 	
