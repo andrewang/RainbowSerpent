@@ -35,6 +35,13 @@
     {"direction":"E","special":"PlayerStart"},
     {"direction":"E","special":"PlayerZoneExit"},   
   ],
+  "playerStartZone": [
+  	{"X":1, "Y":1},
+  	{"X":2, "Y":1},
+  	{"X":3, "Y":1},
+  	{"X":1, "Y":2},
+  	{"X":1, "Y":3},
+  ],
   "width": 11,
   "height": 13,
 }
