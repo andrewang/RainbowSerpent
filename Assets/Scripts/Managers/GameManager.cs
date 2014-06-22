@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour
 	
 	// Prefabs used to instantiate creatures
 	[SerializeField] private GameObject snakePrefab = null;
-	[SerializeField] private GameObject eggPrefab = null;
 	[SerializeField] private GameObject frogPrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
 	[SerializeField] private GameObject enemySnakeConfig = null;
@@ -301,14 +300,9 @@ public class GameManager : MonoBehaviour
 		// For a subsequent level, in case playersnake has been cleared, reattach it.
 		FindPlayerSnake();
 		
-		if (this.playerSnake == null) 
-		{
-			Debug.Log("Player snake is still null");
-		}
-		if (this.mazeController == null)
-		{
-			Debug.Log("Maze controller is null!");
-		}
+		// Remove one extra snake on initial placement
+		Managers.GameState.ExtraSnakes--;
+				
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;				
@@ -350,11 +344,24 @@ public class GameManager : MonoBehaviour
 	
 	private void PlayerReturnedToStart(Snake playerSnake)
 	{
-		// time to go to the next level.
-		this.playerSnake.ReturnToCache();
 		this.playerSnake.Visible = false;
+		this.playerSnake.ReturnToCache();
 		this.playerSnake = null;
-		Managers.GameState.Level += 1;
+		
+		// Add one again to player snakes.  This allows new player snakes to increase the total.  When the initial player is spawned that subtracts one.
+		Managers.GameState.ExtraSnakes += 1;
+		
+		// Does a player egg exist?
+		Egg e = this.eggs[ (int) SerpentConsts.Side.Player ];
+		if ( e != null )
+		{
+			EggHatched( e );
+			e.Die();
+			return;
+		}
+		
+		// Time to go to the next level.		
+		Managers.GameState.Level += 1;		
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
 	}
 	
@@ -424,7 +431,7 @@ public class GameManager : MonoBehaviour
 	
 	private Egg LayEgg(Snake snake)
 	{
-		Egg e = CreateEgg();
+		Egg e = CreateEgg(snake);
 		
 		e.Side = snake.Side;
 		e.CreatureDied += EggDied;
@@ -434,9 +441,13 @@ public class GameManager : MonoBehaviour
 		return e;
 	}
 	
-	private Egg CreateEgg()
+	private Egg CreateEgg(Snake snake)
 	{
-		Egg egg = SerpentUtils.Instantiate<Egg>(this.eggPrefab, this.mazeController.transform);
+		GameObject eggPrefab = snake.GetEggPrefab();
+		Egg egg = SerpentUtils.Instantiate<Egg>(eggPrefab, this.mazeController.transform);
+		// reset rotation
+		egg.transform.localRotation = Quaternion.identity;
+		
 		egg.Hatched += EggHatched;
 		egg.FullyGrown += EggFullyGrown;		
 		return egg;

@@ -67,7 +67,7 @@ public class GameState
 	{
 		this.Level = 1;
 		this.Score = 0;
-		this.ExtraSnakes = 2;
+		this.ExtraSnakes = SerpentConsts.InitialNumPlayerSnakes;
 		this.LevelState = SerpentConsts.LevelState.LevelStart;
 	}
 	

@@ -668,5 +668,13 @@ public class Snake : MobileCreature
 	
 	#endregion Interaction with other creatures
 	
+	#region Eggs
+	
+	public GameObject GetEggPrefab()
+	{
+		return this.config.EggPrefab;
+	}
+	
+	#endregion Eggs
 }
 
