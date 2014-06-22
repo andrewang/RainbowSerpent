@@ -128,7 +128,7 @@ public static class SerpentConsts
 	}
 	
 	
-	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 10);
+	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 60);
 	public static TimeSpan EnemyEggFrequency = new TimeSpan(0, 0, 15);
 	public static TimeSpan TimeToLayEgg = new TimeSpan(0, 0, 10);
 	public static TimeSpan EnemyEggHatchingTime = new TimeSpan(0, 0, 30);

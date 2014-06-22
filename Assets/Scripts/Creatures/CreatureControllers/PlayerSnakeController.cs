@@ -121,13 +121,13 @@ public class PlayerSnakeController : SnakeController
 			return SerpentConsts.Dir.None;
 		}
 		
-		// Check if it's possible to turn.  If not, return the current direction
 		SerpentConsts.Dir currentDirection = this.snake.Head.CurrentDirection;
 		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) currentDirection ];
 		
 		List<SerpentConsts.Dir> availableDirections = GetAvailableDirections();
 		availableDirections.Remove(oppositeDirection);
-		
+
+		// Handle no-turn situations.		
 		if (availableDirections.Count == 0) 
 		{
 			return this.desiredDirection;
@@ -136,35 +136,45 @@ public class PlayerSnakeController : SnakeController
 		{
 			return availableDirections[0];
 		}
-			
-		// Try a y direction choice first.  Otherwise pick between x choices.  If all else fails go in opposite y.		
 		
+		// We're at an intersection with a chioce.
+				
 		SerpentConsts.Dir bestYDir = GetBestYDirection(headMazeCell.Y, targetPos.y);
 		SerpentConsts.Dir bestXDir = GetBestXDirection(headMazeCell.X, targetPos.x);
 		
 		SerpentConsts.Dir bestDir;
 		SerpentConsts.Dir secondBestDir;
 		
+		// Figure out our preferred and second-preferred directions
 		if (bestYDir == SerpentConsts.Dir.None)
 		{
+			// Can't turn towards where we want to go on the Y axis, so take the X-axis direction.
 			bestDir = bestXDir;
 			secondBestDir = bestYDir;
 		}
 		else if (bestXDir == SerpentConsts.Dir.None)
 		{
+			// Can't turn towards where we want to go on the X axis, so take the Y-axis direction.
 			bestDir = bestYDir;
 			secondBestDir = bestXDir;
-		}
+		}		
+		// Prefer x choice over y, if both are available.  This assumes there's a clear path along the
+		// leftmost column to the player start (so it's sort of cheating?)
+		
+		/*
+		// Random pick
 		else if (UnityEngine.Random.Range(0,2) == 0)
 		{
 			bestDir = bestYDir;
 			secondBestDir = bestXDir;
 		}
+		*/
 		else
 		{
 			bestDir = bestXDir;
 			secondBestDir = bestYDir;
 		}
+
 				
 		if (availableDirections.Contains(bestDir))
 		{
