@@ -6,19 +6,13 @@ public class Frog : MobileCreature
 {
 	private DateTime moveTime;
 	
-	private GameManager gameManager;
 	
 	private void Start ()
 	{
 		UpdateTimer();
 	}
-	
-	public void SetUp( GameManager gameManager )
-	{
-		this.gameManager = gameManager;
-	}
-	
-	private void Update ()
+
+	protected virtual void Update ()
 	{
 		if (DateTime.Now > this.moveTime)
 		{
@@ -55,22 +49,7 @@ public class Frog : MobileCreature
 		this.CurrentDestination = dest;			
 	}
 	
-	private Snake GetNearestSnake()
-	{		
-		List<Snake> snakes = this.gameManager.GetSnakes();
-		List<Creature> creatures = new List<Creature>();
-		foreach( Snake s in snakes )
-		{
-			creatures.Add( s );
-		}
-		return GetNearestCreature( creatures ) as Snake;
-	}
 	
-	private Egg GetNearestEgg()
-	{
-		List<Creature> eggs = this.gameManager.GetEggs();		
-		return GetNearestCreature( eggs ) as Egg;
-	}
 	
 
 	

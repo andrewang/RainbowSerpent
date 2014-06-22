@@ -1,4 +1,4 @@
-	using System;
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -43,7 +43,7 @@ public class PlayerSnakeController : SnakeController
 	/// Handles the arrival event - the creature arriving at the centre of a tile.  Returns the
 	/// direction to travel in from this point on.
 	/// </summary>
-	public override SerpentConsts.Dir OnArrival()	
+	public override SerpentConsts.Dir NewDirectionUponArrival()	
 	{
 		if (Managers.GameState.LevelState == SerpentConsts.LevelState.LevelEnd)
 		{

@@ -25,8 +25,6 @@ public class Snake : MobileCreature
 		}
 	}
 	
-	public bool Dead { get; set; }
-	
 	private int initialNumSegments;
 	
 	public int NumSegments
@@ -44,7 +42,6 @@ public class Snake : MobileCreature
 		}
 	}
 	
-	public float Speed { get; set; }
 
 	public SnakeBody Tail
 	{
@@ -77,6 +74,12 @@ public class Snake : MobileCreature
 	
 	public event Action<Snake> SnakeSegmentsChanged = null;
 	public event Action<Vector3> SnakeSegmentEaten = null;
+	
+	protected override Vector3 GetPosition()	
+	{
+		return this.head.transform.localPosition;
+	}
+	
 	
 	#region Set Up
 	
@@ -374,7 +377,7 @@ public class Snake : MobileCreature
 	
 	#region Update
 	
-	public void Update()
+	public override void Update()
 	{
 		if (this.Visible == false || this.Dead) 
 		{
@@ -393,71 +396,39 @@ public class Snake : MobileCreature
 		}
 	}		
 	
-	private void PositionBodySegments()
-	{
-		this.trail.PositionSegments( this.head );
-	}
-	
+	/*
 	private void UpdatePosition()
 	{
 		float displacement =  this.Speed * Time.smoothDeltaTime;
 		
 		float remainingDisplacement = 0.0f;
-		bool arrived = this.head.MoveForward( displacement, out remainingDisplacement );
-			
-		this.trail.UpdateHeadPosition(this.head.transform.localPosition);
+		bool arrived = MoveForward( displacement, out remainingDisplacement );
 		
-		PositionBodySegments();
 		if (arrived == false) { return; }
 		
 		ArrivedAtDestination(remainingDisplacement);		
 	}
+	*/
 	
-	public void ArrivedAtDestination(float remainingDisplacement)
-	{		
-		// Inform the controller we arrived, and receive the new direction to go in.
-		SerpentConsts.Dir newDirection = this.Controller.OnArrival();
-		if (newDirection == SerpentConsts.Dir.None) 
-		{ 
-			this.CurrentDirection = SerpentConsts.Dir.None;
-			return; 
-		}
-		
-		bool directionChanged = (newDirection != this.CurrentDirection);
-		
-		// Change the current direction if it's possible to go that way.  If not, check the current direction - keep moving
-		// in that direction if possible, or stop if it's blocked.
-		if (!IsMotionBlocked( newDirection ))
-		{
-			this.CurrentDirection = newDirection;	
-		}
-		else if (IsMotionBlocked( this.CurrentDirection ))
-		{
-			// stop moving
-			this.CurrentDirection = SerpentConsts.Dir.None;
-			return;
-		}
-		
-		// Open any door between the current position and the next one. 
-		OpenDoor( this.CurrentDirection );
-		
-		if (directionChanged)
-		{			
-			// Note that we changed direction at this point
-			this.trail.AddPosition(this.head.transform.localPosition);
-		}
-		
-		this.head.CurrentDirection = this.CurrentDirection;
-		UpdateDestination();
-		
-		float dummyOutput = 0.0f;
-		this.head.MoveForward( remainingDisplacement, out dummyOutput );	
-		this.trail.UpdateHeadPosition(this.head.transform.localPosition);		
+	public override bool MoveForward( float displacement, out float remainingDisplacement )
+	{
+		bool arrived = this.head.MoveForward( displacement, out remainingDisplacement );			
+		this.trail.UpdateHeadPosition( this.head.transform.localPosition );
 		PositionBodySegments();
 		
-		// Close any door that can now be closed.
-		CloseDoor();		
-	}	
+		return arrived;
+	}
+	
+	protected override void OnDirectionChange()
+	{
+		this.head.CurrentDirection = this.CurrentDirection;
+		this.trail.AddPosition(this.head.transform.localPosition);
+	}
+	
+	private void PositionBodySegments()
+	{
+		this.trail.PositionSegments( this.head );
+	}
 	
 	#endregion Update
 	
@@ -494,22 +465,12 @@ public class Snake : MobileCreature
 		UpdateDestination();
 	}
 	
-	/// <summary>
-	/// Determines whether motion is blocked in the specified direction.
-	/// </summary>
-	/// <returns><c>true</c> if motion is blocked in the specified direction; otherwise, <c>false</c>.</returns>
-	/// <param name="direction">Direction.</param>
-	private bool IsMotionBlocked( SerpentConsts.Dir direction )
+	protected override void OpenDoor( SerpentConsts.Dir direction )
 	{
-		return this.MazeController.IsMotionBlocked( this.head.transform.localPosition, direction );		
+		this.MazeController.OpenDoor( GetPosition(), direction );
 	}
 	
-	private void OpenDoor( SerpentConsts.Dir direction )
-	{
-		this.MazeController.OpenDoor( this.head.transform.localPosition, direction );
-	}
-	
-	private void CloseDoor()
+	protected override void CloseDoor()
 	{
 		SnakeSegment tail = this.Tail;
 		SerpentConsts.Dir tailDir = tail.CurrentDirection;
@@ -564,9 +525,9 @@ public class Snake : MobileCreature
 	}
 	
 	/// <summary>
-	/// Updates the destination of the snake in the direction it's facing
+	/// Updates the destination of the snake in the direction its facing
 	/// </summary>
-	private void UpdateDestination()
+	protected override void UpdateDestination()
 	{
 		Vector3 newPos = this.MazeController.GetNextCellCentre( this.head.transform.localPosition, this.CurrentDirection );
 		this.CurrentDestination = newPos;		

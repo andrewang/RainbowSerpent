@@ -133,6 +133,7 @@
      <Compile Include="Assets\Scripts\Creatures\Creature.cs" />
      <Compile Include="Assets\Scripts\Creatures\CreatureControllers\AISnakeController.cs" />
      <Compile Include="Assets\Scripts\Creatures\CreatureControllers\CreatureController.cs" />
+     <Compile Include="Assets\Scripts\Creatures\CreatureControllers\FrogController.cs" />
      <Compile Include="Assets\Scripts\Creatures\CreatureControllers\PlayerSnakeController.cs" />
      <Compile Include="Assets\Scripts\Creatures\CreatureControllers\SnakeController.cs" />
      <Compile Include="Assets\Scripts\Creatures\Egg.cs" />

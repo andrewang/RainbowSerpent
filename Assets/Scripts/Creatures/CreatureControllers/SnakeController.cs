@@ -25,7 +25,7 @@ public class SnakeController : CreatureController
 		this.snake.StartMoving(direction);
 	}
 	
-	protected List<SerpentConsts.Dir> GetAvailableDirections()
+	protected override List<SerpentConsts.Dir> GetAvailableDirections()
 	{
 		SnakeHead head = this.snake.Head;
 		Vector3 position = head.CurrentDestination;

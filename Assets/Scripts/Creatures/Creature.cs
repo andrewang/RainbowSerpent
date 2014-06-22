@@ -16,16 +16,18 @@ public class Creature : MonoBehaviour
 		}
 	}
 	
-	public SerpentConsts.Side Side
-	{
-		get; set;
-	}
+	public SerpentConsts.Side Side { get; set; }
 	
+	public bool Dead { get; set; }
+		
 	public event Action<Creature> CreatureDied;
 		
-	public MazeController MazeController
+	public MazeController MazeController { get; set; }
+	
+	// Default creature behavior uses the creature object's own transform as its position.  Not the case with snakes
+	protected virtual Vector3 GetPosition()	
 	{
-		get; set; 
+		return this.transform.localPosition;
 	}
 	
 	public void SetUp(MazeController mazeController)
@@ -67,7 +69,7 @@ public class Creature : MonoBehaviour
 		return distanceSq;		
 	}
 	
-	protected Creature GetNearestCreature( List<Creature> creatures )
+	public Creature GetNearestCreature( List<Creature> creatures )
 	{		
 		if (creatures.Count == 0) { return null; }
 		

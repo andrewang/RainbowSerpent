@@ -21,7 +21,7 @@ public class AISnakeController : SnakeController
 	/// Handles the arrival event - the creature arriving at the centre of a tile.  Returns the
 	/// direction to travel in from this point on.
 	/// </summary>
-	public override SerpentConsts.Dir OnArrival()	
+	public override SerpentConsts.Dir NewDirectionUponArrival()	
 	{
 		// Get our current direction first.  We want to turn in a random direction but not do a reverse turn.
 		// So assemble a list of all the directions, excluding the opposite direction to the current, and also

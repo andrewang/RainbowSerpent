@@ -3,11 +3,10 @@ using UnityEngine;
 
 public class MobileCreature : Creature
 {
+	public CreatureController Controller { get; set; }
 	
-	public CreatureController Controller
-	{
-		get; set;
-	}
+	public float Speed { get; set; }
+	
 	
 	/// <summary>
 	/// The current direction.  Creatures can only change direction at the centre of tiles
@@ -40,8 +39,35 @@ public class MobileCreature : Creature
 		get; set; 
 	}
 	
+	public virtual void Update()
+	{
+		/*
+		if (this.Visible == false || this.Dead) 
+		{
+			return; 
+		}
+		*/
 		
-	public bool MoveForward(float displacement, out float remainingDisplacement)
+		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
+		// to the Controller.
+		if (this.CurrentDirection != SerpentConsts.Dir.None)
+		{
+			UpdatePosition();			
+		}
+	}
+	
+	protected void UpdatePosition()
+	{
+		float displacement =  this.Speed * Time.smoothDeltaTime;
+		
+		float remainingDisplacement = 0.0f;
+		bool arrived = this.MoveForward( displacement, out remainingDisplacement );
+		if (arrived == false) { return; }
+		
+		ArrivedAtDestination(remainingDisplacement);		
+	}
+		
+	public virtual bool MoveForward(float displacement, out float remainingDisplacement)
 	{
 		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
 		if (displacement <= toDest.sqrMagnitude)
@@ -61,6 +87,82 @@ public class MobileCreature : Creature
 		
 		remainingDisplacement = displacement - distToDest;
 		return true;
+	}
+	
+	public virtual void ArrivedAtDestination(float remainingDisplacement)
+	{		
+		// Inform the controller we arrived, and receive the new direction to go in.
+		SerpentConsts.Dir newDirection = this.Controller.NewDirectionUponArrival();
+		if (newDirection == SerpentConsts.Dir.None) 
+		{ 
+			this.CurrentDirection = SerpentConsts.Dir.None;
+			return; 
+		}
+		
+		bool directionChanged = (newDirection != this.CurrentDirection);
+		
+		// Change the current direction if it's possible to go that way.  If not, check the current direction - keep moving
+		// in that direction if possible, or stop if it's blocked.
+		if (!IsMotionBlocked( newDirection ))
+		{
+			this.CurrentDirection = newDirection;	
+		}
+		else if (IsMotionBlocked( this.CurrentDirection ))
+		{
+			// stop moving
+			this.CurrentDirection = SerpentConsts.Dir.None;
+			return;
+		}
+		
+		// Open any door between the current position and the next one. 
+		OpenDoor( this.CurrentDirection );
+		
+		if (directionChanged)
+		{			
+			OnDirectionChange();
+		}
+		
+		UpdateDestination();
+		
+		float dummyOutput = 0.0f;
+		MoveForward( remainingDisplacement, out dummyOutput );
+		/*
+		this.head.MoveForward( remainingDisplacement, out dummyOutput );	
+		this.trail.UpdateHeadPosition(this.head.transform.localPosition);		
+		PositionBodySegments();
+		*/
+		
+		// Close any door that can now be closed.
+		CloseDoor();		
 	}	
+	
+	/// <summary>
+	/// Updates the destination of the creature in the direction its facing
+	/// </summary>
+	protected virtual void UpdateDestination()
+	{
+		Vector3 newPos = this.MazeController.GetNextCellCentre( this.transform.localPosition, this.CurrentDirection );
+		this.CurrentDestination = newPos;		
+	}
+	
+	protected bool IsMotionBlocked( SerpentConsts.Dir direction )
+	{
+		return this.MazeController.IsMotionBlocked( GetPosition(), direction );
+	}
+	
+	protected virtual void OnDirectionChange()
+	{
+		// nothing to do.  special case for some creatures
+	}
+	
+	protected virtual void OpenDoor( SerpentConsts.Dir direction )
+	{
+		// by default creatures don't open doors
+	}
+	
+	protected virtual void CloseDoor()
+	{
+		// by default creatures don't close doors
+	}
 }
 
