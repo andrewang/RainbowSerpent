@@ -7,9 +7,9 @@ public class LevelTheme : MonoBehaviour
 	public Color BackgroundColour;
 	public Color TextColour;
 	
-	public Color PlayerSnakeColour;
 	public Color EnemySnakeColour;
 	public Color WeakEnemySnakeColour;	
 	
+	public SnakeConfig EnemySnakeConfig = null;
 }
 

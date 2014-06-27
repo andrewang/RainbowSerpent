@@ -164,7 +164,7 @@ public static class SerpentConsts
 	public static int MaxNumEnemySnakes = 3;
 	public static int EnemySnakeLength = 5;
 	public static int SmallEnemySnakeLength = 3;
-	public static int PlayerSnakeLength = 3;
+	public static int PlayerSnakeLength = 6;
 	public static int SmallPlayerSnakeLength = 2;
 	
 	public static int ScoreForBonusLife = 10000;

@@ -18,16 +18,20 @@ public class Egg : Creature
 
 	Egg()
 	{
-		this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;		
 	}
 	
 	void Start()
 	{
+		this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;		
 		Grow();
 	}
 	
 	public void SetHatchingTime(float hatchingTime)
 	{
+		if (this.grownTime == 0.0f)
+		{
+			this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;
+		}
 		this.hatchingTime = this.grownTime + hatchingTime;
 		this.shouldHatch = true;		
 	}

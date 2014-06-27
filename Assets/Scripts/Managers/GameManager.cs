@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject frogPrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
-	[SerializeField] private GameObject enemySnakeConfig = null;
+	private GameObject enemySnakeConfig = null;
 	
 	#endregion Serialized Fields
 	
@@ -272,7 +272,8 @@ public class GameManager : MonoBehaviour
 		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();		
 		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
 		
-		this.enemySnakeConf = this.enemySnakeConfig.GetComponent<SnakeConfig>();			
+		//this.enemySnakeConfig = this.theme.EnemySnakeConfig;
+		this.enemySnakeConf = this.theme.EnemySnakeConfig;
 		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
 		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
 		{
