@@ -57,7 +57,10 @@ public class PlayerSnakeController : SnakeController
 			if (headMazeCell.InPlayerZone == false)
 			{
 				this.PlayerControlled = true;
-				SnakeExitedStart(this.snake);
+				if (this.SnakeExitedStart != null)
+				{
+					SnakeExitedStart(this.snake);
+				}
 			}
 			else
 			{			
@@ -89,9 +92,11 @@ public class PlayerSnakeController : SnakeController
 			dir = HeadTowards(maze.PlayerStartZoneExit);
 			if (dir == SerpentConsts.Dir.None)
 			{
-				// trigger game manager, and for now keep same direction
-				// need to trigger... something...
-				SnakeReturnedToStart(this.snake);
+				// trigger event for return.
+				if (this.SnakeReturnedToStart != null)
+				{
+					SnakeReturnedToStart(this.snake);
+				}
 				// return "no direction" so that snake code doesn't execute anything else.
 				dir = SerpentConsts.Dir.None;
 			}

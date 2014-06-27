@@ -313,7 +313,11 @@ public class Snake : MobileCreature
 		// NOTE: Can't return snake head to the snake body cache.
 		do
 		{
-			SnakeSegmentEaten(seg.gameObject.transform.localPosition);
+			if (this.SnakeSegmentEaten != null)
+			{
+				this.SnakeSegmentEaten(seg.gameObject.transform.localPosition);
+			}
+			
 			if (seg != this.head)
 			{
 				Managers.SnakeBodyCache.ReturnObject<SnakeBody>(seg.gameObject);
@@ -329,7 +333,7 @@ public class Snake : MobileCreature
 
 		if ( this.SnakeSegmentsChanged != null )
 		{
-			SnakeSegmentsChanged( this );
+			this.SnakeSegmentsChanged( this );
 		}
 		UpdateSpeed();
 		

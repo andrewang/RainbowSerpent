@@ -237,10 +237,15 @@ public class GameManager : MonoBehaviour
 			enemyEggDied = this.playerSnake.TestForInteraction(enemyEgg);
 		}
 		
-		if ( (enemySnakeDied || enemyEggDied) && enemySnakes.Count == 0 && enemyEgg == null)
+		if (enemySnakeDied && enemySnakes.Count == 0 && enemyEgg == null)
 		{
 			// all enemy snakes are dead and no egg exists
 			Managers.GameState.LevelState = SerpentConsts.LevelState.LevelEnd;
+		}
+		else if (enemyEggDied && enemySnakes.Count == 0)
+		{
+			// egg eaten and no enemy snakes exist
+			Managers.GameState.LevelState = SerpentConsts.LevelState.LevelEnd;			
 		}
 	}
 	
@@ -413,12 +418,18 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	
+	private void ResetFrog()
+	{
+		this.frog.Die();
+		this.frog = null;
+		this.frogTimer = 0.0f;
+	}
+	
 	private void CreateFrog()
 	{
 		this.frog = SerpentUtils.Instantiate<Frog>(this.frogPrefab, this.mazeController.transform);
 		if (this.frog == null) { return; }
 		this.frog.SetUp(this, this.mazeController);
-		this.frog.CreatureDied += FrogDied;
 		
 		// Randomize frog placement.
 		int x = 0;
@@ -449,12 +460,7 @@ public class GameManager : MonoBehaviour
 		
 		PlaceCreature(this.frog, x, y, SerpentConsts.Dir.N);
 	}
-	
-	private void FrogDied(Creature creature)
-	{
-	
-	}
-	
+		
 	#endregion Frogs
 	
 	#region Snake Eggs	
@@ -656,6 +662,7 @@ public class GameManager : MonoBehaviour
 		HandleEggsAfterPlayerDeath();
 		
 		ResetSnakes();
+		ResetFrog();
 				
 		StartCoroutine( PlaceSnakes() );
 	}

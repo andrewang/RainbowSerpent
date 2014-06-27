@@ -1,8 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Frog.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Managers/GameManager.cs">
     <Files>
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="11" Column="65" />
+      <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/AISnakeController.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Internal/UIGeometry.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/UI/UIRoot.cs" Line="1" Column="1" />
@@ -17,18 +17,20 @@
       <File FileName="Assets/Scripts/UI/Components/InputController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Maps/Door.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeBody.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeBody.cs" Line="60" Column="12" />
       <File FileName="Assets/Data/Resources/level2.txt" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/CreatureController.cs" Line="7" Column="10" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="19" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/CreatureControllers/CreatureController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Creature.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/FrogController.cs" Line="116" Column="3" />
-      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="527" Column="18" />
-      <File FileName="Assets/Scripts/Creatures/Frog.cs" Line="55" Column="38" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="241" Column="30" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="171" Column="44" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="46" Column="8" />
+      <File FileName="Assets/Scripts/Creatures/CreatureControllers/FrogController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Frog.cs" Line="8" Column="30" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Managers/GameClock.cs" Line="17" Column="47" />
+      <File FileName="Assets/Scripts/Managers/Managers.cs" Line="23" Column="29" />
+      <File FileName="Assets/NGUI/Scripts/UI/UIPanel.cs" Line="632" Column="109" />
+      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="494" Column="11" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -43,6 +45,7 @@
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" line="59" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/NGUI/Scripts/Internal/NGUITools.cs" line="609" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/CreatureControllers/FrogController.cs" line="114" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Managers/GameManager.cs" line="492" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

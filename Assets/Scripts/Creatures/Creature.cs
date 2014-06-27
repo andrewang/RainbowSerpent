@@ -51,7 +51,10 @@ public class Creature : MonoBehaviour
 	
 	public virtual void Die()
 	{	
-		this.CreatureDied(this);
+		if (this.CreatureDied != null)
+		{
+			this.CreatureDied(this);
+		}
 	}
 	
 	public virtual void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)

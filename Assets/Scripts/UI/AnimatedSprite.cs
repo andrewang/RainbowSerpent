@@ -9,7 +9,10 @@ public class AnimatedSprite : MonoBehaviour
 	
 	private void Done()
 	{
-		this.TranslationFinished(this);
+		if (this.TranslationFinished != null)
+		{
+			this.TranslationFinished(this);
+		}
 	}
 	
 }

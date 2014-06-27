@@ -16,11 +16,13 @@ public class Egg : Creature
 	private bool fullyGrown = false;
 	private bool shouldHatch = false;
 
-	void Start()
+	Egg()
 	{
 		this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;		
-		this.shouldHatch = false;
-		
+	}
+	
+	void Start()
+	{
 		Grow();
 	}
 	
@@ -53,15 +55,19 @@ public class Egg : Creature
 	private void ScaledUp()
 	{
 		this.fullyGrown = true;
-		this.FullyGrown(this);	
+		if (this.FullyGrown != null)
+		{
+			this.FullyGrown(this);	
+		}
 	}
 	
 	// Hatching behavior.  TODO Could this be handled in a different way than polling time?
 	void Update()
 	{
-		if (this.fullyGrown && this.shouldHatch && Managers.GameClock.Time >= this.hatchingTime)
+		if (this.fullyGrown && this.shouldHatch && this.Hatched != null && Managers.GameClock.Time >= this.hatchingTime)
 		{
 			this.Hatched(this);
+			Die();
 		}		
 	}
 	
