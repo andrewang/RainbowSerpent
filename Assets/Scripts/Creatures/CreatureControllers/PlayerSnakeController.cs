@@ -126,6 +126,8 @@ public class PlayerSnakeController : SnakeController
 		
 		List<SerpentConsts.Dir> availableDirections = GetAvailableDirections();
 		availableDirections.Remove(oppositeDirection);
+		
+		// TODO REFACTOR, THIS IS CLUNKY!
 
 		// Handle no-turn situations.		
 		if (availableDirections.Count == 0) 
@@ -160,22 +162,12 @@ public class PlayerSnakeController : SnakeController
 		}		
 		// Prefer x choice over y, if both are available.  This assumes there's a clear path along the
 		// leftmost column to the player start (so it's sort of cheating?)
-		
-		/*
-		// Random pick
-		else if (UnityEngine.Random.Range(0,2) == 0)
-		{
-			bestDir = bestYDir;
-			secondBestDir = bestXDir;
-		}
-		*/
 		else
 		{
 			bestDir = bestXDir;
 			secondBestDir = bestYDir;
 		}
-
-				
+			
 		if (availableDirections.Contains(bestDir))
 		{
 			return bestDir;
@@ -189,38 +181,6 @@ public class PlayerSnakeController : SnakeController
 			// pick something at random...
 			int randomIndex = UnityEngine.Random.Range(0, availableDirections.Count);			
 			return availableDirections[randomIndex];
-		}
-	}
-	
-	private SerpentConsts.Dir GetBestYDirection(int headY, int targetY)
-	{
-		if (headY > targetY)
-		{
-			return SerpentConsts.Dir.S;
-		}
-		else if (headY != targetY)
-		{
-			return SerpentConsts.Dir.N;
-		}
-		else
-		{
-			return SerpentConsts.Dir.None;
-		}
-	}
-	
-	private SerpentConsts.Dir GetBestXDirection(int headX, int targetX)
-	{
-		if (headX > targetX)
-		{
-			return SerpentConsts.Dir.W;
-		}
-		else if (headX != targetX)
-		{
-			return SerpentConsts.Dir.E;
-		}
-		else
-		{
-			return SerpentConsts.Dir.None;
 		}
 	}
 	

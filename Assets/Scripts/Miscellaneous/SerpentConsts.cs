@@ -29,6 +29,8 @@ public static class SerpentConsts
 		E,
 		S,
 		W,
+		First = N,
+		Last = W,
 		None
 	}
 
@@ -128,12 +130,13 @@ public static class SerpentConsts
 	}
 	
 	
-	public static TimeSpan PlayerEggFrequency = new TimeSpan(0, 0, 60);
-	public static TimeSpan EnemyEggFrequency = new TimeSpan(0, 0, 15);
-	public static TimeSpan TimeToLayEgg = new TimeSpan(0, 0, 10);
-	public static TimeSpan EnemyEggHatchingTime = new TimeSpan(0, 0, 30);
+	public static float PlayerEggFrequency = 60.0f;
+	public static float EnemyEggFrequency = 15.0f;
+	public static float TimeToLayEgg = 10.0f;
+	public static float EnemyEggHatchingTime = 30.0f;
+	public static float FrogRespawnDelay = 10.0f;
 	
-	public static TimeSpan GetEggLayingFrequency( Side side )
+	public static float GetEggLayingFrequency( Side side )
 	{
 		if (side == Side.Player)
 		{

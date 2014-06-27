@@ -38,4 +38,36 @@ public class CreatureController
 		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;		
 		return availableDirections;
 	}
+		
+	protected SerpentConsts.Dir GetBestYDirection(int currY, int targetY)
+	{
+		if (currY > targetY)
+		{
+			return SerpentConsts.Dir.S;
+		}
+		else if (currY != targetY)
+		{
+			return SerpentConsts.Dir.N;
+		}
+		else
+		{
+			return SerpentConsts.Dir.None;
+		}
+	}
+	
+	protected SerpentConsts.Dir GetBestXDirection(int currX, int targetX)
+	{
+		if (currX > targetX)
+		{
+			return SerpentConsts.Dir.W;
+		}
+		else if (currX != targetX)
+		{
+			return SerpentConsts.Dir.E;
+		}
+		else
+		{
+			return SerpentConsts.Dir.None;
+		}
+	}
 }

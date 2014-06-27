@@ -119,7 +119,6 @@ public class Snake : MobileCreature
 		
 		this.CurrentDirection = SerpentConsts.Dir.None;
 		
-		// TODO: check for any egg in the last segment and remove it.
 		SnakeBody tail = this.Tail;
 		if (tail != null)
 		{
@@ -164,7 +163,6 @@ public class Snake : MobileCreature
 		Vector3 oppositeVector = SerpentConsts.DirectionVector3[ (int) oppositeDirection ];
 		
 		// Add a fake position so the snake segments can be positioned.
-		// TODO FIX with better solution		
 		Vector3 displacement = oppositeVector * this.NumSegments * SerpentConsts.CellWidth;
 		Vector3 tailPos = position + displacement;
 	
@@ -437,7 +435,7 @@ public class Snake : MobileCreature
 	/// rather than when a snake reaches an intersection..
 	/// </summary>
 	/// <param name="direction">Direction.</param>
-	public void StartMoving(SerpentConsts.Dir direction)
+	public override void StartMoving(SerpentConsts.Dir direction)
 	{
 		// Most of the time we'll ignore this call, and wait until we reach an intersection, then ask the controller
 		// for the next direction to go in.
@@ -448,6 +446,9 @@ public class Snake : MobileCreature
 			return;
 		}
 		
+		base.StartMoving(direction);
+		
+		/*
 		if (IsMotionBlocked( direction ))
 		{
 			return;
@@ -463,6 +464,7 @@ public class Snake : MobileCreature
 		this.CurrentDirection = direction;		
 		
 		UpdateDestination();
+		*/
 	}
 	
 	protected override void OpenDoor( SerpentConsts.Dir direction )
@@ -547,7 +549,7 @@ public class Snake : MobileCreature
 		// Otherwise test with the snake's head versus the other creature's own transform position
 		if (this.head.TouchesCreature(otherCreature))
 		{
-			if (otherCreature is Egg)
+			if (otherCreature is Egg || otherCreature is Frog)
 			{
 				this.AddSegment();
 			}

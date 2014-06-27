@@ -145,6 +145,7 @@
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeHead.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeSegment.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeTrail.cs" />
+     <Compile Include="Assets\Scripts\Managers\GameClock.cs" />
      <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
      <Compile Include="Assets\Scripts\Managers\Managers.cs" />
      <Compile Include="Assets\Scripts\Managers\SceneManager.cs" />

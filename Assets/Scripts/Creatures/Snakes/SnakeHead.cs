@@ -11,8 +11,7 @@ public class SnakeHead : SnakeSegment
 	/// <param name="remainingDisplacement">Remaining displacement.</param>
 	public bool MoveForward(float displacement, out float remainingDisplacement)
 	{
-		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
-		
+		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;		
 		Vector3 nextPos = this.transform.localPosition + (this.CurrentDirectionVector * displacement);
 		Vector3 afterMoveToDest = this.CurrentDestination - nextPos;
 		

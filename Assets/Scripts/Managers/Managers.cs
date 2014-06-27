@@ -3,9 +3,11 @@ using System;
 
 public class Managers : MonoBehaviour
 {
-	public static GameObject SceneManagerInstance;
 	public static SceneManager SceneManager;
 	[SerializeField] GameObject sceneManagerPrefab = null;
+	
+	public static GameClock GameClock;
+	[SerializeField] GameObject gameClockPrefab = null;
 		
 	public static ScriptCache SnakeBodyCache;
 	[SerializeField] GameObject snakeBodyCachePrefab = null;
@@ -13,16 +15,24 @@ public class Managers : MonoBehaviour
 	public static GameState GameState;
 	
 	void Start()
-	{		
-		Managers.SceneManagerInstance = (GameObject) Instantiate(this.sceneManagerPrefab);
-		Managers.SceneManager = Managers.SceneManagerInstance.GetComponent<SceneManager>();
-		DontDestroyOnLoad(Managers.SceneManagerInstance);
+	{
+		GameObject sceneManagerInstance = InstantiateManager(this.sceneManagerPrefab);
+		Managers.SceneManager = sceneManagerInstance.GetComponent<SceneManager>();
 		
-		GameObject snakeBodyCacheInst = (GameObject) Instantiate(this.snakeBodyCachePrefab);
+		GameObject gameClockInstance = InstantiateManager(this.gameClockPrefab);
+		Managers.GameClock = gameClockInstance.GetComponent<GameClock>();
+		
+		GameObject snakeBodyCacheInst = InstantiateManager(this.snakeBodyCachePrefab);
 		Managers.SnakeBodyCache = snakeBodyCacheInst.GetComponent<ScriptCache>();
-		DontDestroyOnLoad(snakeBodyCacheInst);
 		
 		Managers.GameState = new GameState();
+	}
+	
+	private GameObject InstantiateManager(GameObject prefab)
+	{
+		GameObject instance = (GameObject) Instantiate(prefab);
+		DontDestroyOnLoad(instance);
+		return instance;
 	}
 
 }

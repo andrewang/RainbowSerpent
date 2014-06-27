@@ -4,53 +4,102 @@ using System.Collections.Generic;
 
 public class Frog : MobileCreature
 {
-	private DateTime moveTime;
+	const float				MovementDelay = 3.0f;
+	private float			currentMovementDelay;
+	private FrogController	frogController;
 	
-	
-	private void Start ()
+	public Frog()
 	{
-		UpdateTimer();
+		this.Speed = 250.0f;
+		this.currentMovementDelay = Frog.MovementDelay;
 	}
+	
+	public void SetUp(GameManager gameManager, MazeController mazeController)
+	{
+		base.SetUp(mazeController);
+		
+		//this.Visible = false;
+		this.Dead = false;
 
-	protected virtual void Update ()
-	{
-		if (DateTime.Now > this.moveTime)
-		{
-			Move();
-		}		
+		this.frogController = new FrogController(this, gameManager, mazeController);		
+		this.Controller = this.frogController;
 	}
 	
-	private void UpdateTimer()
+	public override void Update()
 	{
-		this.moveTime = DateTime.Now + new TimeSpan(0, 0, 5);
-	}
-	
-	private void Move ()
-	{
-		// If there is a snake nearby, move to avoid it.  Potentially move off the map.
-		
-		
-		// If there is an egg, move to eat it.
-		/*
-		Egg egg = GetNearestEgg();
-		if (egg == null)
+		// Decrement movement delay and don't move if the delay hasn't expired
+		if (this.currentMovementDelay > 0.0f)
 		{
+			float delta = RealTime.deltaTime;
+			if (delta > 0.1f) { delta = 0.1f; }
+			
+			this.currentMovementDelay -= delta;
+			if (this.currentMovementDelay > 0.0f)
+			{
+				return;
+			}
 		}
-		*/
 		
-		// Random move?
-		List<SerpentConsts.Dir> validDirections = this.MazeController.GetValidDirections(this.transform.localPosition, false);
-		if (validDirections.Count == 0) { return; }
-
-		int roll = UnityEngine.Random.Range(0, validDirections.Count);		
-		this.CurrentDirection = validDirections[roll];
+		if (this.CurrentDirection != SerpentConsts.Dir.None)
+		{
+			UpdatePosition();
+			return;			
+		}
 		
-		Vector3 dest = this.MazeController.GetNextCellCentre(this.transform.localPosition, this.CurrentDirection);
-		this.CurrentDestination = dest;			
+		this.frogController.Hop();
 	}
 	
+	public override void StartMoving(SerpentConsts.Dir direction)
+	{
+		base.StartMoving(direction);
+		// rotate in direction of movement.
+		this.transform.eulerAngles = SerpentConsts.RotationVector3[ (int)direction ];
+	}
 	
+	public override void ArrivedAtDestination(float remainingDisplacement)
+	{
+		// TODO If the frog has moved off-screen then kill it.
+		
+		this.currentMovementDelay = Frog.MovementDelay;
+		this.CurrentDirection = SerpentConsts.Dir.None; // not currently moving but should we really be resetting direction?
+		
+		base.ArrivedAtDestination(remainingDisplacement);
+	}
 	
-
+	// Frogs hop over maze walls so their motion is NEVER blocked.
+	protected override bool IsMotionBlocked( SerpentConsts.Dir direction )
+	{
+		return false;
+	}
 	
+	#region Eating eggs
+	
+	public override bool TestForInteraction(Creature otherCreature)
+	{
+		if (!(otherCreature is Egg)) { return false; }
+		
+		if (this.TouchesCreature(otherCreature))
+		{
+			// make it die.
+			otherCreature.Die();
+			return true;
+		}
+		    
+		 return false;
+	}
+		    
+	#endregion Eating eggs
+		
+	#region Dying
+	
+	override public void Die()
+	{
+		// frog are totally destroyed on death
+		base.Die();
+		
+		Destroy(this.gameObject);
+		Destroy(this);
+	}
+	
+	#endregion Dying
 }

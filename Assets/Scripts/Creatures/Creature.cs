@@ -50,8 +50,8 @@ public class Creature : MonoBehaviour
 	}
 	
 	public virtual void Die()
-	{
-		CreatureDied(this);
+	{	
+		this.CreatureDied(this);
 	}
 	
 	public virtual void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
@@ -73,11 +73,20 @@ public class Creature : MonoBehaviour
 	{		
 		if (creatures.Count == 0) { return null; }
 		
-		Creature nearestCreature = creatures[0]; 
-		float nearestDistSq = DistanceSqToCreature( nearestCreature );
+		Creature nearestCreature = null;
+		float nearestDistSq = 0.0f;
 		
-		for (int i = 1; i < creatures.Count; ++i)
+		for (int i = 0; i < creatures.Count; ++i)
 		{
+			if (creatures[i] == null) { continue; }
+			
+			if (nearestCreature == null)
+			{
+				nearestCreature = creatures[i]; 
+				nearestDistSq = DistanceSqToCreature( nearestCreature );
+				continue;
+			}
+			
 			float distSq = DistanceSqToCreature( creatures[i] );
 			if (distSq < nearestDistSq)
 			{
@@ -87,6 +96,15 @@ public class Creature : MonoBehaviour
 		}
 		
 		return nearestCreature;
+	}
+	
+	public bool TouchesCreature( Creature otherCreature )
+	{
+		Vector3 positionDiff = this.transform.localPosition - otherCreature.transform.localPosition;
+		float distanceSq = positionDiff.sqrMagnitude;
+		float radii = this.Radius + otherCreature.Radius;
+		float radiiSq = radii * radii;
+		return (distanceSq <= radiiSq);		
 	}
 }
 

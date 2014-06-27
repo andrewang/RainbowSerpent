@@ -527,6 +527,7 @@ public class MazeController : MonoBehaviour
 	/// <returns>The cell centre.</returns>
 	/// <param name="x">The x coordinate.</param>
 	/// <param name="y">The y coordinate.</param>
+	// TODO move this method into MazeCell if possible. Or make it take a MazeCell or IntVector2 instead.
 	public Vector3 GetCellCentre(float x, float y)
 	{
 		Vector3 pos = this.lowerLeftCellCentre;

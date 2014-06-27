@@ -11,20 +11,20 @@ public class Egg : Creature
 	public event Action<Egg> FullyGrown;
 	public event Action<Egg> Hatched;
 	
-	private DateTime grownTime;
-	private DateTime hatchingTime;
+	private float grownTime;
+	private float hatchingTime;
 	private bool fullyGrown = false;
 	private bool shouldHatch = false;
 
 	void Start()
 	{
-		this.grownTime = DateTime.Now + SerpentConsts.TimeToLayEgg;		
+		this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;		
 		this.shouldHatch = false;
 		
 		Grow();
 	}
 	
-	public void SetHatchingTime(TimeSpan hatchingTime)
+	public void SetHatchingTime(float hatchingTime)
 	{
 		this.hatchingTime = this.grownTime + hatchingTime;
 		this.shouldHatch = true;		
@@ -36,7 +36,7 @@ public class Egg : Creature
 	public void Hatch()
 	{
 		this.shouldHatch = true;
-		this.hatchingTime = DateTime.MinValue;
+		this.hatchingTime = 0.0f;
 	}
 	
 	private void Grow()
@@ -44,7 +44,7 @@ public class Egg : Creature
 		// Begin animation of scaling up
 		this.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 		Vector3 finalScale = new Vector3(1.0f, 1.0f, 1.0f);
-		TweenScale scaleTween = TweenScale.Begin(this.gameObject, (float)SerpentConsts.TimeToLayEgg.TotalSeconds, finalScale);
+		TweenScale scaleTween = TweenScale.Begin(this.gameObject, SerpentConsts.TimeToLayEgg, finalScale);
 		
 		EventDelegate tweenFinished = new EventDelegate(this, "ScaledUp");
 		scaleTween.onFinished.Add ( tweenFinished );
@@ -59,7 +59,7 @@ public class Egg : Creature
 	// Hatching behavior.  TODO Could this be handled in a different way than polling time?
 	void Update()
 	{
-		if (this.fullyGrown && this.shouldHatch && DateTime.Now > this.hatchingTime)
+		if (this.fullyGrown && this.shouldHatch && Managers.GameClock.Time >= this.hatchingTime)
 		{
 			this.Hatched(this);
 		}		

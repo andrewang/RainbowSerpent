@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections;
 using SerpentExtensions;
 
-// TODO REFACTOR
+// TODO REFACTOR into multiple classes.
 
 public class GameManager : MonoBehaviour
 {
@@ -36,7 +36,10 @@ public class GameManager : MonoBehaviour
 	private bool updateSnakeColours = false;
 		
 	private Egg[] eggs = new Egg[2];
-	private DateTime[] eggTimers = new DateTime[2];
+	private float[] eggTimers = new float[2];
+	
+	private Frog frog;
+	private float frogTimer;
 	
 	private LevelTheme theme;
 	
@@ -111,8 +114,9 @@ public class GameManager : MonoBehaviour
 	{		
 		for (int i = 0; i < this.eggs.Length; ++i)
 		{
-			this.eggTimers[i] = new DateTime(0);
+			this.eggTimers[i] = 0.0f;
 		}
+		this.frogTimer = 0.0f;
 	}
 	
 	private void PlaceCreature(Creature creature, int x, int y, SerpentConsts.Dir direction)
@@ -139,10 +143,10 @@ public class GameManager : MonoBehaviour
 		if (this.playerSnake == null || this.playerSnake.Dead) { return; }
 		
 		UpdateSnakes();
+		UpdateFrog();
 		
 		if (Managers.GameState.LevelState != SerpentConsts.LevelState.Playing) 
 		{
-			// NB make player eggs hatch...?
 			return;
 		}
 				
@@ -165,6 +169,8 @@ public class GameManager : MonoBehaviour
 		{		
 			HandleEggs(SerpentConsts.Side.Player);
 		}		
+		
+		HandleFrogCreation();
 	}
 	
 	private void UpdateSnakes()
@@ -203,6 +209,12 @@ public class GameManager : MonoBehaviour
 				return;
 			}
 			
+			// Test for frog
+			if (this.frog != null)
+			{
+				enemySnake.TestForInteraction(this.frog);
+			}
+			
 			// Test for eating player egg
 			if (playerEgg != null)
 			{
@@ -211,6 +223,11 @@ public class GameManager : MonoBehaviour
 			
 			++i;
 		}
+		
+		if (this.frog != null)
+		{
+			this.playerSnake.TestForInteraction(this.frog);
+		}		
 		
 		// Check for player eating enemy egg
 		Egg enemyEgg = GetEgg( SerpentConsts.Side.Enemy );
@@ -230,6 +247,15 @@ public class GameManager : MonoBehaviour
 	private void UpdateFrog()
 	{
 		// if there is a frog, test against player egg, and test against enemy egg.
+		if (this.frog != null)
+		{
+			for (int i = 0; i <= (int) SerpentConsts.Side.Enemy; ++i)
+			{
+				if (this.eggs[i] == null) { continue; }
+				
+				this.frog.TestForInteraction(this.eggs[i]);
+			}
+		}
 	}
 	
 	#endregion Update
@@ -252,8 +278,6 @@ public class GameManager : MonoBehaviour
 	private Snake CreatePlayerSnake(int length)
 	{
 		// Player snake is added to array and also assigned to direct pointer.
-		// TODO does this need to be changed for player baby snake and player snake being onscreen at the same time? 
-		// can they be together on map at the same time or not?
 		Snake s = CreateSnake(this.playerSnakeConf, length);
 		s.Side = SerpentConsts.Side.Player;
 		s.CreatureDied += PlayerSnakeDied;
@@ -305,7 +329,9 @@ public class GameManager : MonoBehaviour
 				
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
-		psc.PlayerControlled = false;				
+		psc.PlayerControlled = false;
+		
+						
 		
 		yield return new WaitForSeconds(3.0f);		
 		
@@ -369,15 +395,64 @@ public class GameManager : MonoBehaviour
 	
 	#region Frogs
 	
+	private void HandleFrogCreation()
+	{
+		if (this.frog != null) { return; }
+		
+		if (this.frogTimer == 0.0f)
+		{
+			// Set timer.
+			this.frogTimer = Managers.GameClock.Time + SerpentConsts.FrogRespawnDelay;
+		}
+		else if (Managers.GameClock.Time > this.frogTimer)
+		{
+			// spawn frog
+			CreateFrog();
+			// Reset timer
+			this.frogTimer = 0.0f;
+		}
+	}
+	
 	private void CreateFrog()
 	{
-		Frog frog = SerpentUtils.Instantiate<Frog>(this.frogPrefab, this.mazeController.transform);
-		if (frog == null) { return; }
+		this.frog = SerpentUtils.Instantiate<Frog>(this.frogPrefab, this.mazeController.transform);
+		if (this.frog == null) { return; }
+		this.frog.SetUp(this, this.mazeController);
+		this.frog.CreatureDied += FrogDied;
 		
-		int x = 5;
-		int y = 5;
+		// Randomize frog placement.
+		int x = 0;
+		int y = 0;
 		
-		PlaceCreature(frog, x, y, SerpentConsts.Dir.N);
+		if (UnityEngine.Random.Range(0,2) == 0)
+		{
+			// top or bottom edge
+			if (UnityEngine.Random.Range(0,2) == 0)
+			{
+				y = this.mazeController.Maze.Height - 1;
+			}
+			
+			// avoid spawning right in the corners
+			x = 1 + UnityEngine.Random.Range(0, this.mazeController.Maze.Width - 1);
+		}
+		else
+		{
+			// left or right edge
+			if (UnityEngine.Random.Range(0,2) == 0)
+			{
+				x = this.mazeController.Maze.Width - 1;
+			}
+			
+			// avoid spawning right in the corners
+			y = 1 + UnityEngine.Random.Range(0, this.mazeController.Maze.Height - 1);			
+		}
+		
+		PlaceCreature(this.frog, x, y, SerpentConsts.Dir.N);
+	}
+	
+	private void FrogDied(Creature creature)
+	{
+	
 	}
 	
 	#endregion Frogs
@@ -388,11 +463,11 @@ public class GameManager : MonoBehaviour
 	private void HandleEggs(SerpentConsts.Side side)
 	{
 		int intSide = (int) side;
-		if (this.eggTimers[intSide].Ticks == 0)
+		if (this.eggTimers[intSide] == 0.0f)
 		{
 			SetEggTimer(side);
 		}
-		else if (DateTime.Now > this.eggTimers[intSide])
+		else if (Managers.GameClock.Time > this.eggTimers[intSide])
 		{
 			// time for a random enemy snake to start laying an egg.  But we need a snake with 3+ segments.
 			List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.NumSegments >= 3 );
@@ -421,12 +496,12 @@ public class GameManager : MonoBehaviour
 	
 	private void SetEggTimer(SerpentConsts.Side side)
 	{
-		this.eggTimers[(int)side] = DateTime.Now + SerpentConsts.GetEggLayingFrequency(side);				
+		this.eggTimers[(int)side] = Managers.GameClock.Time + SerpentConsts.GetEggLayingFrequency(side);				
 	}
 	
 	private void ResetEggTimer(SerpentConsts.Side side)
 	{
-		this.eggTimers[(int)side] = new DateTime(0);				
+		this.eggTimers[(int)side] = 0.0f;				
 	}
 	
 	private Egg LayEgg(Snake snake)

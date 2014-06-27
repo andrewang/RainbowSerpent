@@ -5,14 +5,13 @@ public class MobileCreature : Creature
 {
 	public CreatureController Controller { get; set; }
 	
-	public float Speed { get; set; }
-	
+	public float Speed { get; set; }	
 	
 	/// <summary>
 	/// The current direction.  Creatures can only change direction at the centre of tiles
 	/// </summary>
 	private SerpentConsts.Dir currentDirection = SerpentConsts.Dir.None;
-	protected SerpentConsts.Dir CurrentDirection
+	public SerpentConsts.Dir CurrentDirection
 	{
 		get
 		{
@@ -26,7 +25,7 @@ public class MobileCreature : Creature
 	}
 	
 	private Vector3 currentDirectionVector;
-	protected Vector3 CurrentDirectionVector
+	public Vector3 CurrentDirectionVector
 	{
 		get
 		{
@@ -34,11 +33,16 @@ public class MobileCreature : Creature
 		}
 	}
 	
-	protected Vector3 CurrentDestination
+	public Vector3 CurrentDestination
 	{
 		get; set; 
 	}
 	
+	public MobileCreature()
+	{
+		this.Speed = 20.0f;
+	}
+		
 	public virtual void Update()
 	{
 		/*
@@ -58,7 +62,7 @@ public class MobileCreature : Creature
 	
 	protected void UpdatePosition()
 	{
-		float displacement =  this.Speed * Time.smoothDeltaTime;
+		float displacement = this.Speed * Time.smoothDeltaTime;
 		
 		float remainingDisplacement = 0.0f;
 		bool arrived = this.MoveForward( displacement, out remainingDisplacement );
@@ -69,8 +73,16 @@ public class MobileCreature : Creature
 		
 	public virtual bool MoveForward(float displacement, out float remainingDisplacement)
 	{
-		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
-		if (displacement <= toDest.sqrMagnitude)
+		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;		
+		Vector3 nextPos = this.transform.localPosition + (this.CurrentDirectionVector * displacement);
+		Vector3 afterMoveToDest = this.CurrentDestination - nextPos;
+		
+		// possibly this could be optimized with this.CurrentDirectionVector
+		
+		if (Vector3.Dot(toDest, afterMoveToDest) > 0)
+			
+		//Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
+		//if (displacement <= toDest.sqrMagnitude)
 		{
 			// Have not reached current destionation so just move.
 			this.transform.localPosition += (this.CurrentDirectionVector * displacement);
@@ -126,15 +138,27 @@ public class MobileCreature : Creature
 		
 		float dummyOutput = 0.0f;
 		MoveForward( remainingDisplacement, out dummyOutput );
-		/*
-		this.head.MoveForward( remainingDisplacement, out dummyOutput );	
-		this.trail.UpdateHeadPosition(this.head.transform.localPosition);		
-		PositionBodySegments();
-		*/
 		
 		// Close any door that can now be closed.
 		CloseDoor();		
 	}	
+	
+	public virtual void StartMoving(SerpentConsts.Dir direction)
+	{		
+		if (IsMotionBlocked( direction ))
+		{
+			return;
+		}
+		
+		// Make sure any door that needs to open, opens
+		OpenDoor( direction );
+		
+		// Note that we changed direction at this point
+		this.CurrentDirection = direction;		
+		OnDirectionChange();
+		
+		UpdateDestination();
+	}
 	
 	/// <summary>
 	/// Updates the destination of the creature in the direction its facing
@@ -145,7 +169,7 @@ public class MobileCreature : Creature
 		this.CurrentDestination = newPos;		
 	}
 	
-	protected bool IsMotionBlocked( SerpentConsts.Dir direction )
+	protected virtual bool IsMotionBlocked( SerpentConsts.Dir direction )
 	{
 		return this.MazeController.IsMotionBlocked( GetPosition(), direction );
 	}
