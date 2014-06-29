@@ -19,7 +19,10 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UILabel levelLabel = null;
 	[SerializeField] private UILabel scoreLabel = null;
 	[SerializeField] private UILabel livesLabel = null;	
-
+	[SerializeField] private UILabel gameOverLabel = null;	
+	[SerializeField] private GameObject buttonsContainer;
+	[SerializeField] private GameObject restartButtonContainer;
+	
 	#endregion Serialized Fields
 		
 	#region Verify Serialize Fields
@@ -34,12 +37,17 @@ public class GameSceneController : RSSceneController
 		if (this.scoreLabel == null) { Debug.LogError("GameSceneController: scoreLabel is null"); }
 		if (this.livesLabel == null) { Debug.LogError("GameSceneController: livesLabel is null"); }
 		if (this.labels == null || this.labels.Length == 0) { Debug.LogError("GameSceneController: labels is null/empty"); }
+		if (this.gameOverLabel == null) { Debug.LogError("GameSceneController: gameOverLabel is null"); }
+		if (this.buttonsContainer == null) { Debug.LogError("GameSceneController: buttonsContainer is null/empty"); }
 	}
 
 	#endregion Verify Serialize Fields
 
+	#region Setup
+	
 	override public void OnLoad()
 	{
+		this.gameManager.GameOver += this.GameOver;
 		LoadGameLevel(Managers.GameState.Level);
 	}
 
@@ -68,6 +76,8 @@ public class GameSceneController : RSSceneController
 		// by player input.
 		this.inputController.PlayerSnake = this.gameManager.PlayerSnake;
 	}
+	
+	#endregion Setup
 
 	#region Update
 	
@@ -87,5 +97,27 @@ public class GameSceneController : RSSceneController
 	
 	#endregion Update
 	
+	#region Game Over
+	
+	public void GameOver()
+	{
+		// disable all the buttons
+		this.buttonsContainer.SetActive(false);
+		// enable the game over content
+		this.gameOverLabel.gameObject.SetActive(true);
+		this.restartButtonContainer.gameObject.SetActive(true);
+	}
+	
+	private void RestartGame()
+	{
+		this.gameOverLabel.gameObject.SetActive(false);
+		this.restartButtonContainer.gameObject.SetActive(false);		
+		Debug.Log ("Restart");
+		
+		Managers.GameState.Reset();
+		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);		
+	}
+	
+	#endregion Game Over
 	
 }

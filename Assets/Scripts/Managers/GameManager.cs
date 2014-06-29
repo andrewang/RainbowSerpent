@@ -11,13 +11,12 @@ public class GameManager : MonoBehaviour
 	#region Serialized Fields
 	// Main component systems
 	[SerializeField] private MazeController mazeController = null;
-	[SerializeField] private AnimationManager animationManager = null;
+	//[SerializeField] private AnimationManager animationManager = null;
 	
 	// Prefabs used to instantiate creatures
 	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject frogPrefab = null;
 	[SerializeField] private GameObject playerSnakeConfig = null;
-	private GameObject enemySnakeConfig = null;
 	
 	#endregion Serialized Fields
 	
@@ -63,6 +62,12 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	#endregion Properties
+	
+	#region Action callbacks
+	
+	public event Action GameOver;
+	
+	#endregion Action callbacks
 	
 	public GameManager ()
 	{
@@ -337,8 +342,6 @@ public class GameManager : MonoBehaviour
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;
 		
-						
-		
 		yield return new WaitForSeconds(3.0f);		
 		
 		List<Snake> enemySnakes = GetEnemySnakes();
@@ -421,8 +424,12 @@ public class GameManager : MonoBehaviour
 	
 	private void ResetFrog()
 	{
-		this.frog.Die();
-		this.frog = null;
+		if (this.frog != null)
+		{
+			this.frog.Die();
+			this.frog = null;
+		}
+		
 		this.frogTimer = 0.0f;
 	}
 	
@@ -632,9 +639,10 @@ public class GameManager : MonoBehaviour
 			// Trigger post-death sequence
 			StartCoroutine(PlayerDeathSequence());
 		}
-		else
+		else if (this.GameOver != null)			
 		{
 			// Trigger game-over sequence.
+			this.GameOver();
 		}
 	}
 	
