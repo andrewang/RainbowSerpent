@@ -57,18 +57,39 @@ public class FrogController : CreatureController
 	
 	private void MoveTowardsEgg(Egg e)
 	{
-		Vector3 destination = e.transform.localPosition;
-		List<SerpentConsts.Dir> availableDirections = GetAvailableDirectionsTowards(destination);
-		if (availableDirections.Count == 0) { return; }
+		Vector3 eggPosition = e.transform.localPosition;
+		MazeCell cell = this.mazeController.GetCellForPosition( eggPosition );
+		Vector3 eggCellCentre = this.mazeController.GetCellCentre( cell.X, cell.Y );
+		List<SerpentConsts.Dir> availableDirections = GetAvailableDirectionsTowards( eggCellCentre );
+		if (availableDirections.Count == 0) 
+		{
+			// Do a random jump instead
+			MoveRandomly();
+			return;
+		}
 		
 		int roll = UnityEngine.Random.Range(0, availableDirections.Count);		
 		SerpentConsts.Dir chosenDir = availableDirections[roll];
 		StartMoving(chosenDir);
 		
 		// Test whether we want to do a long jump towards the egg.  i.e. don't if we would overshoot.
-		MazeCell cell = this.mazeController.GetCellForPosition( destination );
-		Vector3 eggCellCentre = this.mazeController.GetCellCentre( cell.X, cell.Y );
-		if (this.frog.CurrentDestination == eggCellCentre) { return; }
+		if (this.frog.CurrentDestination.x == eggCellCentre.x) 
+		{
+			// avoid jumps that would go past this column. i.e. west and east
+			if (chosenDir == SerpentConsts.Dir.W || chosenDir == SerpentConsts.Dir.E)
+			{
+				return; 
+			}
+		}
+		
+		if (this.frog.CurrentDestination.y == eggCellCentre.y) 
+		{
+			// avoid jumps that would go past this row. i.e. north and south
+			if (chosenDir == SerpentConsts.Dir.N || chosenDir == SerpentConsts.Dir.S)
+			{	
+				return;
+			}
+		}
 		
 		TakeLongJump(chosenDir);
 	}
