@@ -57,7 +57,7 @@ public class Creature : MonoBehaviour
 		}
 	}
 	
-	public virtual void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
+	public virtual void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection, bool withinTile = false)
 	{
 		Vector3 rotation = SerpentConsts.RotationVector3[ (int) facingDirection ];
 		

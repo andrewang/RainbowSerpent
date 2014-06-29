@@ -112,7 +112,6 @@ public class GameSceneController : RSSceneController
 	{
 		this.gameOverLabel.gameObject.SetActive(false);
 		this.restartButtonContainer.gameObject.SetActive(false);		
-		Debug.Log ("Restart");
 		
 		Managers.GameState.Reset();
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);		

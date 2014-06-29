@@ -362,12 +362,12 @@ public class GameManager : MonoBehaviour
 		this.playerSnake = playerSnakes[0];	
 	}
 	
-	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction)
+	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction, bool justHatched = false)
 	{
 		// NOTE, now we've got this one and the one in maze controller.  This one is needed for spawning from eggs.
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
 		Debug.Log("Adding snake at (" + x + "," + y + "): " + position.x + "," + position.y);
-		snake.SetInitialLocation(position, direction);
+		snake.SetInitialLocation(position, direction, justHatched);
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);		
 	}
@@ -566,7 +566,7 @@ public class GameManager : MonoBehaviour
 		}
 		EggDied( egg );
 		
-		PlaceSnake(newSnake, cell.X, cell.Y, dir);	
+		PlaceSnake(newSnake, cell.X, cell.Y, dir, true);	
 	}
 	
 	private void EggDied(Creature creature)

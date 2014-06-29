@@ -150,7 +150,7 @@ public class Snake : MobileCreature
 		this.Speed = this.config.BaseSpeed - this.config.SpeedPenaltyPerSegment * this.NumSegments;
 	}
 	
-	public override void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection)
+	public override void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection, bool withinTile = false)
 	{
 		Vector3 rotation = SerpentConsts.RotationVector3[ (int) facingDirection ];
 		SetSegmentsRotation(rotation);
@@ -163,7 +163,11 @@ public class Snake : MobileCreature
 		Vector3 oppositeVector = SerpentConsts.DirectionVector3[ (int) oppositeDirection ];
 		
 		// Add a fake position so the snake segments can be positioned.
-		Vector3 displacement = oppositeVector * this.NumSegments * SerpentConsts.CellWidth;
+		Vector3 displacement = oppositeVector; 
+		if (!withinTile)
+		{
+			displacement *= this.NumSegments * SerpentConsts.CellWidth;
+		}
 		Vector3 tailPos = position + displacement;
 	
 		this.trail.AddPosition( tailPos );
@@ -484,9 +488,12 @@ public class Snake : MobileCreature
 		{
 			return;
 		}
-		SerpentConsts.Dir behindDir = SerpentConsts.OppositeDirection[ (int) tailDir ];
-		//SerpentConsts.Dir tailDir = DetermineTailDirection();
-		this.MazeController.CloseDoor( tail.transform.localPosition, behindDir );
+	
+		for (SerpentConsts.Dir direction = SerpentConsts.Dir.First; direction <= SerpentConsts.Dir.Last; ++direction)
+		{
+			if (direction == tailDir) { continue; }
+			this.MazeController.CloseDoor( tail.transform.localPosition, direction );
+		}
 	}
 	
 	private SerpentConsts.Dir DetermineTailDirection()
