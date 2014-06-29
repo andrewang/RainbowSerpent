@@ -261,7 +261,9 @@ public class GameManager : MonoBehaviour
 		{
 			for (int i = 0; i <= (int) SerpentConsts.Side.Enemy; ++i)
 			{
-				if (this.eggs[i] == null) { continue; }
+				Egg e = this.eggs[i];
+				if (e == null) { continue; }
+				if (e.IsFullyGrown == false) { continue; }
 				
 				this.frog.TestForInteraction(this.eggs[i]);
 			}
@@ -544,6 +546,8 @@ public class GameManager : MonoBehaviour
 	
 	private void EggFullyGrown( Egg egg )
 	{			
+		Debug.Log("GameManager EggFullyGrown executed");
+		
 		egg.SetParent( this.mazeController );
 	}
 	
@@ -571,6 +575,7 @@ public class GameManager : MonoBehaviour
 	
 	private void EggDied(Creature creature)
 	{
+		Debug.Log("EggDied called");
 		Egg e = creature as Egg;
 		if (e == null) { return; }
 		
@@ -587,6 +592,8 @@ public class GameManager : MonoBehaviour
 		
 		for (int i = 0; i < this.eggs.Length; ++i)
 		{
+			if (this.eggs[i] == null || this.eggs[i].IsFullyGrown == false) { continue; }
+			
 			eggs.Add( this.eggs[i] );
 		}
 		return eggs;

@@ -3,21 +3,18 @@ using System;
 
 public class Egg : Creature
 {	
-	public SnakeBody ContainingBody
-	{
-		get; set; 
-	}
-	
 	public event Action<Egg> FullyGrown;
 	public event Action<Egg> Hatched;
 	
 	private float grownTime;
 	private float hatchingTime;
-	private bool fullyGrown = false;
+	
+	public bool IsFullyGrown { get; set; }
 	private bool shouldHatch = false;
 
 	Egg()
 	{
+		this.IsFullyGrown = false;
 	}
 	
 	void Start()
@@ -58,7 +55,7 @@ public class Egg : Creature
 	
 	private void ScaledUp()
 	{
-		this.fullyGrown = true;
+		this.IsFullyGrown = true;
 		if (this.FullyGrown != null)
 		{
 			this.FullyGrown(this);	
@@ -68,7 +65,7 @@ public class Egg : Creature
 	// Hatching behavior.  TODO Could this be handled in a different way than polling time?
 	void Update()
 	{
-		if (this.fullyGrown && this.shouldHatch && this.Hatched != null && Managers.GameClock.Time >= this.hatchingTime)
+		if (this.IsFullyGrown && this.shouldHatch && this.Hatched != null && Managers.GameClock.Time >= this.hatchingTime)
 		{
 			this.Hatched(this);
 			Die();
@@ -77,6 +74,8 @@ public class Egg : Creature
 	
 	override public void Die()
 	{
+		Debug.Log("Egg Die called");
+		
 		// eggs are totally destroyed on death
 		base.Die();
 		

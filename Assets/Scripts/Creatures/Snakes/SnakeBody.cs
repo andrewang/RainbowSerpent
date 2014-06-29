@@ -47,13 +47,19 @@ public class SnakeBody : SnakeSegment
 		
 		this.Egg = egg;
 		egg.FullyGrown += this.EggFullyGrown;
-		egg.ContainingBody = this;
+		//egg.ContainingBody = this;
 	}
 	
 	public void EggFullyGrown(Egg e)
-	{
+	{		
 		// Check for null in case of conflict between timer and snake+egg death.
-		if (this.Egg == null) { return; }
+		if (this.Egg == null) 
+		{ 
+			Debug.Log("SnakeBody EggFullyGrown aborted for no egg pointer");			
+			return; 
+		}
+
+		Debug.Log("SnakeBody EggFullyGrown executed");
 		
 		this.Egg.SetSpriteDepth(0);
 		
@@ -62,7 +68,6 @@ public class SnakeBody : SnakeSegment
 		
 		// this snake segment needs to be removed from its snake.		
 		this.Snake.SeverAtSegment(this);
-		
 	}
 	
 	public override void OnDestroy()
