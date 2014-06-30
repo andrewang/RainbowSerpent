@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Serpent;
 
 public class PlayerSnakeController : SnakeController
 {
@@ -8,7 +9,7 @@ public class PlayerSnakeController : SnakeController
 	/// The desired direction.  If that direction is currently blocked, the snake will turn in that direction
 	/// at the next possible opportunity.
 	/// </summary>
-	private SerpentConsts.Dir desiredDirection = SerpentConsts.Dir.None;
+	private Direction desiredDirection = Direction.None;
 	private bool reachedPlayerZone = false;
 	
 	public bool PlayerControlled { get; set; }
@@ -24,11 +25,11 @@ public class PlayerSnakeController : SnakeController
 	
 	public override void Reset()
 	{
-		this.desiredDirection = SerpentConsts.Dir.None;
+		this.desiredDirection = Direction.None;
 		this.reachedPlayerZone = false;
 	}
 	
-	public override void StartMoving(SerpentConsts.Dir direction)
+	public override void StartMoving(Direction direction)
 	{
 		if (direction == this.desiredDirection) { return; }
 		this.snake.StartMoving(direction);
@@ -43,14 +44,14 @@ public class PlayerSnakeController : SnakeController
 	/// Handles the arrival event - the creature arriving at the centre of a tile.  Returns the
 	/// direction to travel in from this point on.
 	/// </summary>
-	public override SerpentConsts.Dir NewDirectionUponArrival()	
+	public override Direction NewDirectionUponArrival()	
 	{
-		if (Managers.GameState.LevelState == SerpentConsts.LevelState.LevelEnd)
+		if (Managers.GameState.LevelState == LevelState.LevelEnd)
 		{
 			return GoToPlayerZone();
 		}
 		
-		if (Managers.GameState.LevelState == SerpentConsts.LevelState.LevelStart)
+		if (Managers.GameState.LevelState == LevelState.LevelStart)
 		{
 			// When the player has exited the player zone then change the level state and give the player control.
 			MazeCell headMazeCell = GetCellForHeadPosition();
@@ -72,16 +73,16 @@ public class PlayerSnakeController : SnakeController
 		
 	}
 	
-	private SerpentConsts.Dir GoToPlayerZone()
+	private Direction GoToPlayerZone()
 	{
 		Maze maze = this.mazeController.Maze;
 		IntVector2 targetPos = maze.PlayerStartZoneEntrance;
 		
-		SerpentConsts.Dir dir = SerpentConsts.Dir.None;
+		Direction dir = Direction.None;
 		if (this.reachedPlayerZone == false)
 		{
 			dir = HeadTowards(targetPos);
-			if (dir == SerpentConsts.Dir.None)
+			if (dir == Direction.None)
 			{
 				this.reachedPlayerZone = true;
 			}
@@ -90,7 +91,7 @@ public class PlayerSnakeController : SnakeController
 		if (this.reachedPlayerZone == true)
 		{
 			dir = HeadTowards(maze.PlayerStartZoneExit);
-			if (dir == SerpentConsts.Dir.None)
+			if (dir == Direction.None)
 			{
 				// trigger event for return.
 				if (this.SnakeReturnedToStart != null)
@@ -98,18 +99,18 @@ public class PlayerSnakeController : SnakeController
 					SnakeReturnedToStart(this.snake);
 				}
 				// return "no direction" so that snake code doesn't execute anything else.
-				dir = SerpentConsts.Dir.None;
+				dir = Direction.None;
 			}
 		}
 		return dir;
 	}
 	
-	private SerpentConsts.Dir ExitPlayerZone()
+	private Direction ExitPlayerZone()
 	{
 		Maze maze = this.mazeController.Maze;
 		IntVector2 targetPos = maze.PlayerStartZoneExit;
-		SerpentConsts.Dir dir = HeadTowards(targetPos);
-		if (dir == SerpentConsts.Dir.None)
+		Direction dir = HeadTowards(targetPos);
+		if (dir == Direction.None)
 		{
 			// keep same direction
 			dir = this.desiredDirection;
@@ -117,19 +118,19 @@ public class PlayerSnakeController : SnakeController
 		return dir;
 	}
 	
-	private SerpentConsts.Dir HeadTowards(IntVector2 targetPos)
+	private Direction HeadTowards(IntVector2 targetPos)
 	{
 		// Is the snake's head already there?
 		MazeCell headMazeCell = GetCellForHeadPosition();
 		if (headMazeCell == null || (headMazeCell.X == targetPos.x && headMazeCell.Y == targetPos.y))
 		{
-			return SerpentConsts.Dir.None;
+			return Direction.None;
 		}
 		
-		SerpentConsts.Dir currentDirection = this.snake.Head.CurrentDirection;
-		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) currentDirection ];
+		Direction currentDirection = this.snake.Head.CurrentDirection;
+		Direction oppositeDirection = SerpentConsts.OppositeDirection[ (int) currentDirection ];
 		
-		List<SerpentConsts.Dir> availableDirections = GetAvailableDirections();
+		List<Direction> availableDirections = GetAvailableDirections();
 		availableDirections.Remove(oppositeDirection);
 		
 		// TODO REFACTOR, THIS IS CLUNKY!
@@ -146,20 +147,20 @@ public class PlayerSnakeController : SnakeController
 		
 		// We're at an intersection with a chioce.
 				
-		SerpentConsts.Dir bestYDir = GetBestYDirection(headMazeCell.Y, targetPos.y);
-		SerpentConsts.Dir bestXDir = GetBestXDirection(headMazeCell.X, targetPos.x);
+		Direction bestYDir = GetBestYDirection(headMazeCell.Y, targetPos.y);
+		Direction bestXDir = GetBestXDirection(headMazeCell.X, targetPos.x);
 		
-		SerpentConsts.Dir bestDir;
-		SerpentConsts.Dir secondBestDir;
+		Direction bestDir;
+		Direction secondBestDir;
 		
 		// Figure out our preferred and second-preferred directions
-		if (bestYDir == SerpentConsts.Dir.None)
+		if (bestYDir == Direction.None)
 		{
 			// Can't turn towards where we want to go on the Y axis, so take the X-axis direction.
 			bestDir = bestXDir;
 			secondBestDir = bestYDir;
 		}
-		else if (bestXDir == SerpentConsts.Dir.None)
+		else if (bestXDir == Direction.None)
 		{
 			// Can't turn towards where we want to go on the X axis, so take the Y-axis direction.
 			bestDir = bestYDir;
@@ -177,7 +178,7 @@ public class PlayerSnakeController : SnakeController
 		{
 			return bestDir;
 		}
-		else if (secondBestDir != SerpentConsts.Dir.None && availableDirections.Contains(secondBestDir))
+		else if (secondBestDir != Direction.None && availableDirections.Contains(secondBestDir))
 		{
 			return secondBestDir;
 		}

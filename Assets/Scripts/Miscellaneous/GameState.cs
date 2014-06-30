@@ -1,4 +1,5 @@
 using System;
+using Serpent;
 
 /// <summary>
 /// Game state.  The game state class tracks the state of "the player's game" - what level they are on, what their score is,
@@ -52,7 +53,7 @@ public class GameState
 	/// <value>The number of extra snakes.</value>
 	public int ExtraSnakes { get; set; }
 	
-	public SerpentConsts.LevelState LevelState { get; set; }
+	public LevelState LevelState { get; set; }
 
 	public GameState ()
 	{
@@ -68,7 +69,7 @@ public class GameState
 		this.Level = 1;
 		this.Score = 0;
 		this.ExtraSnakes = SerpentConsts.InitialNumPlayerSnakes;
-		this.LevelState = SerpentConsts.LevelState.LevelStart;
+		this.LevelState = LevelState.LevelStart;
 	}
 	
 	public void CountLevels()

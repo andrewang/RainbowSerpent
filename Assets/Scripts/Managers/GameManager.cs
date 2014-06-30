@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using SerpentExtensions;
+using Serpent;
 
 // TODO REFACTOR into multiple classes.
 
@@ -124,7 +125,7 @@ public class GameManager : MonoBehaviour
 		this.frogTimer = 0.0f;
 	}
 	
-	private void PlaceCreature(Creature creature, int x, int y, SerpentConsts.Dir direction)
+	private void PlaceCreature(Creature creature, int x, int y, Direction direction)
 	{		
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
 		creature.SetInitialLocation(position, direction);		
@@ -136,7 +137,7 @@ public class GameManager : MonoBehaviour
 	
 	private void StartPlay()
 	{
-		Managers.GameState.LevelState = SerpentConsts.LevelState.Playing;
+		Managers.GameState.LevelState = LevelState.Playing;
 	}
 	
 	#endregion Game State
@@ -150,7 +151,7 @@ public class GameManager : MonoBehaviour
 		UpdateSnakes();
 		UpdateFrog();
 		
-		if (Managers.GameState.LevelState != SerpentConsts.LevelState.Playing) 
+		if (Managers.GameState.LevelState != LevelState.Playing) 
 		{
 			return;
 		}
@@ -161,18 +162,18 @@ public class GameManager : MonoBehaviour
 			this.updateSnakeColours = false;
 		}
 		
-		if (GetEgg(SerpentConsts.Side.Enemy) == null)
+		if (GetEgg(Side.Enemy) == null)
 		{
 			List<Snake> enemySnakes = GetEnemySnakes();
 			if (enemySnakes.Count < this.maxNumEnemySnakes)
 			{
-				HandleEggs(SerpentConsts.Side.Enemy);
+				HandleEggs(Side.Enemy);
 			}
 		}
 		
-		if (GetEgg(SerpentConsts.Side.Player) == null && this.playerSnake != null)
+		if (GetEgg(Side.Player) == null && this.playerSnake != null)
 		{		
-			HandleEggs(SerpentConsts.Side.Player);
+			HandleEggs(Side.Player);
 		}		
 		
 		HandleFrogCreation();
@@ -180,7 +181,7 @@ public class GameManager : MonoBehaviour
 	
 	private void UpdateSnakes()
 	{
-		Egg playerEgg = GetEgg( SerpentConsts.Side.Player );
+		Egg playerEgg = GetEgg( Side.Player );
 		
 		bool enemySnakeDied = false;
 		// Test for snake interactions, based on enemies first
@@ -235,7 +236,7 @@ public class GameManager : MonoBehaviour
 		}		
 		
 		// Check for player eating enemy egg
-		Egg enemyEgg = GetEgg( SerpentConsts.Side.Enemy );
+		Egg enemyEgg = GetEgg( Side.Enemy );
 		bool enemyEggDied = false;
 		if (enemyEgg != null)
 		{
@@ -245,12 +246,12 @@ public class GameManager : MonoBehaviour
 		if (enemySnakeDied && enemySnakes.Count == 0 && enemyEgg == null)
 		{
 			// all enemy snakes are dead and no egg exists
-			Managers.GameState.LevelState = SerpentConsts.LevelState.LevelEnd;
+			Managers.GameState.LevelState = LevelState.LevelEnd;
 		}
 		else if (enemyEggDied && enemySnakes.Count == 0)
 		{
 			// egg eaten and no enemy snakes exist
-			Managers.GameState.LevelState = SerpentConsts.LevelState.LevelEnd;			
+			Managers.GameState.LevelState = LevelState.LevelEnd;			
 		}
 	}
 	
@@ -259,7 +260,7 @@ public class GameManager : MonoBehaviour
 		// if there is a frog, test against player egg, and test against enemy egg.
 		if (this.frog != null)
 		{
-			for (int i = 0; i <= (int) SerpentConsts.Side.Enemy; ++i)
+			for (int i = 0; i <= (int) Side.Enemy; ++i)
 			{
 				Egg e = this.eggs[i];
 				if (e == null) { continue; }
@@ -292,7 +293,7 @@ public class GameManager : MonoBehaviour
 	{
 		// Player snake is added to array and also assigned to direct pointer.
 		Snake s = CreateSnake(this.playerSnakeConf, length);
-		s.Side = SerpentConsts.Side.Player;
+		s.Side = Side.Player;
 		s.CreatureDied += PlayerSnakeDied;
 		this.snakes.Add( s );
 
@@ -332,7 +333,7 @@ public class GameManager : MonoBehaviour
 	
 	private IEnumerator PlaceSnakes()
 	{
-		Managers.GameState.LevelState = SerpentConsts.LevelState.LevelStart;
+		Managers.GameState.LevelState = LevelState.LevelStart;
 		
 		// For a subsequent level, in case playersnake has been cleared, reattach it.
 		FindPlayerSnake();
@@ -358,13 +359,13 @@ public class GameManager : MonoBehaviour
 	{
 		if (this.playerSnake != null) { return; }
 		
-		List<Snake> playerSnakes = this.snakes.FindAll( s => s.Side == SerpentConsts.Side.Player );
+		List<Snake> playerSnakes = this.snakes.FindAll( s => s.Side == Side.Player );
 		if (playerSnakes.Count == 0) { return; }
 		
 		this.playerSnake = playerSnakes[0];	
 	}
 	
-	private void PlaceSnake(Snake snake, int x, int y, SerpentConsts.Dir direction, bool justHatched = false)
+	private void PlaceSnake(Snake snake, int x, int y, Direction direction, bool justHatched = false)
 	{
 		// NOTE, now we've got this one and the one in maze controller.  This one is needed for spawning from eggs.
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
@@ -389,7 +390,7 @@ public class GameManager : MonoBehaviour
 		Managers.GameState.ExtraSnakes += 1;
 		
 		// Does a player egg exist?
-		Egg e = this.eggs[ (int) SerpentConsts.Side.Player ];
+		Egg e = this.eggs[ (int) Side.Player ];
 		if ( e != null )
 		{
 			EggHatched( e );
@@ -468,7 +469,7 @@ public class GameManager : MonoBehaviour
 			y = 1 + UnityEngine.Random.Range(0, this.mazeController.Maze.Height - 1);			
 		}
 		
-		PlaceCreature(this.frog, x, y, SerpentConsts.Dir.N);
+		PlaceCreature(this.frog, x, y, Direction.N);
 	}
 		
 	#endregion Frogs
@@ -476,7 +477,7 @@ public class GameManager : MonoBehaviour
 	#region Snake Eggs	
 
 	
-	private void HandleEggs(SerpentConsts.Side side)
+	private void HandleEggs(Side side)
 	{
 		int intSide = (int) side;
 		if (this.eggTimers[intSide] == 0.0f)
@@ -500,7 +501,7 @@ public class GameManager : MonoBehaviour
 			SetEgg( side, e );		
 			
 			// Enemy snakes have a timed hatching period, while player snakes hatch at the end of the level.
-			if (side == SerpentConsts.Side.Enemy)
+			if (side == Side.Enemy)
 			{
 				e.SetHatchingTime( SerpentConsts.EnemyEggHatchingTime );			                
 			}
@@ -510,12 +511,12 @@ public class GameManager : MonoBehaviour
 		}		
 	}
 	
-	private void SetEggTimer(SerpentConsts.Side side)
+	private void SetEggTimer(Side side)
 	{
 		this.eggTimers[(int)side] = Managers.GameClock.Time + SerpentConsts.GetEggLayingFrequency(side);				
 	}
 	
-	private void ResetEggTimer(SerpentConsts.Side side)
+	private void ResetEggTimer(Side side)
 	{
 		this.eggTimers[(int)side] = 0.0f;				
 	}
@@ -554,13 +555,13 @@ public class GameManager : MonoBehaviour
 	private void EggHatched( Egg egg )
 	{
 		MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
-		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;
+		List<Direction> availableDirections = cell.UnblockedDirections;
 		int randomIndex = UnityEngine.Random.Range (0, availableDirections.Count);
-		SerpentConsts.Dir dir = availableDirections[randomIndex];
+		Direction dir = availableDirections[randomIndex];
 		
 		Snake newSnake = null;
 		int length = SerpentConsts.GetNewlyHatchedSnakeLength( egg.Side );
-		if (egg.Side == SerpentConsts.Side.Enemy)
+		if (egg.Side == Side.Enemy)
 		{
 			newSnake = CreateEnemySnake(length);
 		}
@@ -599,12 +600,12 @@ public class GameManager : MonoBehaviour
 		return eggs;
 	}
 	
-	public Egg GetEgg( SerpentConsts.Side side )
+	public Egg GetEgg( Side side )
 	{
 		return this.eggs[ (int) side ];
 	}
 	
-	private void SetEgg( SerpentConsts.Side side, Egg e )
+	private void SetEgg( Side side, Egg e )
 	{
 		this.eggs[ (int) side ] = e;
 	}
@@ -685,12 +686,12 @@ public class GameManager : MonoBehaviour
 	
 	private void HandleEggsAfterPlayerDeath()
 	{
-		for( int side = 0; side <= (int) SerpentConsts.Side.Enemy; ++side )
+		for( int side = 0; side <= (int) Side.Enemy; ++side )
 		{
 			Egg e = this.eggs[side];
 			if (e == null) { continue; }
 			
-			if (side == (int)SerpentConsts.Side.Enemy)
+			if (side == (int)Side.Enemy)
 			{				
 				EggHatched(e);
 			}
@@ -745,7 +746,7 @@ public class GameManager : MonoBehaviour
 	
 	public List<Snake> GetEnemySnakes()
 	{
-		List<Snake> enemies = this.snakes.FindAll( s => s.Side == SerpentConsts.Side.Enemy );
+		List<Snake> enemies = this.snakes.FindAll( s => s.Side == Side.Enemy );
 		return enemies;
 	}
 

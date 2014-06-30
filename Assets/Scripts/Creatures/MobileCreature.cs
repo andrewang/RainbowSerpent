@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Serpent;
 
 public class MobileCreature : Creature
 {
@@ -10,8 +11,8 @@ public class MobileCreature : Creature
 	/// <summary>
 	/// The current direction.  Creatures can only change direction at the centre of tiles
 	/// </summary>
-	private SerpentConsts.Dir currentDirection = SerpentConsts.Dir.None;
-	public SerpentConsts.Dir CurrentDirection
+	private Direction currentDirection = Direction.None;
+	public Direction CurrentDirection
 	{
 		get
 		{
@@ -20,16 +21,16 @@ public class MobileCreature : Creature
 		set
 		{
 			this.currentDirection = value;
-			this.currentDirectionVector = SerpentConsts.DirectionVector3[ (int)value ];
+			this.directionVector = SerpentConsts.DirectionVector3[ (int)value ];
 		}
 	}
 	
-	private Vector3 currentDirectionVector;
-	public Vector3 CurrentDirectionVector
+	private Vector3 directionVector;
+	public Vector3 DirectionVector
 	{
 		get
 		{
-			return this.currentDirectionVector;
+			return this.directionVector;
 		}
 	}
 	
@@ -44,17 +45,10 @@ public class MobileCreature : Creature
 	}
 		
 	public virtual void Update()
-	{
-		/*
-		if (this.Visible == false || this.Dead) 
-		{
-			return; 
-		}
-		*/
-		
+	{	
 		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
 		// to the Controller.
-		if (this.CurrentDirection != SerpentConsts.Dir.None)
+		if (this.CurrentDirection != Direction.None)
 		{
 			UpdatePosition();			
 		}
@@ -74,18 +68,15 @@ public class MobileCreature : Creature
 	public virtual bool MoveForward(float displacement, out float remainingDisplacement)
 	{
 		Vector3 toDest = this.CurrentDestination - this.transform.localPosition;		
-		Vector3 nextPos = this.transform.localPosition + (this.CurrentDirectionVector * displacement);
+		Vector3 nextPos = this.transform.localPosition + (this.directionVector * displacement);
 		Vector3 afterMoveToDest = this.CurrentDestination - nextPos;
 		
-		// possibly this could be optimized with this.CurrentDirectionVector
+		// possibly this could be optimized with this.CurrentSerpentConsts.DirectionVector
 		
 		if (Vector3.Dot(toDest, afterMoveToDest) > 0)
-			
-		//Vector3 toDest = this.CurrentDestination - this.transform.localPosition;
-		//if (displacement <= toDest.sqrMagnitude)
 		{
 			// Have not reached current destionation so just move.
-			this.transform.localPosition += (this.CurrentDirectionVector * displacement);
+			this.transform.localPosition += (this.directionVector * displacement);
 			
 			// Did not arrive at destination
 			remainingDisplacement = 0.0f;
@@ -104,10 +95,10 @@ public class MobileCreature : Creature
 	public virtual void ArrivedAtDestination(float remainingDisplacement)
 	{		
 		// Inform the controller we arrived, and receive the new direction to go in.
-		SerpentConsts.Dir newDirection = this.Controller.NewDirectionUponArrival();
-		if (newDirection == SerpentConsts.Dir.None) 
+		Direction newDirection = this.Controller.NewDirectionUponArrival();
+		if (newDirection == Direction.None) 
 		{ 
-			this.CurrentDirection = SerpentConsts.Dir.None;
+			this.CurrentDirection = Direction.None;
 			return; 
 		}
 		
@@ -122,7 +113,7 @@ public class MobileCreature : Creature
 		else if (IsMotionBlocked( this.CurrentDirection ))
 		{
 			// stop moving
-			this.CurrentDirection = SerpentConsts.Dir.None;
+			this.CurrentDirection = Direction.None;
 			return;
 		}
 		
@@ -143,7 +134,7 @@ public class MobileCreature : Creature
 		CloseDoor();		
 	}	
 	
-	public virtual void StartMoving(SerpentConsts.Dir direction)
+	public virtual void StartMoving(Direction direction)
 	{		
 		if (IsMotionBlocked( direction ))
 		{
@@ -169,7 +160,7 @@ public class MobileCreature : Creature
 		this.CurrentDestination = newPos;		
 	}
 	
-	protected virtual bool IsMotionBlocked( SerpentConsts.Dir direction )
+	protected virtual bool IsMotionBlocked( Direction direction )
 	{
 		return this.MazeController.IsMotionBlocked( GetPosition(), direction );
 	}
@@ -179,7 +170,7 @@ public class MobileCreature : Creature
 		// nothing to do.  special case for some creatures
 	}
 	
-	protected virtual void OpenDoor( SerpentConsts.Dir direction )
+	protected virtual void OpenDoor( Direction direction )
 	{
 		// by default creatures don't open doors
 	}

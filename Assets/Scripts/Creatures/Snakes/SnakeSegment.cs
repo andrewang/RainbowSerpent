@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SerpentExtensions;
+using Serpent;
 
 /// <summary>
 /// The snake segment is the base class for the snake body (segment) and head (segment) containing 
@@ -31,8 +32,8 @@ public class SnakeSegment : MonoBehaviour
 	/// <summary>
 	/// The current direction.  Creatures can only change direction at the centre of tiles
 	/// </summary>
-	private SerpentConsts.Dir currentDirection;
-	public SerpentConsts.Dir CurrentDirection
+	private Direction currentDirection;
+	public Direction CurrentDirection
 	{
 		get
 		{

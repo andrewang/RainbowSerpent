@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Serpent;
 
 public class Creature : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class Creature : MonoBehaviour
 		}
 	}
 	
-	public SerpentConsts.Side Side { get; set; }
+	public Side Side { get; set; }
 	
 	public bool Dead { get; set; }
 		
@@ -35,7 +36,7 @@ public class Creature : MonoBehaviour
 		this.MazeController = mazeController;
 		
 		// default side is enemy
-		this.Side = SerpentConsts.Side.Enemy;
+		this.Side = Side.Enemy;
 		
 	}
 
@@ -57,7 +58,7 @@ public class Creature : MonoBehaviour
 		}
 	}
 	
-	public virtual void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection, bool withinTile = false)
+	public virtual void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)
 	{
 		Vector3 rotation = SerpentConsts.RotationVector3[ (int) facingDirection ];
 		

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Serpent;
 
 public class FrogController : CreatureController
 {
@@ -19,10 +20,10 @@ public class FrogController : CreatureController
 	/// Handles the arrival event - the creature arriving at the centre of a tile.  Returns the
 	/// direction to travel in from this point on.
 	/// </summary>
-	public override SerpentConsts.Dir NewDirectionUponArrival()	
+	public override Direction NewDirectionUponArrival()	
 	{
 		// Don't move again immediately after arriving.
-		return SerpentConsts.Dir.None;
+		return Direction.None;
 	}
 	
 	public void Hop()
@@ -41,16 +42,16 @@ public class FrogController : CreatureController
 	private void MoveRandomly()
 	{
 		// Random move?  NOTE: this pays attention to walls...
-		List<SerpentConsts.Dir> availableDirections = this.GetAvailableDirections();
+		List<Direction> availableDirections = this.GetAvailableDirections();
 		if (availableDirections.Count == 0) { return; }
 		
 		int roll = UnityEngine.Random.Range(0, availableDirections.Count);		
-		SerpentConsts.Dir chosenDir = availableDirections[roll];
+		Direction chosenDir = availableDirections[roll];
 		StartMoving(chosenDir);		
 		TakeLongJump(chosenDir);		
 	}
 	
-	public override void StartMoving(SerpentConsts.Dir dir)
+	public override void StartMoving(Direction dir)
 	{
 		this.frog.StartMoving(dir);
 	}
@@ -60,7 +61,7 @@ public class FrogController : CreatureController
 		Vector3 eggPosition = e.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( eggPosition );
 		Vector3 eggCellCentre = this.mazeController.GetCellCentre( cell.X, cell.Y );
-		List<SerpentConsts.Dir> availableDirections = GetAvailableDirectionsTowards( eggCellCentre );
+		List<Direction> availableDirections = GetAvailableDirectionsTowards( eggCellCentre );
 		if (availableDirections.Count == 0) 
 		{
 			// Do a random jump instead
@@ -69,14 +70,14 @@ public class FrogController : CreatureController
 		}
 		
 		int roll = UnityEngine.Random.Range(0, availableDirections.Count);		
-		SerpentConsts.Dir chosenDir = availableDirections[roll];
+		Direction chosenDir = availableDirections[roll];
 		StartMoving(chosenDir);
 		
 		// Test whether we want to do a long jump towards the egg.  i.e. don't if we would overshoot.
 		if (this.frog.CurrentDestination.x == eggCellCentre.x) 
 		{
 			// avoid jumps that would go past this column. i.e. west and east
-			if (chosenDir == SerpentConsts.Dir.W || chosenDir == SerpentConsts.Dir.E)
+			if (chosenDir == Direction.W || chosenDir == Direction.E)
 			{
 				return; 
 			}
@@ -85,7 +86,7 @@ public class FrogController : CreatureController
 		if (this.frog.CurrentDestination.y == eggCellCentre.y) 
 		{
 			// avoid jumps that would go past this row. i.e. north and south
-			if (chosenDir == SerpentConsts.Dir.N || chosenDir == SerpentConsts.Dir.S)
+			if (chosenDir == Direction.N || chosenDir == Direction.S)
 			{	
 				return;
 			}
@@ -99,6 +100,11 @@ public class FrogController : CreatureController
 	private bool SnakeIsNearby()
 	{
 		Snake s = GetNearestSnake();
+		if (s == null) 
+		{
+			return false; 
+		}
+		
 		Vector3 distance2D = s.Head.transform.localPosition - this.frog.transform.localPosition;
 		float cellDistance = Mathf.Abs(distance2D.x) / SerpentConsts.CellWidth + Mathf.Abs(distance2D.y) / SerpentConsts.CellHeight;
 		if (cellDistance < SnakeDangerDistance)
@@ -125,16 +131,16 @@ public class FrogController : CreatureController
 		return this.frog.GetNearestCreature( eggs ) as Egg;
 	}
 	
-	protected override List<SerpentConsts.Dir> GetAvailableDirections()
+	protected override List<Direction> GetAvailableDirections()
 	{
 		// Frogs ignore the maze since they can jump over walls.  They just need to take into account the edge of the map.
 		// Except that I do want them to be able to leave the map sometimes.
 		Vector3 position = this.frog.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
 				
-		List<SerpentConsts.Dir> availableDirections = new List<SerpentConsts.Dir>();
+		List<Direction> availableDirections = new List<Direction>();
 		
-		for (SerpentConsts.Dir dir = SerpentConsts.Dir.First; dir != SerpentConsts.Dir.Last; ++dir)
+		for (Direction dir = Direction.First; dir != Direction.Last; ++dir)
 		{
 			if (CanGo( dir, cell.X, cell.Y ))
 			{
@@ -146,48 +152,48 @@ public class FrogController : CreatureController
 		return availableDirections;
 	}
 	
-	protected List<SerpentConsts.Dir> GetAvailableDirectionsTowards(Vector3 destination)
+	protected List<Direction> GetAvailableDirectionsTowards(Vector3 destination)
 	{
 		Vector3 position = this.frog.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
-		List<SerpentConsts.Dir> availableDirections = new List<SerpentConsts.Dir>();
+		List<Direction> availableDirections = new List<Direction>();
 		
 		if (destination.x < position.x) 
 		{ 
-			if (CanGo(SerpentConsts.Dir.W, cell.X, cell.Y))
+			if (CanGo(Direction.W, cell.X, cell.Y))
 			{
-				availableDirections.Add( SerpentConsts.Dir.W ); 
+				availableDirections.Add( Direction.W ); 
 			}
 		}
 		
 		if (destination.x > position.x) 
 		{
-			if (CanGo(SerpentConsts.Dir.E, cell.X, cell.Y))
+			if (CanGo(Direction.E, cell.X, cell.Y))
 			{
-				availableDirections.Add( SerpentConsts.Dir.E ); 
+				availableDirections.Add( Direction.E ); 
 			}
 		}
 		
 		if (destination.y < position.y) 
 		{
-			if (CanGo(SerpentConsts.Dir.S, cell.X, cell.Y))
+			if (CanGo(Direction.S, cell.X, cell.Y))
 			{
-				availableDirections.Add( SerpentConsts.Dir.S ); 
+				availableDirections.Add( Direction.S ); 
 			}
 		}
 		
 		if (destination.y > position.y) 
 		{
-			if (CanGo(SerpentConsts.Dir.N, cell.X, cell.Y))
+			if (CanGo(Direction.N, cell.X, cell.Y))
 			{   
-				availableDirections.Add( SerpentConsts.Dir.N ); 
+				availableDirections.Add( Direction.N ); 
 			}
 		}
 		
 		return availableDirections;
 	}
 	
-	private bool CanGo( SerpentConsts.Dir direction, int fromX, int fromY )
+	private bool CanGo( Direction direction, int fromX, int fromY )
 	{
 		int x = fromX + SerpentConsts.DirectionVector[ (int)direction ].x;
 		int y = fromY + SerpentConsts.DirectionVector[ (int)direction ].y;
@@ -207,7 +213,7 @@ public class FrogController : CreatureController
 		return true;
 	}
 	
-	private void TakeLongJump(SerpentConsts.Dir dir)
+	private void TakeLongJump(Direction dir)
 	{
 		Vector3 position = this.frog.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
@@ -229,7 +235,7 @@ public class FrogController : CreatureController
 	}
 	
 	/*
-	private bool CanTakeLongJump(SerpentConsts.Dir dir)
+	private bool CanTakeLongJump(Direction dir)
 	{
 		Vector3 position = this.frog.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
@@ -249,7 +255,7 @@ public class FrogController : CreatureController
 	*/
 	
 	/*
-	private IntVector2 GetLongJumpDestination(SerpentConsts.Dir dir)
+	private IntVector2 GetLongJumpDestination(Direction dir)
 	{
 		
 	}

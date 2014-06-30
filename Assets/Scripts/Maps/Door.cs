@@ -1,11 +1,12 @@
 using System;
+using Serpent;
 
 public class Door : Wall
 {
-	private SerpentConsts.Dir openableSide;
+	private Direction openableSide;
 	private bool open;
 	
-	public SerpentConsts.LevelState LevelStateRequired { get; set; }
+	public LevelState LevelStateRequired { get; set; }
 	
 	// Doors need a reference to their sprite to do animations.
 	public UISprite Sprite
@@ -14,18 +15,18 @@ public class Door : Wall
 		set;
 	}
 	
-	public Door (SerpentConsts.Dir dir)
+	public Door (Direction dir)
 	{
-		this.LevelStateRequired = SerpentConsts.LevelState.None;
+		this.LevelStateRequired = LevelState.None;
 		this.open = false;
 		this.openableSide = dir;
 	}
 	
-	public bool OpenableFrom( SerpentConsts.Dir direction )
+	public bool OpenableFrom( Direction direction )
 	{
-		if (this.LevelStateRequired != SerpentConsts.LevelState.None)
+		if (this.LevelStateRequired != LevelState.None)
 		{
-			SerpentConsts.LevelState currentState = Managers.GameState.LevelState;
+			LevelState currentState = Managers.GameState.LevelState;
 			if (currentState != this.LevelStateRequired)
 			{
 				return false;

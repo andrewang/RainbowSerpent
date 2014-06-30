@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Serpent;
 
 public class MazeController : MonoBehaviour
 {
@@ -144,7 +145,7 @@ public class MazeController : MonoBehaviour
 		};
 		
 		// Create south walls along all rows.
-		intSide = (int) SerpentConsts.Dir.S;
+		intSide = (int) Direction.S;
 		for (y = 0; y < this.Maze.Height; ++y)
 		{
 			CreateWalls(this.Maze.Width, getWallFunction, createSpriteFunction);
@@ -197,7 +198,7 @@ public class MazeController : MonoBehaviour
 		};
 		
 		// Create east walls along all columns.
-		intSide = (int) SerpentConsts.Dir.E;
+		intSide = (int) Direction.E;
 		for (x = 0; x < this.Maze.Width; ++x)
 		{
 			CreateWalls(this.Maze.Height, getWallFunction, createSpriteFunction);
@@ -416,7 +417,7 @@ public class MazeController : MonoBehaviour
 
 	#region Movement related methods	
 	
-	public void OpenDoor(Vector3 position, SerpentConsts.Dir direction)
+	public void OpenDoor(Vector3 position, Direction direction)
 	{
 		MazeCell cell = GetCellForPosition(position);
 		if (cell == null) { return; }
@@ -429,7 +430,7 @@ public class MazeController : MonoBehaviour
 		}
 	}
 	
-	public void CloseDoor(Vector3 position, SerpentConsts.Dir direction)
+	public void CloseDoor(Vector3 position, Direction direction)
 	{
 		MazeCell cell = GetCellForPosition(position);
 		if (cell == null) { return; }
@@ -448,7 +449,7 @@ public class MazeController : MonoBehaviour
 	/// <returns><c>true</c>, if motion was blocked, <c>false</c> otherwise.</returns>
 	/// <param name="position">Position.</param>
 	/// <param name="direction">Direction.</param>
-	public bool IsMotionBlocked(Vector3 position, SerpentConsts.Dir direction)
+	public bool IsMotionBlocked(Vector3 position, Direction direction)
 	{
 		MazeCell cell = GetCellForPosition(position);
 		if (cell == null) { return true; }
@@ -456,14 +457,13 @@ public class MazeController : MonoBehaviour
 		return cell.IsMotionBlocked(direction);
 	}
 	
-	public List<SerpentConsts.Dir> GetValidDirections(Vector3 position, bool allowOffscreen)
+	public List<Direction> GetValidDirections(Vector3 position, bool allowOffscreen)
 	{
-		List<SerpentConsts.Dir> availableDirections = new List<SerpentConsts.Dir>();
+		List<Direction> availableDirections = new List<Direction>();
 		if (allowOffscreen)
 		{
-			for (int i = 0; i < SerpentConsts.NumDirections; ++i)
+			for (Direction dir = Direction.First; dir <= Direction.Last; ++dir)
 			{
-				SerpentConsts.Dir dir = (SerpentConsts.Dir) i;
 				availableDirections.Add(dir);
 			}		
 			return availableDirections;
@@ -473,19 +473,19 @@ public class MazeController : MonoBehaviour
 		
 		if (cell.X > 0) 
 		{
-			availableDirections.Add( SerpentConsts.Dir.W ); 
+			availableDirections.Add( Direction.W ); 
 		}
 		if (cell.X < this.Maze.Width)
 		{
-			availableDirections.Add( SerpentConsts.Dir.E ); 
+			availableDirections.Add( Direction.E ); 
 		}
 		if (cell.Y > 0)
 		{
-			availableDirections.Add( SerpentConsts.Dir.S );
+			availableDirections.Add( Direction.S );
 		}
 		if (cell.Y < this.Maze.Height)
 		{
-			availableDirections.Add( SerpentConsts.Dir.N );
+			availableDirections.Add( Direction.N );
 		}
 		
 		return availableDirections;
@@ -498,7 +498,7 @@ public class MazeController : MonoBehaviour
 	public void PlaceSnake(Snake snake, bool player)
 	{
 		IntVector2 cellPosition;
-		SerpentConsts.Dir direction;
+		Direction direction;
 		if (player)
 		{
 			cellPosition = this.Maze.PlayerStartPosition;
@@ -550,7 +550,7 @@ public class MazeController : MonoBehaviour
 		return this.Maze.Cells[x,y];
 	}
 	
-	public Vector3 GetNextCellCentre(Vector3 position, SerpentConsts.Dir direction)
+	public Vector3 GetNextCellCentre(Vector3 position, Direction direction)
 	{
 		// Convert the Vector3 position into a floating point position measured
 		// in cells.  Then adjust the position by a step in the direction specified,

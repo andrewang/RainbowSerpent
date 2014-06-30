@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using SerpentExtensions;
+using Serpent;
 
 public class Snake : MobileCreature
 {
@@ -117,7 +118,7 @@ public class Snake : MobileCreature
 		this.trail.Reset();
 		this.Controller.Reset();
 		
-		this.CurrentDirection = SerpentConsts.Dir.None;
+		this.CurrentDirection = Direction.None;
 		
 		SnakeBody tail = this.Tail;
 		if (tail != null)
@@ -150,7 +151,7 @@ public class Snake : MobileCreature
 		this.Speed = this.config.BaseSpeed - this.config.SpeedPenaltyPerSegment * this.NumSegments;
 	}
 	
-	public override void SetInitialLocation(Vector3 position, SerpentConsts.Dir facingDirection, bool withinTile = false)
+	public override void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)
 	{
 		Vector3 rotation = SerpentConsts.RotationVector3[ (int) facingDirection ];
 		SetSegmentsRotation(rotation);
@@ -159,7 +160,7 @@ public class Snake : MobileCreature
 		// Each body segment should be laid out in opposite direction
 		this.head.transform.localPosition = position;
 		
-		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) facingDirection ];
+		Direction oppositeDirection = SerpentConsts.OppositeDirection[ (int) facingDirection ];
 		Vector3 oppositeVector = SerpentConsts.DirectionVector3[ (int) oppositeDirection ];
 		
 		// Add a fake position so the snake segments can be positioned.
@@ -392,7 +393,7 @@ public class Snake : MobileCreature
 		
 		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
 		// to the Controller.
-		if (this.CurrentDirection != SerpentConsts.Dir.None)
+		if (this.CurrentDirection != Direction.None)
 		{
 			UpdatePosition();			
 		}
@@ -443,13 +444,13 @@ public class Snake : MobileCreature
 	/// rather than when a snake reaches an intersection..
 	/// </summary>
 	/// <param name="direction">Direction.</param>
-	public override void StartMoving(SerpentConsts.Dir direction)
+	public override void StartMoving(Direction direction)
 	{
 		// Most of the time we'll ignore this call, and wait until we reach an intersection, then ask the controller
 		// for the next direction to go in.
-		
-		SerpentConsts.Dir oppositeDirection = SerpentConsts.OppositeDirection[ (int) this.CurrentDirection ];
-		if (this.CurrentDirection != SerpentConsts.Dir.None && direction != oppositeDirection)
+		int index = (int) this.CurrentDirection;
+		Direction oppositeDirection = SerpentConsts.OppositeDirection[ index ];
+		if (this.CurrentDirection != Direction.None && direction != oppositeDirection)
 		{
 			return;
 		}
@@ -475,7 +476,7 @@ public class Snake : MobileCreature
 		*/
 	}
 	
-	protected override void OpenDoor( SerpentConsts.Dir direction )
+	protected override void OpenDoor( Direction direction )
 	{
 		this.MazeController.OpenDoor( GetPosition(), direction );
 	}
@@ -483,20 +484,20 @@ public class Snake : MobileCreature
 	protected override void CloseDoor()
 	{
 		SnakeSegment tail = this.Tail;
-		SerpentConsts.Dir tailDir = tail.CurrentDirection;
-		if (tailDir == SerpentConsts.Dir.None)
+		Direction tailDir = tail.CurrentDirection;
+		if (tailDir == Direction.None)
 		{
 			return;
 		}
 	
-		for (SerpentConsts.Dir direction = SerpentConsts.Dir.First; direction <= SerpentConsts.Dir.Last; ++direction)
+		for (Direction direction = Direction.First; direction <= Direction.Last; ++direction)
 		{
 			if (direction == tailDir) { continue; }
 			this.MazeController.CloseDoor( tail.transform.localPosition, direction );
 		}
 	}
 	
-	private SerpentConsts.Dir DetermineTailDirection()
+	private Direction DetermineTailDirection()
 	{
 		if (this.head.NextSegment == null)
 		{
@@ -517,22 +518,22 @@ public class Snake : MobileCreature
 		{
 			if (xDelta < 0.0f)
 			{
-				return SerpentConsts.Dir.W;
+				return Direction.W;
 			}
 			else
 			{
-				return SerpentConsts.Dir.E;
+				return Direction.E;
 			}
 		}
 		else
 		{
 			if (yDelta < 0.0f)
 			{
-				return SerpentConsts.Dir.S;				
+				return Direction.S;				
 			}
 			else
 			{
-				return SerpentConsts.Dir.N;
+				return Direction.N;
 			}
 		}
 	}

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using SerpentExtensions;
 using MiniJSON;
 using System;
+using Serpent;
 
 public class Maze : MonoBehaviour 
 {
@@ -11,13 +12,13 @@ public class Maze : MonoBehaviour
 	public int Height { get; set; }
 	
 	public IntVector2 PlayerStartPosition { get; private set; }
-	public SerpentConsts.Dir PlayerStartFacing { get; private set; }
+	public Direction PlayerStartFacing { get; private set; }
 	
 	public IntVector2 PlayerStartZoneExit { get; private set; }
 	public IntVector2 PlayerStartZoneEntrance { get; private set; }
 	
 	public IntVector2 EnemyStartPosition { get; private set; }
-	public SerpentConsts.Dir EnemyStartFacing { get; private set; }
+	public Direction EnemyStartFacing { get; private set; }
 	
 	public MazeCell[,] Cells;
 	
@@ -164,7 +165,7 @@ public class Maze : MonoBehaviour
 				// Add a wall on the west side of this cell
 				IntVector2 position = new IntVector2(x, y);
 				// Does position need to be deleted or will it be GC'd?
-				CreateWall(position, SerpentConsts.Dir.N);
+				CreateWall(position, Direction.N);
 			}
 			else if (wallInfo == 'D')
 			{
@@ -196,7 +197,7 @@ public class Maze : MonoBehaviour
 				// Add a wall on the west side of this cell
 				IntVector2 position = new IntVector2(x, y);
 				// Does position need to be deleted or will it be GC'd?
-				CreateWall(position, SerpentConsts.Dir.W);
+				CreateWall(position, Direction.W);
 			}
 			else if (wallInfo == 'D')
 			{
@@ -209,7 +210,7 @@ public class Maze : MonoBehaviour
 		}
 	}
 
-	private void CreateWall(IntVector2 position, SerpentConsts.Dir side)
+	private void CreateWall(IntVector2 position, Direction side)
 	{
 		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height) 
 		{
@@ -230,18 +231,18 @@ public class Maze : MonoBehaviour
 		}
 		
 		object door = doorData[doorIndex];
-		SerpentConsts.Dir dir = GetDoorDirection( door );
+		Direction dir = GetDoorDirection( door );
 		string special = GetSpecialDoorInfo( door );
-		SerpentConsts.LevelState levelStateRequired = GetDoorLevelStateRequired( door );
+		LevelState levelStateRequired = GetDoorLevelStateRequired( door );
 		
 		// Use the door direction to offset the placement of the door so that it appears in the correct place.
 		// In the case of a south-facing door, the y position must be 1 less.
 		// In the case of an east-facing door, the x position must be 1 less.
-		if (dir == SerpentConsts.Dir.S)
+		if (dir == Direction.S)
 		{
 			position.y += 1;
 		}
-		else if (dir == SerpentConsts.Dir.E)
+		else if (dir == Direction.E)
 		{
 			position.x -= 1;
 		}
@@ -284,23 +285,23 @@ public class Maze : MonoBehaviour
 	}
 	
 	// Extract any specified door direction from the object doorInfo
-	private SerpentConsts.Dir GetDoorDirection(object doorInfo)
+	private Direction GetDoorDirection(object doorInfo)
 	{
 		Dictionary<string,object> doorDict = doorInfo as Dictionary<string,object>;
 		if (doorDict == null)
 		{
-			return SerpentConsts.Dir.None;
+			return Direction.None;
 		}
 		
 		string dirStr = doorDict.GetString("direction");
 		
 		if (dirStr.Length == 0)
 		{
-			return SerpentConsts.Dir.None;
+			return Direction.None;
 		}
 		
 		char c = dirStr[0];
-		List<SerpentConsts.Dir> sides = SerpentConsts.DirectionIndexes[c];
+		List<Direction> sides = SerpentConsts.DirectionIndexes[c];
 		
 		return sides[0];
 	}
@@ -317,36 +318,36 @@ public class Maze : MonoBehaviour
 		return outStr;		
 	}	
 		
-	private SerpentConsts.LevelState GetDoorLevelStateRequired(object doorInfo)
+	private LevelState GetDoorLevelStateRequired(object doorInfo)
 	{
 		Dictionary<string,object> doorDict = doorInfo as Dictionary<string,object>;
 		if (doorDict == null)
 		{
-			return SerpentConsts.LevelState.None;
+			return LevelState.None;
 		}
 		
 		string str = doorDict.GetString("levelStateRequired");	
 		if (str == null)
 		{
-			return SerpentConsts.LevelState.None;
+			return LevelState.None;
 		}
 		
 		// We have to turn this string into an enum value
 		try
 		{
-			SerpentConsts.LevelState state = (SerpentConsts.LevelState) Enum.Parse(typeof(SerpentConsts.LevelState), str);        
+			LevelState state = (LevelState) Enum.Parse(typeof(LevelState), str);        
 			return state;
 		}
 		catch( ArgumentException )
 		{
 			Console.WriteLine("'{0}' is not a member of the LevelState enumeration.", str);			
-			return SerpentConsts.LevelState.None;
+			return LevelState.None;
 		}
 	}
 	
-	private Door CreateDoor(IntVector2 position, SerpentConsts.Dir side)
+	private Door CreateDoor(IntVector2 position, Direction side)
 	{
-		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height || side == SerpentConsts.Dir.None) 
+		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height || side == Direction.None) 
 		{
 			Debug.Log("Bad position given for door");
 			return null;
@@ -358,7 +359,7 @@ public class Maze : MonoBehaviour
 		return door;
 	}
 	
-	private void SetupWallLinks( Wall wall, IntVector2 position, SerpentConsts.Dir side)
+	private void SetupWallLinks( Wall wall, IntVector2 position, Direction side)
 	{
 		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height)
 		{
@@ -376,7 +377,7 @@ public class Maze : MonoBehaviour
 		this.Cells[newPosition.x,newPosition.y].Walls[ oppositeSide ] = wall;		
 	}
 	
-	private IntVector2 GetNextCellPosition(IntVector2 intCellPos, SerpentConsts.Dir direction)
+	private IntVector2 GetNextCellPosition(IntVector2 intCellPos, Direction direction)
 	{
 		IntVector2 newPos = intCellPos;
 		IntVector2 step = SerpentConsts.DirectionVector[ (int)direction ];

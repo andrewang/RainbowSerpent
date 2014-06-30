@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Serpent;
 
 public static class SerpentConsts
 {
-	public const int NumDirections = 4; 
-
+	#region Level Data Keys
+	
 	// Keys for reading level data	
 	public const string WidthKey = "width";
 	public const string HeightKey = "height";
@@ -17,43 +18,40 @@ public static class SerpentConsts
 	public const string YKey = "Y";
 	public const string DirectionKey = "dir";
 	
+	#endregion Level Data Keys
+	
+	#region Map Constants
+	
 	// Pixel sizes of cells.
 	public const int CellWidth = 32;
-	public const int CellHeight = 24;
-	
+	public const int CellHeight = 24;	
+
 	public const int BorderWidth = 1;
 	
-	public enum Dir
-	{
-		N = 0,
-		E,
-		S,
-		W,
-		First = N,
-		Last = W,
-		None
-	}
+	#endregion Map Constants
 
-	public static Dictionary<char,List<SerpentConsts.Dir>> DirectionIndexes = new Dictionary<char,List<SerpentConsts.Dir>>()
+	#region Direction-related
+	
+	public static Dictionary<char,List<Direction>> DirectionIndexes = new Dictionary<char,List<Direction>>()
 	{
-		{'n', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N}},
-		{'e', new List<SerpentConsts.Dir>{SerpentConsts.Dir.E}},
-		{'s', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S}},
-		{'w', new List<SerpentConsts.Dir>{SerpentConsts.Dir.W}},
-		{'N', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N}},
-		{'E', new List<SerpentConsts.Dir>{SerpentConsts.Dir.E}},
-		{'S', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S}},
-		{'W', new List<SerpentConsts.Dir>{SerpentConsts.Dir.W}},
+		{'n', new List<Direction>{Direction.N}},
+		{'e', new List<Direction>{Direction.E}},
+		{'s', new List<Direction>{Direction.S}},
+		{'w', new List<Direction>{Direction.W}},
+		{'N', new List<Direction>{Direction.N}},
+		{'E', new List<Direction>{Direction.E}},
+		{'S', new List<Direction>{Direction.S}},
+		{'W', new List<Direction>{Direction.W}},
 		
-		{'f', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.W}},
-		{'g', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.E}},
-		{'b', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.E}},
-		{'v', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.W}},
+		{'f', new List<Direction>{Direction.N, Direction.W}},
+		{'g', new List<Direction>{Direction.N, Direction.E}},
+		{'b', new List<Direction>{Direction.S, Direction.E}},
+		{'v', new List<Direction>{Direction.S, Direction.W}},
 		
-		{'F', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.W}},
-		{'G', new List<SerpentConsts.Dir>{SerpentConsts.Dir.N, SerpentConsts.Dir.E}},
-		{'B', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.E}},
-		{'V', new List<SerpentConsts.Dir>{SerpentConsts.Dir.S, SerpentConsts.Dir.W}},
+		{'F', new List<Direction>{Direction.N, Direction.W}},
+		{'G', new List<Direction>{Direction.N, Direction.E}},
+		{'B', new List<Direction>{Direction.S, Direction.E}},
+		{'V', new List<Direction>{Direction.S, Direction.W}},
 		
 	};
 	
@@ -92,45 +90,33 @@ public static class SerpentConsts
 		new Vector3( 0, 0, 0 )		
 	};
 
-	public static SerpentConsts.Dir[] OppositeDirection = new SerpentConsts.Dir[]
+	public static Direction[] OppositeDirection = new Direction[]
 	{
-		SerpentConsts.Dir.S,
-		SerpentConsts.Dir.W,
-		SerpentConsts.Dir.N,
-		SerpentConsts.Dir.E,
-		SerpentConsts.Dir.None		
+		Direction.S,
+		Direction.W,
+		Direction.N,
+		Direction.E,
+		Direction.None		
 	};
 	
-	public static SerpentConsts.Dir GetDirectionForVector( Vector3 v )
+	public static Direction GetDirectionForVector( Vector3 v )
 	{
-		for(int i = 0; i < DirectionVector3.Length; ++i)
+		for(int i = 0; i < SerpentConsts.DirectionVector3.Length; ++i)
 		{
-			if (v == DirectionVector3[i])
+			if (v == SerpentConsts.DirectionVector3[i])
 			{
-				return (SerpentConsts.Dir)i;
+				return (Direction)i;
 			}
 		}
 		
-		return SerpentConsts.Dir.None;
+		return Direction.None;
 	}
 	
-	public enum Side
-	{
-		Player,
-		Enemy,
-		Frog,
-	}
+	#endregion Direction-related
 	
-	public enum LevelState
-	{
-		None,
-		LevelStart,
-		Playing,
-		LevelEnd
-	}
+	#region Eggs
 	
-	
-	public static float PlayerEggFrequency = 6.0f;
+	public static float PlayerEggFrequency = 60.0f;
 	public static float EnemyEggFrequency = 15.0f;
 	public static float TimeToLayEgg = 10.0f;
 	public static float EnemyEggHatchingTime = 30.0f;
@@ -148,6 +134,10 @@ public static class SerpentConsts
 		}
 	}
 	
+	#endregion Eggs
+	
+	#region Snake Lengths
+	
 	public static int GetNewlyHatchedSnakeLength( Side side )
 	{
 		if (side == Side.Player)
@@ -164,10 +154,18 @@ public static class SerpentConsts
 	public static int MaxNumEnemySnakes = 3;
 	public static int EnemySnakeLength = 5;
 	public static int SmallEnemySnakeLength = 3;
-	public static int PlayerSnakeLength = 6;
+	public static int PlayerSnakeLength = 3;
 	public static int SmallPlayerSnakeLength = 2;
 	
+	#endregion Snake Lengths
+	
+	#region Score
+	
 	public static int ScoreForBonusLife = 10000;
+	
+	#endregion Score
+	
+	#region Player Snake Colours
 		
 	public static Color[] PlayerSegmentColours = new Color[]
 	{
@@ -179,12 +177,17 @@ public static class SerpentConsts
 		Color.yellow,
 	};
 	
+	#endregion Player Snake Colours
+	
+	#region Scene Names
 	
 	public static class SceneNames
 	{
 		public const string Loading = "LoadingScene";
 		public const string Game = "GameScene";
-		public const string MainMenu = "MenuScene";
+		//public const string MainMenu = "MenuScene";
 	};
+	
+	#endregion Scene Names
 }
 

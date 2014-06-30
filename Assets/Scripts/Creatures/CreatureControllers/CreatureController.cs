@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Serpent;
 
 public class CreatureController
 {
@@ -17,7 +18,7 @@ public class CreatureController
 	{
 	}
 	
-	public virtual void StartMoving(SerpentConsts.Dir direction)
+	public virtual void StartMoving(Direction direction)
 	{
 	}
 
@@ -25,49 +26,49 @@ public class CreatureController
 	/// Handles the arrival event - the creature arriving at the centre of a tile.  Returns the
 	/// direction to travel in from this point on.
 	/// </summary>
-	public virtual SerpentConsts.Dir NewDirectionUponArrival()	
+	public virtual Direction NewDirectionUponArrival()	
 	{
-		return SerpentConsts.Dir.None;
+		return Direction.None;
 	}
 	
-	protected virtual List<SerpentConsts.Dir> GetAvailableDirections()
+	protected virtual List<Direction> GetAvailableDirections()
 	{
 		Vector3 position = this.creature.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
 		
-		List<SerpentConsts.Dir> availableDirections = cell.UnblockedDirections;		
+		List<Direction> availableDirections = cell.UnblockedDirections;		
 		return availableDirections;
 	}
 		
-	protected SerpentConsts.Dir GetBestYDirection(int currY, int targetY)
+	protected Direction GetBestYDirection(int currY, int targetY)
 	{
 		if (currY > targetY)
 		{
-			return SerpentConsts.Dir.S;
+			return Direction.S;
 		}
 		else if (currY != targetY)
 		{
-			return SerpentConsts.Dir.N;
+			return Direction.N;
 		}
 		else
 		{
-			return SerpentConsts.Dir.None;
+			return Direction.None;
 		}
 	}
 	
-	protected SerpentConsts.Dir GetBestXDirection(int currX, int targetX)
+	protected Direction GetBestXDirection(int currX, int targetX)
 	{
 		if (currX > targetX)
 		{
-			return SerpentConsts.Dir.W;
+			return Direction.W;
 		}
 		else if (currX != targetX)
 		{
-			return SerpentConsts.Dir.E;
+			return Direction.E;
 		}
 		else
 		{
-			return SerpentConsts.Dir.None;
+			return Direction.None;
 		}
 	}
 }

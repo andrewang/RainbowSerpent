@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Serpent;
 
 public class SnakeTrail
 {
@@ -152,13 +153,13 @@ public class SnakeTrail
 	
 	private void SetSegmentRotation( SnakeSegment bodySegment, SnakePosition position )
 	{
-		SerpentConsts.Dir dir = SerpentConsts.GetDirectionForVector( position.UnitVectorToPreviousPosition );
-		if (dir == SerpentConsts.Dir.None)
+		Direction dir = SerpentConsts.GetDirectionForVector( position.UnitVectorToPreviousPosition );
+		if (dir == Direction.None)
 		{
 			return;
 		}
 		
-		SerpentConsts.Dir oppositeDir = SerpentConsts.OppositeDirection[ (int)dir ];
+		Direction oppositeDir = SerpentConsts.OppositeDirection[ (int)dir ];
 		bodySegment.CurrentDirection = oppositeDir;
 	}
 	

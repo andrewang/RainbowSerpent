@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Serpent;
 
 public class MazeCell
 {
@@ -9,14 +10,13 @@ public class MazeCell
 
 	public Wall[] Walls; 
 	
-	public List<SerpentConsts.Dir> UnblockedDirections
+	public List<Direction> UnblockedDirections
 	{
 		get
 		{
-			List<SerpentConsts.Dir> availableDirections = new List<SerpentConsts.Dir>();
-			for (int i = 0; i < SerpentConsts.NumDirections; ++i)
+			List<Direction> availableDirections = new List<Direction>();
+			for (Direction dir = Direction.First; dir <= Direction.Last; ++dir)
 			{
-				SerpentConsts.Dir dir = (SerpentConsts.Dir) i;
 				if (IsMotionBlocked(dir))
 				{
 					continue;
@@ -33,7 +33,7 @@ public class MazeCell
 		this.X = x;
 		this.Y = y;
 		this.InPlayerZone = false;
-		this.Walls = new Wall[SerpentConsts.NumDirections];
+		this.Walls = new Wall[(int)Direction.Count];
 	}
 	
 	public void SetInPlayerZone(bool inZone)
@@ -41,10 +41,9 @@ public class MazeCell
 		this.InPlayerZone = inZone;
 	}
 	
-	public bool IsMotionBlocked(SerpentConsts.Dir direction)
+	public bool IsMotionBlocked(Direction direction)
 	{		
-		int intDirection = (int)direction;
-		if (intDirection < 0 || intDirection > SerpentConsts.NumDirections)
+		if (direction < Direction.First || direction > Direction.Last)
 		{
 			// out of range.
 			return false;
@@ -53,12 +52,13 @@ public class MazeCell
 		if (this.InPlayerZone)
 		{
 			// Check the level state
-			if (Managers.GameState.LevelState == SerpentConsts.LevelState.Playing)
+			if (Managers.GameState.LevelState == LevelState.Playing)
 			{
 				return false;
 			}
 		}
 		
+		int intDirection = (int)direction;		
 		Wall wall = this.Walls[intDirection];
 		if (wall is Door)
 		{

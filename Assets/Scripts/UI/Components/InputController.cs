@@ -1,4 +1,5 @@
 using UnityEngine;
+using Serpent;
 
 public class InputController : MonoBehaviour
 {
@@ -13,25 +14,25 @@ public class InputController : MonoBehaviour
 	
 	private void OnPressUp()
 	{
-		OnPressDirection(SerpentConsts.Dir.N);
+		OnPressDirection(Direction.N);
 	}
 	
 	private void OnPressDown()
 	{
-		OnPressDirection(SerpentConsts.Dir.S);
+		OnPressDirection(Direction.S);
 	}
 	
 	private void OnPressLeft()
 	{
-		OnPressDirection(SerpentConsts.Dir.W);
+		OnPressDirection(Direction.W);
 	}
 	
 	private void OnPressRight()
 	{
-		OnPressDirection(SerpentConsts.Dir.E);
+		OnPressDirection(Direction.E);
 	}
 	
-	private void OnPressDirection(SerpentConsts.Dir direction)
+	private void OnPressDirection(Direction direction)
 	{
 		if (this.PlayerSnake.Dead) { return; }
 		if (this.playerSnakeController == null)

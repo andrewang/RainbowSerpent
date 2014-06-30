@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Serpent;
 
 public class Frog : MobileCreature
 {
@@ -40,7 +41,7 @@ public class Frog : MobileCreature
 			}
 		}
 		
-		if (this.CurrentDirection != SerpentConsts.Dir.None)
+		if (this.CurrentDirection != Direction.None)
 		{
 			UpdatePosition();
 			return;			
@@ -49,7 +50,7 @@ public class Frog : MobileCreature
 		this.frogController.Hop();
 	}
 	
-	public override void StartMoving(SerpentConsts.Dir direction)
+	public override void StartMoving(Direction direction)
 	{
 		base.StartMoving(direction);
 		// rotate in direction of movement.
@@ -61,13 +62,13 @@ public class Frog : MobileCreature
 		// TODO If the frog has moved off-screen then kill it.
 		
 		this.currentMovementDelay = Frog.MovementDelay;
-		this.CurrentDirection = SerpentConsts.Dir.None; // not currently moving but should we really be resetting direction?
+		this.CurrentDirection = Direction.None; // not currently moving but should we really be resetting direction?
 		
 		base.ArrivedAtDestination(remainingDisplacement);
 	}
 	
 	// Frogs hop over maze walls so their motion is NEVER blocked.
-	protected override bool IsMotionBlocked( SerpentConsts.Dir direction )
+	protected override bool IsMotionBlocked( Direction direction )
 	{
 		return false;
 	}
