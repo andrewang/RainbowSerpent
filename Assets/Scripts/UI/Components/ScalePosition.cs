@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ScaleClipping : MonoBehaviour
+public class ScalePosition : MonoBehaviour
 {
 	#region Serialize Fields
 	
@@ -15,7 +15,7 @@ public class ScaleClipping : MonoBehaviour
 	
 	private float widthScale;
 	private float heightScale;
-		
+	
 	#endregion Serialize Fields
 	
 	void Start()
@@ -28,18 +28,19 @@ public class ScaleClipping : MonoBehaviour
 	{
 		if (this.applyToHorizontal == false && this.applyToVertical == false)
 		{
-			Debug.LogError("ScaleDimensions applies neither to horizontal or vertical");
+			Debug.LogError("ScalePosition applies neither to horizontal or vertical");
 		}
+		
 		if (this.maintainProportionsScaledByWidth && this.maintainProportionsScaledByHeight)    
 		{
-			Debug.LogError("ScaleDimensions has maintain propertions set, and BOTH scale by width and scale by height are set");
+			Debug.LogError("ScalePosition has maintain propertions set, and BOTH scale by width and scale by height are set");
 		}
 	}
 	
 	private void DetermineScales()
 	{
-		this.widthScale = Screen.width / this.baseWidth ;
-		this.heightScale = Screen.height / this.baseHeight ;
+		this.widthScale = Screen.width / this.baseWidth;
+		this.heightScale = Screen.height / this.baseHeight;
 		
 		if (this.maintainProportionsScaledByWidth)
 		{
@@ -50,22 +51,17 @@ public class ScaleClipping : MonoBehaviour
 			this.widthScale = this.heightScale;
 		}
 		
-		UIPanel panel = this.GetComponentInChildren<UIPanel>();
-		if (panel == null) { return; }
-		
-		Vector4 clipRange = panel.clipRange;
-		// remember, size of clip range is ZW.
-		
+		Vector3 position = this.transform.localPosition;
 		if (this.applyToHorizontal)		
 		{
-			clipRange.z *= this.widthScale;
+			position.x *= this.widthScale;
 		}
 		if (this.applyToVertical)
 		{
-			clipRange.y *= this.heightScale;
+			position.y *= this.heightScale;
 		}
 		
-		panel.clipRange = clipRange;
+		this.transform.localPosition = position;
 	}
 	
 }

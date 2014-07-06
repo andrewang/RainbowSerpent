@@ -28,6 +28,7 @@ public class SceneManager : MonoBehaviour
 		if (this.currentController != null)
 		{
 			this.currentController.OnUnload();
+			Destroy(this.currentController.gameObject);
 			this.currentController = null;
 		}
 

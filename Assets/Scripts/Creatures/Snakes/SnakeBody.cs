@@ -47,7 +47,6 @@ public class SnakeBody : SnakeSegment
 		
 		this.Egg = egg;
 		egg.FullyGrown += this.EggFullyGrown;
-		//egg.ContainingBody = this;
 	}
 	
 	public void EggFullyGrown(Egg e)
@@ -61,7 +60,8 @@ public class SnakeBody : SnakeSegment
 
 		Debug.Log("SnakeBody EggFullyGrown executed");
 		
-		this.Egg.SetSpriteDepth(0);
+		// set the depth of the egg sprite so that the egg is just below this snake.
+		this.Egg.SetSpriteDepth( this.sprite.depth - 1 ); 
 		
 		this.Egg.FullyGrown -= this.EggFullyGrown;
 		this.Egg = null;

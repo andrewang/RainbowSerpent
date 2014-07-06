@@ -167,11 +167,14 @@
      <Compile Include="Assets\Scripts\UI\AnimationManager.cs" />
      <Compile Include="Assets\Scripts\UI\Components\InputController.cs" />
      <Compile Include="Assets\Scripts\UI\Components\MazeController.cs" />
+     <Compile Include="Assets\Scripts\UI\Components\MidpointPositioner.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScaleClipping.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScaleDimensions.cs" />
+     <Compile Include="Assets\Scripts\UI\Components\ScalePosition.cs" />
      <Compile Include="Assets\Scripts\UI\RSSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneControllers\GameSceneController.cs" />
+     <Compile Include="Assets\Scripts\UI\SceneControllers\HelpSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneControllers\ScreenShotSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneControllers\SplashSceneController.cs" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Depth Cutout.shader" />

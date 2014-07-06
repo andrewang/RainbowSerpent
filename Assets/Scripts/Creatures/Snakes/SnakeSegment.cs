@@ -14,7 +14,7 @@ public class SnakeSegment : MonoBehaviour
 	#region Serialized Fields
 
 	// Any segment will have a sprite
-	[SerializeField] private UISprite sprite;
+	[SerializeField] protected UISprite sprite;
 		
 	#endregion Serialized Fields
 	
@@ -93,17 +93,6 @@ public class SnakeSegment : MonoBehaviour
 		}
 	}
 	
-	public void SetGradatedColour(Color c1, Color c2)
-	{
-		this.sprite.type = UISprite.Type.VertexColoured;
-		this.sprite.SetVertexColours(c2, c1, c1, c2);		
-	}
-	
-	public void SetSpriteName(string spriteName)
-	{
-		this.sprite.spriteName = spriteName;
-	}
-	
 	public bool Visible
 	{
 		get
@@ -154,4 +143,29 @@ public class SnakeSegment : MonoBehaviour
 			this.sprite = null;
 		}
 	}
+	
+	#region Sprite
+	
+	public void SetSpriteDepth(int depth)
+	{
+		this.sprite.depth = depth;
+	}
+	
+	public int GetSpriteDepth()
+	{
+		return this.sprite.depth;
+	}
+	
+	public void SetGradatedColour(Color c1, Color c2)
+	{
+		this.sprite.type = UISprite.Type.VertexColoured;
+		this.sprite.SetVertexColours(c2, c1, c1, c2);		
+	}
+	
+	public void SetSpriteName(string spriteName)
+	{
+		this.sprite.spriteName = spriteName;
+	}
+
+	#endregion Sprite	
 }

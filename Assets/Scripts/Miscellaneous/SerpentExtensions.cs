@@ -70,6 +70,38 @@ namespace SerpentExtensions
 			child.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);			
 		}
 		
+		static public Vector3 GetLocalPositionRelativeTo(this Transform transform, Transform topMostTransform)
+		{
+			Vector3 relativePosition = transform.localPosition;
+			Transform temp = transform.parent;
+			
+			while( temp != topMostTransform && temp != null )
+			{
+				relativePosition.x *= temp.localScale.x;
+				relativePosition.y *= temp.localScale.y;
+				relativePosition += temp.localPosition;
+				temp = temp.parent;
+			}
+			
+			return relativePosition;
+		}
+		
+		static public Vector3 GetDimensionsRelativeTo(this UIWidget widget, Transform topMostTransform)
+		{
+			Vector3 size = new Vector3();
+			size.x = widget.width;
+			size.y = widget.height;
+			
+			Transform temp = widget.transform;
+			while( temp != topMostTransform && temp != null )
+			{
+				size.x *= temp.localScale.x;
+				size.y *= temp.localScale.y;
+				temp = temp.parent;
+			}
+			
+			return size;
+		}
 	}
 
 }

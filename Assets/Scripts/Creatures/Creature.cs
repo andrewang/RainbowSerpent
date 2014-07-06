@@ -110,5 +110,14 @@ public class Creature : MonoBehaviour
 		float radiiSq = radii * radii;
 		return (distanceSq <= radiiSq);		
 	}
+	
+	#region Sprite
+	
+	public virtual void SetSpriteDepth(int depth)
+	{
+		this.sprite.depth = depth;
+	}
+	
+	#endregion Sprite	
 }
 

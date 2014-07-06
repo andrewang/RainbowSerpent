@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Serpent;
+using SerpentExtensions;
 
 public class MazeController : MonoBehaviour
 {
@@ -316,7 +317,7 @@ public class MazeController : MonoBehaviour
 		
 		this.Maze.HideDoors();
 		
-		Vector3 relativePosition = GetLocalPositionSum( this.screenShotTaker.transform );
+		Vector3 relativePosition = this.transform.GetLocalPositionRelativeTo( this.screenShotTaker.transform );
 		                                               
 		this.screenShotTaker.TakeScreenShot(ScreenShotPath(), 
 			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w, 
@@ -384,13 +385,13 @@ public class MazeController : MonoBehaviour
 		this.wallSprites.Clear();
 	}
 	
-	// In the chain of transforms, calculate all the local offsets relative to the specified ancestor transform.
-	private Vector3 GetLocalPositionSum(Transform ancestorTransform)
+	// In the chain of transforms, calculate all the local offsets relative to the specified transform.
+	private Vector3 GetSumOfLocalPositions(Transform topMostTransform)
 	{
 		Vector3 relativePosition = this.transform.localPosition;
 		Transform temp = this.transform.parent;
 		
-		while( temp != ancestorTransform && temp != null )
+		while( temp != topMostTransform && temp != null )
 		{
 			relativePosition += temp.localPosition;
 			temp = temp.parent;

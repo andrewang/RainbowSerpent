@@ -104,6 +104,17 @@ public class FrogController : CreatureController
 		{
 			return false; 
 		}
+		if (s.Head == null)
+		{
+			Debug.Log("Nearest snake to frog has no head!");
+			return false;
+		}
+		
+		if (this.frog == null)
+		{
+			Debug.Log ("Frog controller still executing but frog is gone!?!");
+			return false;
+		}
 		
 		Vector3 distance2D = s.Head.transform.localPosition - this.frog.transform.localPosition;
 		float cellDistance = Mathf.Abs(distance2D.x) / SerpentConsts.CellWidth + Mathf.Abs(distance2D.y) / SerpentConsts.CellHeight;

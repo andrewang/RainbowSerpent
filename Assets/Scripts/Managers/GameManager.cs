@@ -260,13 +260,12 @@ public class GameManager : MonoBehaviour
 		// if there is a frog, test against player egg, and test against enemy egg.
 		if (this.frog != null)
 		{
-			for (int i = 0; i <= (int) Side.Enemy; ++i)
+			for (Side side = Side.Player; side <= Side.Enemy; ++side)
 			{
-				Egg e = this.eggs[i];
+				Egg e = GetEgg(side);
 				if (e == null) { continue; }
-				if (e.IsFullyGrown == false) { continue; }
 				
-				this.frog.TestForInteraction(this.eggs[i]);
+				this.frog.TestForInteraction(e);
 			}
 		}
 	}
@@ -293,6 +292,7 @@ public class GameManager : MonoBehaviour
 	{
 		// Player snake is added to array and also assigned to direct pointer.
 		Snake s = CreateSnake(this.playerSnakeConf, length);
+		s.SetSpriteDepth(10);
 		s.Side = Side.Player;
 		s.CreatureDied += PlayerSnakeDied;
 		this.snakes.Add( s );
@@ -309,6 +309,7 @@ public class GameManager : MonoBehaviour
 	private Snake CreateEnemySnake(int length)
 	{
 		Snake enemySnake = CreateSnake(this.enemySnakeConf, length);
+		enemySnake.SetSpriteDepth(1 + this.snakes.Count);
 		enemySnake.CreatureDied += EnemySnakeDied;
 		enemySnake.ChangeColour(this.theme.EnemySnakeColour);
 		this.snakes.Add(enemySnake);
@@ -389,14 +390,15 @@ public class GameManager : MonoBehaviour
 		// Add one again to player snakes.  This allows new player snakes to increase the total.  When the initial player is spawned that subtracts one.
 		Managers.GameState.ExtraSnakes += 1;
 		
-		// Does a player egg exist?
-		Egg e = this.eggs[ (int) Side.Player ];
-		if ( e != null )
+		// Does a player egg exist?  If so, make it hatch
+		Egg egg = GetEgg ( Side.Player );
+		if ( egg != null )
 		{
-			EggHatched( e );
-			e.Die();
+			EggHatched( egg );
+			egg.Die();
 			return;
 		}
+		// What if the player had an egg growing at the time of level end
 		
 		// Time to go to the next level.		
 		Managers.GameState.Level += 1;		
@@ -497,7 +499,7 @@ public class GameManager : MonoBehaviour
 			
 			int i = UnityEngine.Random.Range( 0, qualifiedSnakes.Count );
 			Snake snake = qualifiedSnakes[i];
-			Egg e = LayEgg(snake);
+			Egg e = CreateEgg(snake);
 			SetEgg( side, e );		
 			
 			// Enemy snakes have a timed hatching period, while player snakes hatch at the end of the level.
@@ -521,28 +523,19 @@ public class GameManager : MonoBehaviour
 		this.eggTimers[(int)side] = 0.0f;				
 	}
 	
-	private Egg LayEgg(Snake snake)
+	private Egg CreateEgg(Snake snake)
 	{
-		Egg e = CreateEgg(snake);
+		Egg e = snake.CreateEgg();
 		
-		e.Side = snake.Side;
+		e.Side = snake.Side;		
 		e.CreatureDied += EggDied;
+		e.Hatched += EggHatched;
+		e.FullyGrown += EggFullyGrown;		
+		
 		SnakeBody lastSegment = snake.Tail;
 		lastSegment.BeginToCreateEgg(e);
 		
 		return e;
-	}
-	
-	private Egg CreateEgg(Snake snake)
-	{
-		GameObject eggPrefab = snake.GetEggPrefab();
-		Egg egg = SerpentUtils.Instantiate<Egg>(eggPrefab, this.mazeController.transform);
-		// reset rotation
-		egg.transform.localRotation = Quaternion.identity;
-		
-		egg.Hatched += EggHatched;
-		egg.FullyGrown += EggFullyGrown;		
-		return egg;
 	}
 	
 	private void EggFullyGrown( Egg egg )
@@ -602,12 +595,17 @@ public class GameManager : MonoBehaviour
 	
 	public Egg GetEgg( Side side )
 	{
+		int iSide = (int) side;
+		if (this.eggs[iSide] == null || this.eggs[iSide].IsFullyGrown == false)
+		{
+			return null;
+		}
 		return this.eggs[ (int) side ];
 	}
 	
-	private void SetEgg( Side side, Egg e )
+	private void SetEgg( Side side, Egg egg )
 	{
-		this.eggs[ (int) side ] = e;
+		this.eggs[ (int) side ] = egg;
 	}
 	
 	#endregion Snake Eggs

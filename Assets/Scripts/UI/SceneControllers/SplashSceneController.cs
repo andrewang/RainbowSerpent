@@ -8,13 +8,15 @@ public class SplashSceneController : RSSceneController
 	{
 	}
 
-	private void OnStartPressed ()
+	private void OnStartPressed()
 	{
 		// begin the game by switching to the game scene		
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
 	}
-
-	override public void OnUnload()
+	
+	private void OnHelpPressed()
 	{
+		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Help);
 	}
+
 }

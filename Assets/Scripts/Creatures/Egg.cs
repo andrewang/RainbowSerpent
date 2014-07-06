@@ -82,10 +82,5 @@ public class Egg : Creature
 		Destroy(this.gameObject);
 		Destroy(this);
 	}
-	
-	public void SetSpriteDepth(int depth)
-	{
-		this.sprite.depth = depth;
-	}
 }
 

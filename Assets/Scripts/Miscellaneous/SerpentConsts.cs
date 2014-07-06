@@ -117,9 +117,9 @@ public static class SerpentConsts
 	#region Eggs
 	
 	public static float PlayerEggFrequency = 60.0f;
-	public static float EnemyEggFrequency = 15.0f;
+	public static float EnemyEggFrequency = 10.0f;
 	public static float TimeToLayEgg = 10.0f;
-	public static float EnemyEggHatchingTime = 30.0f;
+	public static float EnemyEggHatchingTime = 20.0f;
 	public static float FrogRespawnDelay = 10.0f;
 	
 	public static float GetEggLayingFrequency( Side side )
@@ -185,7 +185,8 @@ public static class SerpentConsts
 	{
 		public const string Loading = "LoadingScene";
 		public const string Game = "GameScene";
-		//public const string MainMenu = "MenuScene";
+		public const string Help = "HelpScene";
+		public const string Main = "SplashScene";
 	};
 	
 	#endregion Scene Names

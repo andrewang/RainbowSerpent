@@ -43,7 +43,6 @@ public class Snake : MobileCreature
 		}
 	}
 	
-
 	public SnakeBody Tail
 	{
 		get
@@ -213,8 +212,9 @@ public class Snake : MobileCreature
 			newBodySegment.SetParent(this);			
 			newBodySegment.Snake = this;
 			
-			// Configure sprite with prefab.
+			// Configure sprite 
 			newBodySegment.SetSpriteName(this.config.BodySprite.spriteName);
+			newBodySegment.SetSpriteDepth(this.head.GetSpriteDepth());
 			
 			SnakeSegment last = this.Tail;
 			if (last == null) { last = this.head; }
@@ -645,11 +645,26 @@ public class Snake : MobileCreature
 	
 	#region Eggs
 	
-	public GameObject GetEggPrefab()
+	public Egg CreateEgg()
 	{
-		return this.config.EggPrefab;
+		GameObject eggPrefab = this.config.EggPrefab;
+		Egg egg = SerpentUtils.Instantiate<Egg>(eggPrefab, this.transform);		
+		return egg;
 	}
 	
 	#endregion Eggs
+	
+	#region Sprite depth
+	
+	public override void SetSpriteDepth(int depth)
+	{
+		for (SnakeSegment segment = this.head; segment != null; segment = segment.NextSegment)
+		{
+			segment.SetSpriteDepth(depth);
+		}
+	}
+	
+	#endregion Sprite depth
+	
 }
 
