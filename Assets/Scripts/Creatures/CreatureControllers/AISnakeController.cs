@@ -19,7 +19,7 @@ public class AISnakeController : SnakeController
 		// So assemble a list of all the directions, excluding the opposite direction to the current, and also
 		// excluding directions where motion is blocked.		
 		Direction currentDirection = this.snake.Head.CurrentDirection;
-		Direction oppositeDirection = SerpentConsts.OppositeDirection[ (int) currentDirection ];
+		Direction oppositeDirection	 = SerpentConsts.OppositeDirection[ (int) currentDirection ];
 		
 		List<Direction> availableDirections = GetAvailableDirections();
 		availableDirections.Remove(oppositeDirection);

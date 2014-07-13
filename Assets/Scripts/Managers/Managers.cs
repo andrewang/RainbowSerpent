@@ -6,6 +6,9 @@ public class Managers : MonoBehaviour
 	public static SceneManager SceneManager;
 	[SerializeField] GameObject sceneManagerPrefab = null;
 	
+	public static ScreenManager ScreenManager;
+	[SerializeField] GameObject screenManagerPrefab = null; 
+	
 	public static GameClock GameClock;
 	[SerializeField] GameObject gameClockPrefab = null;
 		
@@ -18,6 +21,9 @@ public class Managers : MonoBehaviour
 	{
 		GameObject sceneManagerInstance = InstantiateManager(this.sceneManagerPrefab);
 		Managers.SceneManager = sceneManagerInstance.GetComponent<SceneManager>();
+
+		GameObject screenManagerInstance = InstantiateManager(this.screenManagerPrefab);
+		Managers.ScreenManager = screenManagerInstance.GetComponent<ScreenManager>();
 		
 		GameObject gameClockInstance = InstantiateManager(this.gameClockPrefab);
 		Managers.GameClock = gameClockInstance.GetComponent<GameClock>();

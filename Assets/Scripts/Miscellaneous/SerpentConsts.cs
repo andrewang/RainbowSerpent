@@ -5,6 +5,8 @@ using Serpent;
 
 public static class SerpentConsts
 {
+	public const string Version = "0.2.0";
+	
 	#region Level Data Keys
 	
 	// Keys for reading level data	
@@ -186,7 +188,8 @@ public static class SerpentConsts
 		public const string Loading = "LoadingScene";
 		public const string Game = "GameScene";
 		public const string Help = "HelpScene";
-		public const string Main = "SplashScene";
+		public const string Credits = "CreditsScene";		
+		public const string Main = "MainMenuScene";
 	};
 	
 	#endregion Scene Names

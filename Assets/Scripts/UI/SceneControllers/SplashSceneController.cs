@@ -1,22 +1,21 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class SplashSceneController : RSSceneController 
 {
-	// Use this for initialization
-	void Start () 
-	{
-	}
-
-	private void OnStartPressed()
-	{
-		// begin the game by switching to the game scene		
-		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
-	}
+	[SerializeField] private GameObject ManagerHolder;
 	
-	private void OnHelpPressed()
+	void Start()
 	{
-		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Help);
+		StartCoroutine("LoadMainMenu");
+	}	
+	
+	IEnumerator LoadMainMenu()
+	{
+		yield return new WaitForEndOfFrame();
+		
+		DontDestroyOnLoad(ManagerHolder);
+		
+		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Main);
 	}
-
 }

@@ -38,8 +38,8 @@ public class ScaleClipping : MonoBehaviour
 	
 	private void DetermineScales()
 	{
-		this.widthScale = Screen.width / this.baseWidth ;
-		this.heightScale = Screen.height / this.baseHeight ;
+		this.widthScale = Managers.ScreenManager.ScreenWidth / this.baseWidth ;
+		this.heightScale = Managers.ScreenManager.ScreenHeight / this.baseHeight ;
 		
 		if (this.maintainProportionsScaledByWidth)
 		{

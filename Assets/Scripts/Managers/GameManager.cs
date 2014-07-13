@@ -114,6 +114,7 @@ public class GameManager : MonoBehaviour
 
 		// Only place snakes once the map screenshot has been made.  So we pass a reference to the Begin method in here to be invoked when CreateScreenShot is done.
 		this.mazeController.CreateScreenshot(Begin);		
+		//Begin();
 	}
 	
 	private void SetTimers()
@@ -669,9 +670,7 @@ public class GameManager : MonoBehaviour
 	private IEnumerator PlayerDeathSequence()
 	{
 		yield return new WaitForSeconds(3.0f);
-		
-		Managers.GameState.ExtraSnakes--;		
-		
+				
 		// Remove any player egg.  Create enemy snake if egg exists.
 		
 		HandleEggsAfterPlayerDeath();

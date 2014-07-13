@@ -12,13 +12,18 @@ public class MazeController : MonoBehaviour
 	[SerializeField] private GameObject wallSpritePrefab = null;
 	[SerializeField] private GameObject screenShotPrefab = null;	
 	[SerializeField] private UIPanel panel = null;
+	[SerializeField] private bool useScreenShots = true;
 	[SerializeField] private ScreenShotTaker screenShotTaker = null; 
+	[SerializeField] private ScreenShotFileManager screenShotFileManager = null;
 	
 	private int levelNumber;
 	private Color wallColour;
 	
+	private GameObject screenShotContainer;
 	private Action screenShotCompletedAction;
 	private bool screenShotLoaded = false;
+	
+	private bool scaleSet = false;
 	
 	private List<UISprite> wallSprites = new List<UISprite>();
 
@@ -50,8 +55,27 @@ public class MazeController : MonoBehaviour
 		this.levelNumber = levelNum;
 		this.wallColour = wallColour;
 		this.Maze.SetUp(mazeTextAsset);
-		DetermineMazeScale();		
 		CreateMazeSprites();
+	}
+	
+	void LateUpdate()
+	{
+		if (this.scaleSet == false)
+		{
+			DetermineMazeScale();
+			this.scaleSet = true;
+			
+			if (this.useScreenShots == false) { return; }
+			
+			if (this.screenShotContainer == null)
+			{
+				CreateScreenshot(this.screenShotCompletedAction);
+			}
+			else
+			{
+				SetScreenShotScale();				
+			}
+		}
 	}
 		
 	/// <summary>
@@ -77,12 +101,9 @@ public class MazeController : MonoBehaviour
 	/// </summary>
 	private void CreateMazeSprites()
 	{
-		// If a screenshot for the level exists, then just load that?
 		// DOORS need to be separate sprites.  So in order to create a screenshot, we would need to 
 		// create the maze without doors.
-		// The screenshot should be version-stamped so that when I update the version number, the old
-		// screenshots are removed and new ones are generated
-	
+		
 		int width = this.Maze.Width;
 		int height = this.Maze.Height;
 		if (width == 0 || height == 0) { return; }
@@ -92,13 +113,12 @@ public class MazeController : MonoBehaviour
 		this.lowerLeftCellCentre.y = -1.0f * ((height - 1) * SerpentConsts.CellHeight) * 0.5f;
 		
 		// If a screenshot for this level already exists then use that.
-		/*
-		if (ScreenShotExists())
+		if (this.useScreenShots && this.screenShotFileManager.ScreenShotExists(this.levelNumber))
 		{
-			LoadScreenShot();
+			Texture2D screenShotTexture = this.screenShotFileManager.LoadScreenShot(this.levelNumber);		
+			UseScreenShot(screenShotTexture);
 			this.screenShotLoaded = true;
 		}
-		*/
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
@@ -307,20 +327,37 @@ public class MazeController : MonoBehaviour
 	
 	public void CreateScreenshot(Action completedAction)
 	{
-		if (ScreenShotExists ()) 
+		if (this.useScreenShots == false)
+		{	
+			// just run what was supposed to be executed after creating the screenshot
+			completedAction();
+			return;
+		}
+		
+		if (this.screenShotFileManager.ScreenShotExists(this.levelNumber)) 
 		{
+			// screenshot should already be attached to the UI
 			completedAction();
 			return;
 		}
 		
 		this.screenShotCompletedAction = completedAction;
+		if (this.scaleSet == false)
+		{
+			// it is too early to take a screenshot
+			return;
+		}
 		
 		this.Maze.HideDoors();
 		
 		Vector3 relativePosition = this.transform.GetLocalPositionRelativeTo( this.screenShotTaker.transform );
-		                                               
-		this.screenShotTaker.TakeScreenShot(ScreenShotPath(), 
-			(int) this.panel.clipRange.z, (int) this.panel.clipRange.w, 
+		
+		float screenRescaling = Managers.ScreenManager.ScreenScale;
+		int shotWidth = (int) (this.panel.clipRange.z / screenRescaling);
+		int shotHeight = (int) (this.panel.clipRange.w / screenRescaling);
+		
+		this.screenShotTaker.TakeScreenShot(this.screenShotFileManager.ScreenShotPath(this.levelNumber), 
+		                                    shotWidth, shotHeight, 
 		                                    (int) relativePosition.x, (int) relativePosition.y, ScreenShotCreated);
 	}
 	
@@ -332,19 +369,6 @@ public class MazeController : MonoBehaviour
 			this.screenShotCompletedAction();
 			this.screenShotCompletedAction = null;
 		}
-		
-	}
-	
-	private void LoadScreenShot()
-	{
-		string path = ScreenShotPath();
-		byte[] byteArray = File.ReadAllBytes(path);
-		
-		// The texture will be resized by reading it in.
-		Texture2D screenshotTexture = new Texture2D(4, 4);
-		screenshotTexture.LoadImage(byteArray);
-		
-		UseScreenShot(screenshotTexture);
 	}
 	
 	private void UseScreenShot(Texture2D screenShotTexture)
@@ -357,21 +381,33 @@ public class MazeController : MonoBehaviour
 								
 		uiTexture.mainTexture = screenShotTexture;
 		uiTexture.MakePixelPerfect();	
-						
-		// NOTE: the maze itself is being shown at a reduced scale.  The screenshot was taken of images which had
-		// already been scaled down.  So at this point we need to divide by the maze's scale to compensate for the
-		// application of the current maze object's scale value on the ALREADY scaled-down maze.
-		Vector3 mazeScale = this.transform.localScale;
-		Vector3 textureScale = gameObj.transform.localScale;
-		textureScale.x /= mazeScale.x;
-		textureScale.y /= mazeScale.y;
-		gameObj.transform.localScale = textureScale;
 		
+		this.screenShotContainer = gameObj;
+			
 		// set z position of the screenshot to further back.
 		int depth = uiTexture.depth;
 		uiTexture.depth = depth - 10;
 		
 		RemoveExistingWallSprites();
+		
+		if (this.scaleSet)
+		{
+			SetScreenShotScale();
+		}
+	}
+	
+	private void SetScreenShotScale()
+	{
+		if (this.screenShotContainer == null) { return; }
+
+		float screenRescaling = Managers.ScreenManager.ScreenScale;
+		
+		Vector3 mazeScale = this.transform.localScale;
+		Vector3 textureScale = this.screenShotContainer.transform.localScale;
+		textureScale.x /= mazeScale.x;
+		textureScale.y /= mazeScale.y;
+		textureScale *= screenRescaling;
+		this.screenShotContainer.transform.localScale = textureScale;
 	}
 	
 	private void RemoveExistingWallSprites()
@@ -398,19 +434,6 @@ public class MazeController : MonoBehaviour
 		}
 		
 		return relativePosition;
-	}
-	
-	private string ScreenShotPath()
-	{
-		string dataPath = Application.persistentDataPath;
-		dataPath = Path.Combine(dataPath, "Maze." + this.levelNumber + ".png");
-		return dataPath;
-	}
-	
-	private bool ScreenShotExists()
-	{
-		string path = ScreenShotPath();
-		return File.Exists(path);
 	}
 	
 	#endregion Screenshots
@@ -589,6 +612,20 @@ public class MazeController : MonoBehaviour
 	}
 	
 	#endregion Utility methods
+	
+	#region Debug methods
+	
+	public UISprite GetFirstWallSprite()
+	{
+		if (this.wallSprites.Count == 0) { return null; }
+		return this.wallSprites[0];
+	}
+	
+	public GameObject GetScreenShot()
+	{
+		return this.screenShotContainer;
+	}
+	#endregion Debug methods
 	
 }
 
