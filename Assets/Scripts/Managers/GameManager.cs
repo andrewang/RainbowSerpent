@@ -247,13 +247,21 @@ public class GameManager : MonoBehaviour
 		if (enemySnakeDied && enemySnakes.Count == 0 && enemyEgg == null)
 		{
 			// all enemy snakes are dead and no egg exists
-			Managers.GameState.LevelState = LevelState.LevelEnd;
+			EndLevel();			
 		}
 		else if (enemyEggDied && enemySnakes.Count == 0)
 		{
 			// egg eaten and no enemy snakes exist
-			Managers.GameState.LevelState = LevelState.LevelEnd;			
+			EndLevel();			
 		}
+	}
+	
+	private void EndLevel()
+	{
+		Managers.GameState.LevelState = LevelState.LevelEnd;			
+		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
+		if (psc == null) { return; }
+		psc.PlayerControlled = false;		
 	}
 	
 	private void UpdateFrog()
