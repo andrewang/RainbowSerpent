@@ -40,7 +40,11 @@ public class InputController : MonoBehaviour
 			this.playerSnakeController = this.PlayerSnake.Controller as PlayerSnakeController;
 			if (this.playerSnakeController == null) { return; }
 		}
-		if (this.playerSnakeController.PlayerControlled == false) { return; }
+		if (this.playerSnakeController.PlayerControlled == false) 
+		{ 
+			this.playerSnakeController.SetDesiredDirection(direction);
+			return; 
+		}
 		
 		this.playerSnakeController.StartMoving(direction);
 	}

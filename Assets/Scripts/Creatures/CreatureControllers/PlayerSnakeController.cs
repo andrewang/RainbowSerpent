@@ -29,6 +29,13 @@ public class PlayerSnakeController : SnakeController
 		this.reachedPlayerZone = false;
 	}
 	
+	public void SetDesiredDirection(Direction direction)
+	{
+		// This method sets the desired direction but nothing else, so it's only used in the situation where the player doesn't have
+		// control of their snake.
+		this.desiredDirection = direction;
+	}
+	
 	public override void StartMoving(Direction direction)
 	{
 		if (direction == this.desiredDirection) { return; }
