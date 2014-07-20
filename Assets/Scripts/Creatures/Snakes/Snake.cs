@@ -598,7 +598,7 @@ public class Snake : MobileCreature
 				bool willDie = otherSnake.SeverAtSegment(otherSegment);
 				if (willDie)
 				{
-					AddSegment();
+					// Other snake dies, but don't gain a segment
 					otherSnake.Die();					
 				}
 				
