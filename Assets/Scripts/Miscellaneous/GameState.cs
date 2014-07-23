@@ -14,9 +14,21 @@ public class GameState
 	/// Gets or sets the level of the map being played.
 	/// </summary>
 	/// <value>The level.</value>
-	public int Level { get; set; }
+	private int level = 0;
+	public int Level { 
+		get
+		{
+			return this.level;
+		}
+		set
+		{
+			this.level = value;
+			this.GameSpeed = SerpentConsts.StartingSpeedMultiplier + SerpentConsts.SpeedIncreasePerLevel * (this.level - 1);
+		}
+	}
 	
 	public int NumLevels { get; private set; }
+	public int NumThemes { get; private set; }
 	
 	/// <summary>
 	/// The player's score (private storage)
@@ -53,12 +65,15 @@ public class GameState
 	/// <value>The number of extra snakes.</value>
 	public int ExtraSnakes { get; set; }
 	
+	public float GameSpeed { get; set; }
+	
 	public LevelState LevelState { get; set; }
 
 	public GameState ()
 	{
 		Reset();
 		CountLevels();
+		CountThemes();
 	}
 	
 	/// <summary>
@@ -72,19 +87,30 @@ public class GameState
 		this.LevelState = LevelState.LevelStart;
 	}
 	
+	// TODO move this code out of GameState
 	public void CountLevels()
 	{
-		int levelNum = 1;
+		this.NumLevels = CountResources("level");		
+	}
+	
+	public void CountThemes()
+	{
+		this.NumThemes = CountResources("theme");
+	}
+	
+	private int CountResources(string namePrefix)
+	{
+		int number = 1;
 		while( true )
 		{
-			TextAsset mazeTextAsset = Resources.Load("level" + levelNum.ToString()) as TextAsset;
-			if (mazeTextAsset == null)
+			UnityEngine.Object obj = Resources.Load(namePrefix + number.ToString());
+			if (obj == null)
 			{
 				break;
 			}
-			levelNum++;			
+			number++;			
 		}
-		this.NumLevels = levelNum - 1;
+		return number - 1;
 	}
 }
 

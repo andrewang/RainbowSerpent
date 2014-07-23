@@ -375,7 +375,6 @@ public class Snake : MobileCreature
 	
 		this.head = null;
 		
-	//	this.head.gameObject.SetActive(false);
 		UpdateSpeed();
 		
 	}
@@ -403,19 +402,6 @@ public class Snake : MobileCreature
 		}
 	}		
 	
-	/*
-	private void UpdatePosition()
-	{
-		float displacement =  this.Speed * Time.smoothDeltaTime;
-		
-		float remainingDisplacement = 0.0f;
-		bool arrived = MoveForward( displacement, out remainingDisplacement );
-		
-		if (arrived == false) { return; }
-		
-		ArrivedAtDestination(remainingDisplacement);		
-	}
-	*/
 	
 	public override bool MoveForward( float displacement, out float remainingDisplacement )
 	{

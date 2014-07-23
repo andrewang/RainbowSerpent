@@ -56,7 +56,7 @@ public class MobileCreature : Creature
 	
 	protected void UpdatePosition()
 	{
-		float displacement = this.Speed * Time.smoothDeltaTime;
+		float displacement = this.Speed * Time.smoothDeltaTime * Managers.GameState.GameSpeed;
 		
 		float remainingDisplacement = 0.0f;
 		bool arrived = this.MoveForward( displacement, out remainingDisplacement );

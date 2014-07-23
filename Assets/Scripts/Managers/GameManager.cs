@@ -76,17 +76,12 @@ public class GameManager : MonoBehaviour
 	
 	#region Setup
 	
-	public void Setup(int levelNum)
+	public void Setup(int rawLevelNum)
 	{
-		// Cap levelNum according to the maximum number of levels.
-		// We don't want a zero so calculate this with a loop and subtraction, only
-		// considering values greater than NumLevels as a problem.
-		while (levelNum > Managers.GameState.NumLevels)
-		{
-			levelNum -= Managers.GameState.NumLevels;
-		}
+		int levelNum = ((rawLevelNum - 1) % Managers.GameState.NumLevels) + 1;
+		int themeNum = ((rawLevelNum - 1) % Managers.GameState.NumThemes) + 1;
 		
-		LoadTheme(levelNum);
+		LoadTheme(themeNum);
 		
 		// NOTE: snakes need to be created before input can be configured.  So snakes need to be created here.
 		SetTimers();
@@ -118,12 +113,13 @@ public class GameManager : MonoBehaviour
 	}
 	
 	private void SetTimers()
-	{		
+	{	
+		// Set the egg timers so no timers are counting down, but start the countdown before spawning a frog.	
 		for (int i = 0; i < this.eggs.Length; ++i)
 		{
 			this.eggTimers[i] = 0.0f;
 		}
-		this.frogTimer = 0.0f;
+		SetFrogTimer();
 	}
 	
 	private void PlaceCreature(Creature creature, int x, int y, Direction direction)
@@ -424,16 +420,27 @@ public class GameManager : MonoBehaviour
 		
 		if (this.frogTimer == 0.0f)
 		{
-			// Set timer.
-			this.frogTimer = Managers.GameClock.Time + SerpentConsts.FrogRespawnDelay;
+			// Frog is dead, but timer isn't set.  We can now set the timer.
+			SetFrogTimer();
+			return;
 		}
-		else if (Managers.GameClock.Time > this.frogTimer)
+		
+		if (Managers.GameClock.Time > this.frogTimer)
 		{
-			// spawn frog
+			// spawn frog and clear the timer
 			CreateFrog();
-			// Reset timer
-			this.frogTimer = 0.0f;
+			ClearFrogTimer();
 		}
+	}
+	
+	private void SetFrogTimer()
+	{
+		this.frogTimer = Managers.GameClock.Time + SerpentConsts.FrogRespawnDelay;
+	}
+	
+	private void ClearFrogTimer()
+	{
+		this.frogTimer = 0.0f;
 	}
 	
 	private void ResetFrog()
@@ -444,7 +451,7 @@ public class GameManager : MonoBehaviour
 			this.frog = null;
 		}
 		
-		this.frogTimer = 0.0f;
+		ClearFrogTimer();
 	}
 	
 	private void CreateFrog()
@@ -493,15 +500,15 @@ public class GameManager : MonoBehaviour
 		int intSide = (int) side;
 		if (this.eggTimers[intSide] == 0.0f)
 		{
-			SetEggTimer(side);
+			// Do nothing.  No timer set.
 		}
 		else if (Managers.GameClock.Time > this.eggTimers[intSide])
 		{
-			// time for a random enemy snake to start laying an egg.  But we need a snake with 3+ segments.
+			// time for a random snake to start laying an egg.  But we need a snake with 3+ segments.
 			List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.NumSegments >= 3 );
 			if (qualifiedSnakes.Count == 0)
 			{
-				// Can't spawn an egg.  Reset the timer.
+				// Can't spawn an egg right now.  Reset the timer until later
 				SetEggTimer(side);
 				return;
 			}
@@ -517,17 +524,22 @@ public class GameManager : MonoBehaviour
 				e.SetHatchingTime( SerpentConsts.EnemyEggHatchingTime );			                
 			}
 			
-			// reset the timer for next time.
-			ResetEggTimer(side);
+			ClearEggTimer(side);
 		}		
 	}
 	
+	// This method should be called when an enemy snake dies or an enemy egg is eaten
 	private void SetEggTimer(Side side)
 	{
+		if (this.eggTimers[(int)side] > 0.0f) 
+		{
+			// already set, don't delay it any further
+			return;
+		}
 		this.eggTimers[(int)side] = Managers.GameClock.Time + SerpentConsts.GetEggLayingFrequency(side);				
 	}
 	
-	private void ResetEggTimer(Side side)
+	private void ClearEggTimer(Side side)
 	{
 		this.eggTimers[(int)side] = 0.0f;				
 	}
@@ -586,6 +598,11 @@ public class GameManager : MonoBehaviour
 		e.Hatched -= this.EggHatched;
 		
 		SetEgg(e.Side, null);
+		
+		if (e.Side == Side.Enemy)
+		{
+			SetEggTimer(Side.Enemy);
+		}
 	}
 	
 	
@@ -673,6 +690,8 @@ public class GameManager : MonoBehaviour
 		
 		snake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
 		this.snakes.Remove(snake);
+		
+		SetEggTimer(Side.Enemy);
 	}
 	
 	private IEnumerator PlayerDeathSequence()

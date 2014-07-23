@@ -330,14 +330,20 @@ public class MazeController : MonoBehaviour
 		if (this.useScreenShots == false)
 		{	
 			// just run what was supposed to be executed after creating the screenshot
-			completedAction();
+			if (completedAction != null)
+			{
+				completedAction();
+			}
 			return;
 		}
 		
 		if (this.screenShotFileManager.ScreenShotExists(this.levelNumber)) 
 		{
 			// screenshot should already be attached to the UI
-			completedAction();
+			if (completedAction != null)
+			{
+				completedAction();
+			}
 			return;
 		}
 		

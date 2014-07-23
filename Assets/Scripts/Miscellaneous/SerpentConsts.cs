@@ -167,6 +167,13 @@ public static class SerpentConsts
 	
 	#endregion Score
 	
+	#region Speed
+	
+	public static float StartingSpeedMultiplier = 1.0f;
+	public static float SpeedIncreasePerLevel = 0.1f;
+	
+	#endregion Speed
+	
 	#region Player Snake Colours
 		
 	public static Color[] PlayerSegmentColours = new Color[]
