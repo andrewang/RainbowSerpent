@@ -163,7 +163,9 @@ public static class SerpentConsts
 	
 	#region Score
 	
-	public static int ScoreForBonusLife = 10000;
+	public static int ScorePerBonusLife = 10000;
+	public static int ScoreForEatingSegment = 100;
+	public static int ScoreForEatingFrog = 50;
 	
 	#endregion Score
 	

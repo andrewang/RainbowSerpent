@@ -46,10 +46,10 @@ public class GameState
 		}		
 		set
 		{
-			int numBonusLives = this.score / SerpentConsts.ScoreForBonusLife;
+			int numBonusLives = this.score / SerpentConsts.ScorePerBonusLife;
 			this.score = value;
 			// Handle bonus lives here.
-			int newBonusLives = this.score / SerpentConsts.ScoreForBonusLife;
+			int newBonusLives = this.score / SerpentConsts.ScorePerBonusLife;
 			if (newBonusLives > numBonusLives)
 			{
 				// Score went over a "score for bonus life" threshold.  PRESUMABLY it only ever goes 

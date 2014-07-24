@@ -645,9 +645,12 @@ public class GameManager : MonoBehaviour
 		this.updateSnakeColours = true;
 	}
 	
-	private void SnakeSegmentEaten(Vector3 position)
-	{
-		//this.animationManager.PlayRandomAnimation(position);
+	private void SnakeSegmentEaten(Side side, Vector3 position)
+	{		
+		if (side == Side.Enemy)
+		{
+			Managers.GameState.Score += SerpentConsts.ScoreForEatingSegment;
+		}		
 	}
 	
 	

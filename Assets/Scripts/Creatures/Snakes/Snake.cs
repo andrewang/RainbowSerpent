@@ -73,7 +73,7 @@ public class Snake : MobileCreature
 	private SnakeTrail trail;
 	
 	public event Action<Snake> SnakeSegmentsChanged = null;
-	public event Action<Vector3> SnakeSegmentEaten = null;
+	public event Action<Side, Vector3> SnakeSegmentEaten = null;
 	
 	protected override Vector3 GetPosition()	
 	{
@@ -320,7 +320,7 @@ public class Snake : MobileCreature
 		{
 			if (this.SnakeSegmentEaten != null)
 			{
-				this.SnakeSegmentEaten(seg.gameObject.transform.localPosition);
+				this.SnakeSegmentEaten(this.Side, seg.gameObject.transform.localPosition);
 			}
 			
 			if (seg != this.head)
@@ -335,6 +335,13 @@ public class Snake : MobileCreature
 			}
 			nextSegment = seg.NextSegment;
 		} while ( true );
+		
+		/*
+		if (this.Controller is PlayerSnakeController)
+				{
+					Managers.GameState.Score += SerpentConsts.ScoreForEatingSegment;
+				}
+		*/
 
 		if ( this.SnakeSegmentsChanged != null )
 		{
@@ -549,6 +556,10 @@ public class Snake : MobileCreature
 		{
 			if (otherCreature is Egg || otherCreature is Frog)
 			{
+				if (this.Side == Side.Player)
+				{
+					Managers.GameState.Score += SerpentConsts.ScoreForEatingFrog;
+				}
 				this.AddSegment();
 			}
 			otherCreature.Die();
@@ -566,11 +577,7 @@ public class Snake : MobileCreature
 		if (CanBiteHead(otherSnake))
 		{
 			otherSnake.SeverAtSegment(otherSnake.Head);
-			AddSegment();
-			if (this.Controller is PlayerSnakeController)
-			{
-				Managers.GameState.Score += 300;
-			}
+			AddSegment();			
 			otherSnake.Die();
 			return true;		
 		}
@@ -587,11 +594,7 @@ public class Snake : MobileCreature
 					// Other snake dies, but don't gain a segment
 					otherSnake.Die();					
 				}
-				
-				if (this.Controller is PlayerSnakeController)
-				{
-					Managers.GameState.Score += 100;
-				}				
+						
 				return willDie;
 			}
 			
