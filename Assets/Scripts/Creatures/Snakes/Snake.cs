@@ -558,7 +558,7 @@ public class Snake : MobileCreature
 			{
 				if (this.Side == Side.Player)
 				{
-					Managers.GameState.Score += SerpentConsts.ScoreForEatingFrog;
+					Managers.GameState.Score += SerpentConsts.ScoreForEatingFrogOrEgg;
 				}
 				this.AddSegment();
 			}

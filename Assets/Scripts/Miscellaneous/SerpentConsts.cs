@@ -28,6 +28,8 @@ public static class SerpentConsts
 	public const int CellWidth = 32;
 	public const int CellHeight = 24;	
 
+	public const int WallIntersectionOverlap = 1;
+	
 	public const int BorderWidth = 1;
 	
 	#endregion Map Constants
@@ -122,6 +124,10 @@ public static class SerpentConsts
 	public static float EnemyEggFrequency = 10.0f;
 	public static float TimeToLayEgg = 10.0f;
 	public static float EnemyEggHatchingTime = 20.0f;
+	public static float EggShakeDuration = 2.0f;
+	public static int EggNumShakes = 15;
+	public static float EggShakeDisplacement = 1.5f;
+	
 	public static float FrogRespawnDelay = 10.0f;
 	
 	public static float GetEggLayingFrequency( Side side )
@@ -165,7 +171,7 @@ public static class SerpentConsts
 	
 	public static int ScorePerBonusLife = 10000;
 	public static int ScoreForEatingSegment = 100;
-	public static int ScoreForEatingFrog = 50;
+	public static int ScoreForEatingFrogOrEgg = 50;
 	
 	#endregion Score
 	

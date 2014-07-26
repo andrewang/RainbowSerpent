@@ -156,7 +156,7 @@ public class MazeController : MonoBehaviour
 			newWallSprite.color = this.wallColour;			
 			
 			// Configure as horizontal.
-			newWallSprite.width = SerpentConsts.CellWidth * (endX - startX + 1);
+			newWallSprite.width = SerpentConsts.CellWidth * (endX - startX + 1) + SerpentConsts.WallIntersectionOverlap * 2;
 			float x = (float)(startX + endX) * 0.5f;			
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
 			pos.x -= newWallSprite.width * 0.5f;
@@ -205,7 +205,7 @@ public class MazeController : MonoBehaviour
 			}
 			newWallSprite.color = this.wallColour;			
 			
-			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1);
+			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1) + SerpentConsts.WallIntersectionOverlap * 2;
 			
 			float y = (float)(startY + endY) * 0.5f;
 			Vector3 pos = GetCellSideCentre( x, y, intSide);			

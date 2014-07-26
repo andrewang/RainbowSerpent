@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class Egg : Creature
 {	
@@ -11,10 +12,18 @@ public class Egg : Creature
 	
 	public bool IsFullyGrown { get; set; }
 	private bool shouldHatch = false;
+	
+	private float shakingDisplacement;
+	//private float shakingDisplacementStep;
+	private float shakingStepTime;
+	private int numShakesRemaining;
+	private TweenPosition shakeTween;
+	private bool hasShakingBegun;
 
 	Egg()
 	{
 		this.IsFullyGrown = false;
+		this.hasShakingBegun = false;
 	}
 	
 	void Start()
@@ -65,15 +74,27 @@ public class Egg : Creature
 	// Hatching behavior.  TODO Could this be handled in a different way than polling time?
 	void Update()
 	{
-		if (this.IsFullyGrown && this.shouldHatch && this.Hatched != null && Managers.GameClock.Time >= this.hatchingTime)
+		if (this.IsFullyGrown && this.shouldHatch && this.Hatched != null)
 		{
-			this.Hatched(this);
-			Die();
+			if (this.hasShakingBegun == false && Managers.GameClock.Time + SerpentConsts.EggShakeDuration >= this.hatchingTime)
+			{
+				this.hasShakingBegun = true;
+				BeginShaking(SerpentConsts.EggShakeDuration, SerpentConsts.EggNumShakes, SerpentConsts.EggShakeDisplacement);				
+			}			
+			else if (Managers.GameClock.Time >= this.hatchingTime)
+			{
+				this.Hatched(this);
+				Die();
+			}
 		}		
 	}
 	
 	override public void Die()
 	{
+		if (this.shakeTween != null)
+		{
+			this.shakeTween.enabled = false;
+		}
 		Debug.Log("Egg Die called");
 		
 		// eggs are totally destroyed on death
@@ -82,5 +103,84 @@ public class Egg : Creature
 		Destroy(this.gameObject);
 		Destroy(this);
 	}
+	
+	public void BeginShaking(float totalDuration, int numVibrations, float displacement)
+	{
+		this.numShakesRemaining = numVibrations;
+		this.shakingDisplacement = displacement;				
+		this.shakingStepTime = CalculateInitialDuration(totalDuration, numVibrations);
+		
+		StartCoroutine( StartNextShakeCoroutine() );		
+	}
+	
+	private float CalculateInitialDuration(float totalDuration, int numSteps)
+	{
+		// Figure out the multipliers on all the steps and add them together
+		// Once we know that total, the initial duration is the total duration
+		// divided by the total.
+		float multiplierTotal = 0.0f;
+		float multiplier = 1.0f;
+		
+		for (int i = 0; i < numSteps; ++i)
+		{
+			multiplierTotal += multiplier;
+			multiplier *= 0.95f;
+		}
+		
+		float initialDuration = totalDuration / multiplierTotal;
+		return initialDuration;
+	}
+	
+	private void EndOfShake()
+	{
+		if (this.shakeTween != null)
+		{
+			Destroy(this.shakeTween);
+			this.shakeTween = null;
+		}
+	
+		this.numShakesRemaining--;
+		if (this.numShakesRemaining < 0)
+		{
+			return;
+		}
+		else if (this.numShakesRemaining == 0)
+		{
+			// We need to do one more half animation to get back to the beginning
+			this.shakingDisplacement *= 0.5f;
+		}
+		
+		float newDisplacement = this.shakingDisplacement * -1;
+		/*
+		if (newDisplacement > 0)
+		{
+			newDisplacement += this.shakingDisplacementStep;
+		}
+		else
+		{
+			newDisplacement -= this.shakingDisplacementStep;
+		}
+		*/
+		this.shakingDisplacement = newDisplacement;
+		Debug.Log("Shaking displacement is " + this.shakingDisplacement);		
+		
+		this.shakingStepTime *= 0.95f;
+
+		// Replace it with the new one
+		StartCoroutine( StartNextShakeCoroutine() );
+	}
+		
+	private IEnumerator StartNextShakeCoroutine()
+	{
+		yield return new WaitForEndOfFrame();
+		
+		Vector3 pos = this.sprite.cachedTransform.localPosition;
+		pos.x += this.shakingDisplacement;
+		
+		this.shakeTween = TweenPosition.Begin( this.gameObject, this.shakingStepTime, pos );
+		EventDelegate tweenFinished = new EventDelegate(this, "EndOfShake");
+		this.shakeTween.onFinished.Add ( tweenFinished );
+	}
+	
 }
 

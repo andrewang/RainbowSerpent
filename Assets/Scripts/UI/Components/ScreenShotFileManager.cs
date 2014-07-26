@@ -4,7 +4,7 @@ using System.IO;
 
 public class ScreenShotFileManager : MonoBehaviour
 {
-	private const int Version = 1;
+	private const int Version = 2;
 	
 	public ScreenShotFileManager ()
 	{
