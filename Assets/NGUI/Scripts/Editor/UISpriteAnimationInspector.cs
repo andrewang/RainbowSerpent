@@ -50,5 +50,13 @@ public class UISpriteAnimationInspector : Editor
 			anim.loop = loop;
 			EditorUtility.SetDirty(anim);
 		}
+		
+		bool randomizedStart = EditorGUILayout.Toggle("Randomized", anim.randomizedStart);
+		if (anim.randomizedStart != randomizedStart)
+		{
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
+			anim.randomizedStart = randomizedStart;
+			EditorUtility.SetDirty(anim);
+		}
 	}
 }

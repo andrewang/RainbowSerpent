@@ -380,6 +380,12 @@ public class Snake : MobileCreature
 			nextSegment = seg.NextSegment;
 		} while ( true );
 	
+		// Destroy head prefab and any attached objects - esp with sprite animations.
+		UISpriteAnimation[] animations = this.head.GetComponentsInChildren<UISpriteAnimation>();
+		foreach (UISpriteAnimation anim in animations)
+		{
+			Destroy(animation.gameObject);
+		}
 		this.head = null;
 		
 		UpdateSpeed();

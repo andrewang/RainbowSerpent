@@ -102,9 +102,18 @@ public class SnakeSegment : MonoBehaviour
 		}		
 		set
 		{
+			int alphaValue = value ? 255 : 0;
 			Color c = this.sprite.color;
-			c.a = value ? 255 : 0;	
+			c.a = alphaValue;
 			this.sprite.color = c;
+			
+			// Set the transparency of all child 
+			foreach (UISprite s in this.GetComponentsInChildren<UISprite>())
+			{
+				c = s.color;
+				c.a = alphaValue;
+				s.color = c;
+			}
 		}
 	}
 	

@@ -18,6 +18,7 @@ public class UISpriteAnimation : MonoBehaviour
 	[HideInInspector][SerializeField] int mFPS = 30;
 	[HideInInspector][SerializeField] string mPrefix = "";
 	[HideInInspector][SerializeField] bool mLoop = true;
+	[HideInInspector][SerializeField] bool mRandomizedStart = false;
 
 	UISprite mSprite;
 	float mDelta = 0f;
@@ -48,6 +49,9 @@ public class UISpriteAnimation : MonoBehaviour
 	/// </summary>
 
 	public bool loop { get { return mLoop; } set { mLoop = value; } }
+	
+	// CJC - addition
+	public bool randomizedStart { get { return mRandomizedStart; } set { mRandomizedStart = value; } }
 
 	/// <summary>
 	/// Returns is the animation is still playing or not
@@ -59,7 +63,14 @@ public class UISpriteAnimation : MonoBehaviour
 	/// Rebuild the sprite list first thing.
 	/// </summary>
 
-	void Start () { RebuildSpriteList(); }
+	void Start () 
+	{
+		RebuildSpriteList(); 
+		if (mRandomizedStart)
+		{
+			RandomizeFrame();
+		}
+	}
 
 	/// <summary>
 	/// Advance the sprite animation process.
@@ -132,4 +143,12 @@ public class UISpriteAnimation : MonoBehaviour
 			mSprite.MakePixelPerfect();
 		}
 	}
+	
+	// CJC - custom addition
+	public void RandomizeFrame()
+	{
+		int randomFrame = UnityEngine.Random.Range(0, this.frames);
+		this.mIndex = randomFrame;
+	}
+	
 }
