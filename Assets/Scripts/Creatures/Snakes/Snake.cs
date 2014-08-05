@@ -384,7 +384,7 @@ public class Snake : MobileCreature
 		UISpriteAnimation[] animations = this.head.GetComponentsInChildren<UISpriteAnimation>();
 		foreach (UISpriteAnimation anim in animations)
 		{
-			Destroy(animation.gameObject);
+			Destroy(anim.gameObject);
 		}
 		this.head = null;
 		

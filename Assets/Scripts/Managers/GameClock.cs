@@ -12,12 +12,17 @@ public class GameClock : MonoBehaviour
 		}
 	}
 	
+	public bool Paused { get; set; }
+	
 	public void Update()
 	{
+		if (this.Paused) { return; }
+		
 		float deltaTime = UnityEngine.Time.deltaTime;
 		if (deltaTime > 0.1f) { deltaTime = 0.1f; }
 		this.time += deltaTime;
 	}
+	
 	
 }
 

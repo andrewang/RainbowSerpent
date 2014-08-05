@@ -19,9 +19,10 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UILabel levelLabel = null;
 	[SerializeField] private UILabel scoreLabel = null;
 	[SerializeField] private UILabel livesLabel = null;	
-	[SerializeField] private UILabel gameOverLabel = null;	
 	[SerializeField] private GameObject buttonsContainer;
-	[SerializeField] private GameObject restartButtonContainer;
+
+	[SerializeField] private GameObject pauseUIContainer = null;
+	[SerializeField] private GameObject gameOverUIContainer = null;
 	
 	[SerializeField] private UIPanel mazePanel = null; 
 	[SerializeField] private UILabel debugInfoLabel = null;
@@ -40,8 +41,8 @@ public class GameSceneController : RSSceneController
 		if (this.scoreLabel == null) { Debug.LogError("GameSceneController: scoreLabel is null"); }
 		if (this.livesLabel == null) { Debug.LogError("GameSceneController: livesLabel is null"); }
 		if (this.labels == null || this.labels.Length == 0) { Debug.LogError("GameSceneController: labels is null/empty"); }
-		if (this.gameOverLabel == null) { Debug.LogError("GameSceneController: gameOverLabel is null"); }
 		if (this.buttonsContainer == null) { Debug.LogError("GameSceneController: buttonsContainer is null/empty"); }
+		if (this.gameOverUIContainer == null) { Debug.LogError("GameSceneController: gameOverUIContainer is null"); } 
 		
 		if (this.mazePanel == null) { Debug.LogError("GameSceneController: mazePanel is null"); }
 		if (this.debugInfoLabel == null) { Debug.LogError("GameSceneController: debugInfoLabel is null"); }
@@ -137,22 +138,53 @@ public class GameSceneController : RSSceneController
 	
 	public void GameOver()
 	{
-		// disable all the buttons
+		Managers.GameState.Paused = true;
+		Managers.GameClock.Paused = true;
+			
 		this.buttonsContainer.SetActive(false);
-		// enable the game over content
-		this.gameOverLabel.gameObject.SetActive(true);
-		this.restartButtonContainer.gameObject.SetActive(true);
+		this.gameOverUIContainer.gameObject.SetActive(true);
 	}
+	
+	#endregion Game Over
+	
+	#region Button input
 	
 	private void RestartGame()
 	{
-		this.gameOverLabel.gameObject.SetActive(false);
-		this.restartButtonContainer.gameObject.SetActive(false);		
-		
+		Managers.GameClock.Paused = false;			
 		Managers.GameState.Reset();
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);		
 	}
 	
-	#endregion Game Over
+	private void GoToOptions()
+	{
+		// No options currently
+	}
+		
+	private void PauseGame()
+	{
+		this.buttonsContainer.SetActive(false);
+		this.pauseUIContainer.gameObject.SetActive(true);	
+		Managers.GameState.Paused = true;
+		Managers.GameClock.Paused = true;
+	}
+	
+	private void ResumeGame()
+	{
+		this.buttonsContainer.SetActive(true);
+		this.pauseUIContainer.gameObject.SetActive(false);	
+		Managers.GameState.Paused = false;
+		Managers.GameClock.Paused = false;		
+	}
+	
+	private void ReturnToMainMenu()
+	{
+		Managers.GameClock.Paused = false;		
+		Managers.GameState.Reset();
+		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Main);
+	}
+	
+	#endregion Button input
+	
 	
 }

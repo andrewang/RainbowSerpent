@@ -23,7 +23,7 @@ public class GameState
 		set
 		{
 			this.level = value;
-			this.GameSpeed = SerpentConsts.StartingSpeedMultiplier + SerpentConsts.SpeedIncreasePerLevel * (this.level - 1);
+			this.gameSpeed = SerpentConsts.StartingSpeedMultiplier + SerpentConsts.SpeedIncreasePerLevel * (this.level - 1);
 		}
 	}
 	
@@ -65,9 +65,19 @@ public class GameState
 	/// <value>The number of extra snakes.</value>
 	public int ExtraSnakes { get; set; }
 	
-	public float GameSpeed { get; set; }
+	private float gameSpeed = 0.0f;
+	public float GameSpeed 
+	{
+		get
+		{
+			if (this.Paused) { return 0.0f; }
+			return this.gameSpeed;
+		}
+	}
 	
 	public LevelState LevelState { get; set; }
+	
+	public bool Paused { get; set; }
 
 	public GameState ()
 	{
@@ -85,6 +95,7 @@ public class GameState
 		this.Score = 0;
 		this.ExtraSnakes = SerpentConsts.InitialNumPlayerSnakes;
 		this.LevelState = LevelState.LevelStart;
+		this.Paused = false;
 	}
 	
 	// TODO move this code out of GameState
