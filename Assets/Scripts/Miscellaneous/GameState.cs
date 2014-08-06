@@ -15,7 +15,8 @@ public class GameState
 	/// </summary>
 	/// <value>The level.</value>
 	private int level = 0;
-	public int Level { 
+	public int Level 
+	{ 
 		get
 		{
 			return this.level;
@@ -23,7 +24,21 @@ public class GameState
 		set
 		{
 			this.level = value;
-			this.gameSpeed = SerpentConsts.StartingSpeedMultiplier + SerpentConsts.SpeedIncreasePerLevel * (this.level - 1);
+			RecalculateSpeed();
+		}
+	}
+	
+	private Difficulty difficulty = 0;
+	public Difficulty Difficulty
+	{
+		get
+		{
+			return this.difficulty;
+		}
+		set
+		{
+			this.difficulty = value;
+			RecalculateSpeed();
 		}
 	}
 	
@@ -96,6 +111,15 @@ public class GameState
 		this.ExtraSnakes = SerpentConsts.InitialNumPlayerSnakes;
 		this.LevelState = LevelState.LevelStart;
 		this.Paused = false;
+	}
+	
+	public void RecalculateSpeed()
+	{
+		this.gameSpeed = SerpentConsts.StartingSpeedMultiplier + SerpentConsts.SpeedIncreasePerLevel * (this.level - 1);
+		if (this.difficulty == Difficulty.Classic)
+		{
+			this.gameSpeed *= SerpentConsts.ClassicSpeedMultiplier;
+		}
 	}
 	
 	// TODO move this code out of GameState

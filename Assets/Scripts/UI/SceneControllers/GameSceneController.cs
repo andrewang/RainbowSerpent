@@ -155,11 +155,6 @@ public class GameSceneController : RSSceneController
 		Managers.GameState.Reset();
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);		
 	}
-	
-	private void GoToOptions()
-	{
-		// No options currently
-	}
 		
 	private void PauseGame()
 	{

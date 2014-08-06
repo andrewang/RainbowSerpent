@@ -1,10 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/NGUI/Scripts/UI/UISpriteAnimation.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Miscellaneous/SerpentConsts.cs">
     <Files>
       <File FileName="Assets/Scripts/UI/SceneControllers/MainMenuSceneController.cs" Line="17" Column="1" />
       <File FileName="Assets/Scripts/Creatures/MobileCreature.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/GameState.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/SerpentNamespace.cs" Line="1" Column="1" />
       <File FileName="Assets/Data/Resources/oldlevel1.txt" Line="1" Column="1" />
       <File FileName="Assets/Data/Resources/outside11x13.txt" Line="1" Column="1" />
@@ -22,11 +21,12 @@
       <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="206" Column="56" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="109" Column="4" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="239" Column="18" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="168" Column="26" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="387" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="23" Column="12" />
-      <File FileName="Assets/NGUI/Scripts/UI/UISpriteAnimation.cs" Line="83" Column="1" />
+      <File FileName="Assets/NGUI/Scripts/UI/UISpriteAnimation.cs" Line="74" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Editor/UISpriteAnimationInspector.cs" Line="54" Column="60" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="9" Column="25" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -41,7 +41,6 @@
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" line="59" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/NGUI/Scripts/Internal/NGUITools.cs" line="609" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/MazeController.cs" line="365" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Miscellaneous/GameState.cs" line="26" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Egg.cs" line="227" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/NGUI/Scripts/UI/UISpriteAnimation.cs" line="150" />
     </BreakpointStore>

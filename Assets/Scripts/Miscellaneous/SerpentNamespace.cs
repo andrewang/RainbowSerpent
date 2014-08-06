@@ -27,5 +27,11 @@ namespace Serpent
 		Frog,
 	}	
 	
+	public enum Difficulty
+	{
+		Easy,
+		Classic
+	}
+	
 }
 

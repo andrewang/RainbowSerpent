@@ -179,6 +179,7 @@ public static class SerpentConsts
 	
 	public static float StartingSpeedMultiplier = 1.0f;
 	public static float SpeedIncreasePerLevel = 0.1f;
+	public static float ClassicSpeedMultiplier = 2.0f;
 	
 	#endregion Speed
 	
