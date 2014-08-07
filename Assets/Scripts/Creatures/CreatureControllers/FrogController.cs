@@ -151,7 +151,7 @@ public class FrogController : CreatureController
 				
 		List<Direction> availableDirections = new List<Direction>();
 		
-		for (Direction dir = Direction.First; dir != Direction.Last; ++dir)
+		for (Direction dir = Direction.First; dir <= Direction.Last; ++dir)
 		{
 			if (CanGo( dir, cell.X, cell.Y ))
 			{

@@ -12,7 +12,27 @@ public class PlayerSnakeController : SnakeController
 	private Direction desiredDirection = Direction.None;
 	private bool reachedPlayerZone = false;
 	
-	public bool PlayerControlled { get; set; }
+	private bool playerControlled;
+	public bool PlayerControlled 
+	{
+		get
+		{
+			return this.playerControlled;
+		}
+		set
+		{
+			this.playerControlled = value; 
+			if (value == false)
+			{
+				if (this.snake.CurrentDirection == Direction.None)
+				{
+					// Not moving so start moving in a new direction
+					Direction newDir = GoToPlayerZone();
+					StartMoving(newDir);
+				}
+			}
+		}		
+	}
 	
 	public event Action<Snake> SnakeReturnedToStart = null;
 	public event Action<Snake> SnakeExitedStart = null;
