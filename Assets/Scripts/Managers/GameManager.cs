@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
 	
 	public void Begin()
 	{
-		StartCoroutine( PlaceSnakes() );
+		PlaceSnakes();
 	}
 	
 	public void LoadTheme(int levelNum)
@@ -109,7 +109,6 @@ public class GameManager : MonoBehaviour
 
 		// Only place snakes once the map screenshot has been made.  So we pass a reference to the Begin method in here to be invoked when CreateScreenShot is done.
 		this.mazeController.CreateScreenshot(Begin);		
-		//Begin();
 	}
 	
 	private void SetTimers()
@@ -337,7 +336,7 @@ public class GameManager : MonoBehaviour
 		return snake;
 	}	
 	
-	private IEnumerator PlaceSnakes()
+	private void PlaceSnakes()
 	{
 		Managers.GameState.LevelState = LevelState.LevelStart;
 		
@@ -346,19 +345,19 @@ public class GameManager : MonoBehaviour
 		
 		// Remove one extra snake on initial placement
 		Managers.GameState.ExtraSnakes--;
-				
+		
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;
-		
-		yield return new WaitForSeconds(3.0f);		
-		
+				
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
 		{	
-			this.mazeController.PlaceSnake(enemySnakes[i], false);	
-			yield return new WaitForSeconds(5.0f);
-		}		
+			Snake enemySnake = enemySnakes[i];
+			Managers.GameClock.RegisterEvent(4.0f * i, 
+				() => this.mazeController.PlaceSnake(enemySnake, false)
+			);
+		}				
 	}
 	
 	private void FindPlayerSnake()
@@ -672,7 +671,7 @@ public class GameManager : MonoBehaviour
 		if (Managers.GameState.ExtraSnakes > 0)
 		{			
 			// Trigger post-death sequence
-			StartCoroutine(PlayerDeathSequence());
+			TriggerPlayerDeathSequence();
 		}
 		else if (this.GameOver != null)			
 		{
@@ -697,18 +696,20 @@ public class GameManager : MonoBehaviour
 		SetEggTimer(Side.Enemy);
 	}
 	
-	private IEnumerator PlayerDeathSequence()
+	private void TriggerPlayerDeathSequence()
 	{
-		yield return new WaitForSeconds(3.0f);
-				
-		// Remove any player egg.  Create enemy snake if egg exists.
-		
+		Managers.GameClock.RegisterEvent(3.0f,
+			() => PlayerDeathSequence() );
+	}
+	
+	private void PlayerDeathSequence ()
+	{
 		HandleEggsAfterPlayerDeath();
 		
 		ResetSnakes();
 		ResetFrog();
-				
-		StartCoroutine( PlaceSnakes() );
+		
+		PlaceSnakes();	
 	}
 	
 	private void HandleEggsAfterPlayerDeath()

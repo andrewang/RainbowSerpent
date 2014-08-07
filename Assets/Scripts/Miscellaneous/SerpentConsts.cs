@@ -206,6 +206,7 @@ public static class SerpentConsts
 		public const string Help = "HelpScene";
 		public const string Credits = "CreditsScene";		
 		public const string Main = "MainMenuScene";
+		public const string Options = "OptionsScene";
 	};
 	
 	#endregion Scene Names

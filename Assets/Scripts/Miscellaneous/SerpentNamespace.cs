@@ -14,7 +14,7 @@ namespace Serpent
 	
 	public enum LevelState
 	{
-		None,
+		None = 0,
 		LevelStart,
 		Playing,
 		LevelEnd
@@ -22,14 +22,14 @@ namespace Serpent
 	
 	public enum Side
 	{
-		Player,
+		Player = 0,
 		Enemy,
 		Frog,
 	}	
 	
 	public enum Difficulty
 	{
-		Easy,
+		Easy = 0,
 		Classic
 	}
 	

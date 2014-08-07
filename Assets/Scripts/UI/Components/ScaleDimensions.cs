@@ -9,6 +9,7 @@ public class ScaleDimensions : MonoBehaviour
 	
 	[SerializeField] private bool maintainProportionsScaledByWidth;
 	[SerializeField] private bool maintainProportionsScaledByHeight;
+	[SerializeField] private bool maintainProportionsScaledBySmaller;
 	
 	[SerializeField] private float baseWidth = 480;
 	[SerializeField] private float baseHeight = 800;
@@ -49,6 +50,12 @@ public class ScaleDimensions : MonoBehaviour
 		else if (this.maintainProportionsScaledByHeight)
 		{
 			this.widthScale = this.heightScale;
+		}
+		else if (this.maintainProportionsScaledBySmaller)
+		{
+			float smaller = Mathf.Min(this.widthScale, this.heightScale);
+			this.widthScale = smaller;
+			this.heightScale = smaller;
 		}
 		
 		Vector3 scale = this.transform.localScale;

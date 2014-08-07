@@ -22,4 +22,9 @@ public class MainMenuSceneController : RSSceneController
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Help);
 	}
 
+	private void OnOptionsPressed()
+	{
+		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Options);
+	}
+	
 }

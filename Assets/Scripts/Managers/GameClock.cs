@@ -1,8 +1,17 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+
+public class GameEvent
+{
+	public float ExecutionTime { get; set; }
+	public Action Action { get; set; }
+}
 
 public class GameClock : MonoBehaviour
 {
+	private List<GameEvent> eventQueue = new List<GameEvent>();
+	
 	private float time = 0.0f;
 	public float Time	
 	{
@@ -21,8 +30,60 @@ public class GameClock : MonoBehaviour
 		float deltaTime = UnityEngine.Time.deltaTime;
 		if (deltaTime > 0.1f) { deltaTime = 0.1f; }
 		this.time += deltaTime;
+		
+		CheckEventQueue();
 	}
 	
+	#region Event Queue
 	
+	public void RegisterEvent(float timeInFuture, Action action)
+	{
+		GameEvent newEvent = new GameEvent();
+		newEvent.ExecutionTime = this.time + timeInFuture;
+		newEvent.Action = action;	
+		InsertInEventQueue(newEvent);
+	}
+	
+	private void InsertInEventQueue(GameEvent newEvent)
+	{
+		// Insert the event by order of execution time
+		if (this.eventQueue.Count == 0)
+		{
+			this.eventQueue.Add(newEvent);
+			return;
+		}
+		
+		for (int index = 0; index < this.eventQueue.Count; ++index)
+		{
+			GameEvent existingEvent = this.eventQueue[index];
+			if (newEvent.ExecutionTime < existingEvent.ExecutionTime)
+			{
+				this.eventQueue.Insert(index, newEvent);
+				return;
+			}
+		}
+		
+		// Event occurs after all existing events
+		this.eventQueue.Add(newEvent);
+	}
+	
+	private void CheckEventQueue()
+	{
+		// A while loop is required in case there are multiple events triggered
+		// at the same time.	
+		while( this.eventQueue.Count > 0 )
+		{
+			GameEvent existingEvent = this.eventQueue[0];
+			if (existingEvent.ExecutionTime < this.time)
+			{
+				existingEvent.Action();
+				this.eventQueue.RemoveAt(0);
+				continue;
+			}
+			break;
+		}
+	}
+
+	#endregion Event Queue	
 }
 
