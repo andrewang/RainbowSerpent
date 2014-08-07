@@ -54,6 +54,7 @@ public class GameSceneController : RSSceneController
 	
 	override public void OnLoad()
 	{
+		Managers.GameClock.Reset();
 		this.gameManager.GameOver += this.GameOver;
 		LoadGameLevel(Managers.GameState.Level);
 	}

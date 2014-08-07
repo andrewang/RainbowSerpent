@@ -83,6 +83,12 @@ public class GameClock : MonoBehaviour
 			break;
 		}
 	}
+	
+	public void Reset()
+	{
+		this.eventQueue.Clear();
+		this.time = 0.0f;
+	}
 
 	#endregion Event Queue	
 }
