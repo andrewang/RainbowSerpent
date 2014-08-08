@@ -455,24 +455,6 @@ public class Snake : MobileCreature
 		}
 		
 		base.StartMoving(direction);
-		
-		/*
-		if (IsMotionBlocked( direction ))
-		{
-			return;
-		}
-		
-		// Make sure any door that needs to open, opens
-		OpenDoor( direction );
-	
-		// Note that we changed direction at this point
-		this.trail.AddPosition(this.head.transform.localPosition);
-				
-		this.head.CurrentDirection = direction;
-		this.CurrentDirection = direction;		
-		
-		UpdateDestination();
-		*/
 	}
 	
 	protected override void OpenDoor( Direction direction )

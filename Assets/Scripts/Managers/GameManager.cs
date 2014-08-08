@@ -93,7 +93,6 @@ public class GameManager : MonoBehaviour
 	public void Begin()
 	{
 		PlaceSnakes();
-		SetEggTimer(Side.Player);
 	}
 	
 	public void LoadTheme(int levelNum)
@@ -350,6 +349,9 @@ public class GameManager : MonoBehaviour
 		this.mazeController.PlaceSnake(this.playerSnake, true);
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;
+		
+		// Every time we place the player snake, reset the lay-egg timer.
+		SetEggTimer(Side.Player);
 				
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
