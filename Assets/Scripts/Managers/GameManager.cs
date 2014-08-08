@@ -93,6 +93,7 @@ public class GameManager : MonoBehaviour
 	public void Begin()
 	{
 		PlaceSnakes();
+		SetEggTimer(Side.Player);
 	}
 	
 	public void LoadTheme(int levelNum)
@@ -536,10 +537,12 @@ public class GameManager : MonoBehaviour
 			return;
 		}
 		this.eggTimers[(int)side] = Managers.GameClock.Time + SerpentConsts.GetEggLayingFrequency(side);				
+		Debug.Log("Egg timer for " + (int) side + " is " + this.eggTimers[(int)side]);
 	}
 	
 	private void ClearEggTimer(Side side)
 	{
+		Debug.Log("Egg timer for " + (int) side + " is cleared");
 		this.eggTimers[(int)side] = 0.0f;				
 	}
 	

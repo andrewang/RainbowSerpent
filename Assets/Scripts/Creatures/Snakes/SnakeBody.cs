@@ -43,7 +43,7 @@ public class SnakeBody : SnakeSegment
 		
 		// Make sure egg is displayed on top of the segment
 		egg.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-		egg.SetSpriteDepth(5);
+		egg.SetSpriteDepth(GetSpriteDepth() + 1);
 		
 		this.Egg = egg;
 		egg.FullyGrown += this.EggFullyGrown;
