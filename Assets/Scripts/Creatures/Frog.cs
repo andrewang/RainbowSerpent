@@ -5,14 +5,13 @@ using Serpent;
 
 public class Frog : MobileCreature
 {
-	const float				MovementDelay = 3.0f;
 	private float			currentMovementDelay;
 	private FrogController	frogController;
 	
 	public Frog()
 	{
-		this.Speed = 250.0f;
-		this.currentMovementDelay = Frog.MovementDelay;
+		this.Speed = SerpentConsts.FrogSpeed;
+		this.currentMovementDelay = SerpentConsts.FrogMovementDelay;
 	}
 	
 	public void SetUp(GameManager gameManager, MazeController mazeController)
@@ -61,7 +60,7 @@ public class Frog : MobileCreature
 	{
 		// TODO If the frog has moved off-screen then kill it.
 		
-		this.currentMovementDelay = Frog.MovementDelay;
+		this.currentMovementDelay = SerpentConsts.FrogMovementDelay;
 		this.CurrentDirection = Direction.None; // not currently moving but should we really be resetting direction?
 		
 		base.ArrivedAtDestination(remainingDisplacement);

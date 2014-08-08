@@ -179,7 +179,18 @@ public static class SerpentConsts
 	
 	public static float StartingSpeedMultiplier = 1.0f;
 	public static float SpeedIncreasePerLevel = 0.1f;
-	public static float ClassicSpeedMultiplier = 2.0f;
+	public static float ClassicSpeedMultiplier = 1.5f;
+	
+	public static float FrogSpeed = 250.0f;
+	public static float FrogMovementDelay = 3.0f;
+	
+	// player snake speed
+	// player snake speed penalty per segment
+	
+	// enemy snake speed
+	// enemy snake speed penalty per segment
+	
+	// How do these change on harder difficulties? -> bring them closer together.
 	
 	#endregion Speed
 	
