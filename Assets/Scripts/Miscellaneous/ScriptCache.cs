@@ -55,7 +55,7 @@ public class ScriptCache: MonoBehaviour
 		T test = o.GetComponent<T>();
 		if (test == null)
 		{
-			Debug.Log("Adding game object of wrong type to script cache!");
+			Debug.LogError("Adding game object of wrong type to script cache!");
 			return;
 		}
 	

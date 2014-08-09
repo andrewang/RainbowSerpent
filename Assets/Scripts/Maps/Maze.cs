@@ -65,7 +65,6 @@ public class Maze : MonoBehaviour
 		// Add border width to the width and height of the map in order to have room around the edge of the maze
 		width = width + SerpentConsts.BorderWidth * 2;
 		height = height + SerpentConsts.BorderWidth * 2;		
-		Debug.Log("Maze width " + width + " and height " + height);	
 		this.Width = width;
 		this.Height = height;
 
@@ -214,7 +213,6 @@ public class Maze : MonoBehaviour
 	{
 		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height) 
 		{
-			Debug.Log("Bad position given for wall");
 			return; 
 		}
 		
@@ -349,7 +347,6 @@ public class Maze : MonoBehaviour
 	{
 		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height || side == Direction.None) 
 		{
-			Debug.Log("Bad position given for door");
 			return null;
 		}
 		
@@ -363,7 +360,6 @@ public class Maze : MonoBehaviour
 	{
 		if (position.x < 0 || position.x >= this.Width || position.y < 0 || position.y >= this.Height)
 		{
-			Debug.Log("Bad position in SetupWallLinks!");
 			return;
 		}
 		

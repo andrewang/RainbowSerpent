@@ -326,7 +326,6 @@ public class Snake : MobileCreature
 			if (seg != this.head)
 			{
 				Managers.SnakeBodyCache.ReturnObject<SnakeBody>(seg.gameObject);
-				Debug.Log("Returned segment to snake body cache");
 			}
 			seg = nextSegment;
 			if (seg == null)
@@ -370,7 +369,6 @@ public class Snake : MobileCreature
 			if (seg != this.head)
 			{
 				Managers.SnakeBodyCache.ReturnObject<SnakeBody>(seg.gameObject);
-				Debug.Log("Returned segment to snake body cache");
 			}
 			seg = nextSegment;
 			if (seg == null)
@@ -407,7 +405,7 @@ public class Snake : MobileCreature
 		// to the Controller.
 		if (this.CurrentDirection != Direction.None)
 		{
-			UpdatePosition();			
+			UpdatePosition();
 		}
 		else
 		{
@@ -462,7 +460,7 @@ public class Snake : MobileCreature
 		this.MazeController.OpenDoor( GetPosition(), direction );
 	}
 	
-	protected override void CloseDoor()
+	protected override void CloseDoors()
 	{
 		SnakeSegment tail = this.Tail;
 		Direction tailDir = tail.CurrentDirection;
@@ -480,10 +478,6 @@ public class Snake : MobileCreature
 	
 	private Direction DetermineTailDirection()
 	{
-		if (this.head.NextSegment == null)
-		{
-			Debug.Log("Snake without a body!");
-		}
 		SnakeSegment previousSegment = this.head;
 		SnakeSegment segment = previousSegment.NextSegment;
  			while (segment.NextSegment != null)

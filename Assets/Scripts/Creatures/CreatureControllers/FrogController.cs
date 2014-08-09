@@ -106,13 +106,11 @@ public class FrogController : CreatureController
 		}
 		if (s.Head == null)
 		{
-			Debug.Log("Nearest snake to frog has no head!");
 			return false;
 		}
 		
 		if (this.frog == null)
 		{
-			Debug.Log ("Frog controller still executing but frog is gone!?!");
 			return false;
 		}
 		

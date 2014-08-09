@@ -377,7 +377,6 @@ public class GameManager : MonoBehaviour
 	{
 		// NOTE, now we've got this one and the one in maze controller.  This one is needed for spawning from eggs.
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
-		Debug.Log("Adding snake at (" + x + "," + y + "): " + position.x + "," + position.y);
 		snake.SetInitialLocation(position, direction, justHatched);
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);		
@@ -539,12 +538,10 @@ public class GameManager : MonoBehaviour
 			return;
 		}
 		this.eggTimers[(int)side] = Managers.GameClock.Time + SerpentConsts.GetEggLayingFrequency(side);				
-		Debug.Log("Egg timer for " + (int) side + " is " + this.eggTimers[(int)side]);
 	}
 	
 	private void ClearEggTimer(Side side)
 	{
-		Debug.Log("Egg timer for " + (int) side + " is cleared");
 		this.eggTimers[(int)side] = 0.0f;				
 	}
 	
@@ -564,9 +561,7 @@ public class GameManager : MonoBehaviour
 	}
 	
 	private void EggFullyGrown( Egg egg )
-	{			
-		Debug.Log("GameManager EggFullyGrown executed");
-		
+	{					
 		egg.SetParent( this.mazeController );
 	}
 	
@@ -594,7 +589,6 @@ public class GameManager : MonoBehaviour
 	
 	private void EggDied(Creature creature)
 	{
-		Debug.Log("EggDied called");
 		Egg e = creature as Egg;
 		if (e == null) { return; }
 		

@@ -151,18 +151,7 @@ public class Egg : Creature
 		}
 		
 		float newDisplacement = this.shakingDisplacement * -1;
-		/*
-		if (newDisplacement > 0)
-		{
-			newDisplacement += this.shakingDisplacementStep;
-		}
-		else
-		{
-			newDisplacement -= this.shakingDisplacementStep;
-		}
-		*/
 		this.shakingDisplacement = newDisplacement;
-		Debug.Log("Shaking displacement is " + this.shakingDisplacement);		
 		
 		this.shakingStepTime *= 0.95f;
 

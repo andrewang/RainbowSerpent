@@ -54,11 +54,8 @@ public class SnakeBody : SnakeSegment
 		// Check for null in case of conflict between timer and snake+egg death.
 		if (this.Egg == null) 
 		{ 
-			Debug.Log("SnakeBody EggFullyGrown aborted for no egg pointer");			
 			return; 
 		}
-
-		Debug.Log("SnakeBody EggFullyGrown executed");
 		
 		// set the depth of the egg sprite so that the egg is just below this snake.
 		this.Egg.SetSpriteDepth( this.sprite.depth - 1 ); 
