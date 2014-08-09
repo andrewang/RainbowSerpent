@@ -5,7 +5,7 @@ using Serpent;
 
 public static class SerpentConsts
 {
-	public const string Version = "0.3.0";
+	public const string Version = "0.3.1";
 	
 	#region Level Data Keys
 	
