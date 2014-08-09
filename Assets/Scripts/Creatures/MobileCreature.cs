@@ -51,6 +51,9 @@ public class MobileCreature : Creature
 		if (this.CurrentDirection != Direction.None)
 		{
 			UpdatePosition();			
+			
+			// Close any door that can now be closed.
+			CloseDoors();
 		}
 	}
 	
@@ -99,6 +102,7 @@ public class MobileCreature : Creature
 		if (newDirection == Direction.None) 
 		{ 
 			this.CurrentDirection = Direction.None;
+			CloseDoors();			
 			return; 
 		}
 		
@@ -114,6 +118,7 @@ public class MobileCreature : Creature
 		{
 			// stop moving
 			this.CurrentDirection = Direction.None;
+			CloseDoors();			
 			return;
 		}
 		
@@ -130,8 +135,7 @@ public class MobileCreature : Creature
 		float dummyOutput = 0.0f;
 		MoveForward( remainingDisplacement, out dummyOutput );
 		
-		// Close any door that can now be closed.
-		CloseDoor();		
+		CloseDoors();
 	}	
 	
 	public virtual void StartMoving(Direction direction)
@@ -175,7 +179,7 @@ public class MobileCreature : Creature
 		// by default creatures don't open doors
 	}
 	
-	protected virtual void CloseDoor()
+	protected virtual void CloseDoors()
 	{
 		// by default creatures don't close doors
 	}
