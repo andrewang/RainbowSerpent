@@ -129,7 +129,6 @@ public class Egg : Creature
 		{
 			this.shakeTween.enabled = false;
 		}
-		Debug.Log("Egg Die called");
 		
 		// eggs are totally destroyed on death
 		base.Die();

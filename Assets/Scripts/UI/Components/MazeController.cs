@@ -541,7 +541,6 @@ public class MazeController : MonoBehaviour
 		}
 		
 		Vector3 position = this.GetCellCentre(cellPosition.x, cellPosition.y);
-		Debug.Log("Adding snake at (" + cellPosition.x + "," + cellPosition.y + "): " + position.x + "," + position.y);
 		snake.SetInitialLocation(position, direction);
 		snake.Visible = true;
 		snake.Controller.StartMoving(direction);		
