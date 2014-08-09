@@ -47,6 +47,7 @@ public class Snake : MobileCreature
 	{
 		get
 		{
+			if (this.head == null) { return null; }
 			SnakeSegment segment = this.head;
 			while (segment.NextSegment != null)
 			{
@@ -92,6 +93,11 @@ public class Snake : MobileCreature
 		
 		this.trail = new SnakeTrail();
 		
+		if (config.Player)
+		{
+			this.Side = Side.Player;
+		}
+		
 		this.config = config;
 		this.initialNumSegments = numSegments;
 		for (int i = 0; i < numSegments; ++i)
@@ -129,7 +135,6 @@ public class Snake : MobileCreature
 		int numSegments = this.NumSegments;
 		for (int i = numSegments; i < this.initialNumSegments; ++i)	
 		{
-			Debug.Log ("Adding snake segment to " + this);
 			AddSegment();
 		}
 		// Make sure the head's gameObject is active
@@ -142,12 +147,28 @@ public class Snake : MobileCreature
 	{
 		base.Die();
 	}
-	
-	
-	private void UpdateSpeed()
+		
+	public void UpdateSpeed()
 	{
-		// Should level factor into this?
-		this.Speed = this.config.BaseSpeed - this.config.SpeedPenaltyPerSegment * this.NumSegments;
+		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		float baseSpeed = 0.0f;
+		float penaltyPerSegment = 0.0f;
+		if (this.Side == Side.Player)
+		{
+			baseSpeed = difficulty.BasePlayerSpeed;
+			penaltyPerSegment = difficulty.PlayerSegmentSlowdown;
+		}
+		else
+		{
+			baseSpeed = difficulty.BaseEnemySpeed;
+			penaltyPerSegment = difficulty.EnemySegmentSlowdown;
+		}
+	
+		this.Speed = baseSpeed - penaltyPerSegment * this.NumSegments;
+		if (Managers.GameState.LevelState == LevelState.LevelEnd)
+		{
+			this.Speed *= 2.0f;
+		}
 	}
 	
 	public override void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)
@@ -335,13 +356,6 @@ public class Snake : MobileCreature
 			nextSegment = seg.NextSegment;
 		} while ( true );
 		
-		/*
-		if (this.Controller is PlayerSnakeController)
-				{
-					Managers.GameState.Score += SerpentConsts.ScoreForEatingSegment;
-				}
-		*/
-
 		if ( this.SnakeSegmentsChanged != null )
 		{
 			this.SnakeSegmentsChanged( this );
@@ -463,6 +477,8 @@ public class Snake : MobileCreature
 	protected override void CloseDoors()
 	{
 		SnakeSegment tail = this.Tail;
+		if (tail == null) { return; }
+		
 		Direction tailDir = tail.CurrentDirection;
 		if (tailDir == Direction.None)
 		{

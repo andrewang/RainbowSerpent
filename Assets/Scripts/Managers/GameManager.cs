@@ -78,6 +78,8 @@ public class GameManager : MonoBehaviour
 	
 	public void Setup(int rawLevelNum)
 	{
+		Managers.GameState.LevelState = LevelState.LevelStart;
+		
 		int levelNum = ((rawLevelNum - 1) % Managers.GameState.NumLevels) + 1;
 		int themeNum = ((rawLevelNum - 1) % Managers.GameState.NumThemes) + 1;
 		
@@ -256,7 +258,8 @@ public class GameManager : MonoBehaviour
 		Managers.GameState.LevelState = LevelState.LevelEnd;			
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		if (psc == null) { return; }
-		psc.PlayerControlled = false;		
+		psc.PlayerControlled = false;
+		this.playerSnake.UpdateSpeed();		
 	}
 	
 	private void UpdateFrog()
@@ -297,7 +300,6 @@ public class GameManager : MonoBehaviour
 		// Player snake is added to array and also assigned to direct pointer.
 		Snake s = CreateSnake(this.playerSnakeConf, length);
 		s.SetSpriteDepth(10);
-		s.Side = Side.Player;
 		s.CreatureDied += PlayerSnakeDied;
 		this.snakes.Add( s );
 
@@ -338,6 +340,7 @@ public class GameManager : MonoBehaviour
 	
 	private void PlaceSnakes()
 	{
+		// Reset state to level start since the player is respawning.
 		Managers.GameState.LevelState = LevelState.LevelStart;
 		
 		// For a subsequent level, in case playersnake has been cleared, reattach it.
