@@ -20,7 +20,7 @@ public class ScreenShotTaker : MonoBehaviour
 		// This yield is necessary to make sure that it is safe to read the screen buffer.
 		yield return new WaitForEndOfFrame();
 		
-		Texture2D tex = new Texture2D(width, height);
+		Texture2D tex = new Texture2D(width, height, TextureFormat.ARGB32, false);		
 		tex.ReadPixels(new Rect(leftX, bottomY, width, height), 0, 0);
 		tex.Apply();
 		
