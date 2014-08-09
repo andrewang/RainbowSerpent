@@ -1,11 +1,15 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using Serpent;
 
 public class Egg : Creature
 {	
 	public event Action<Egg> FullyGrown;
 	public event Action<Egg> Hatched;
+	
+	private float growingDuration;
+	private float hatchingDuration;
 	
 	private float grownTime;
 	private float hatchingTime;
@@ -26,19 +30,49 @@ public class Egg : Creature
 		this.hasShakingBegun = false;
 	}
 	
-	void Start()
+	public void Setup()
 	{
-		this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;		
+		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		if (this.Side == Side.Player)
+		{
+			this.growingDuration = difficulty.PlayerEggCreationTime;
+			this.hatchingDuration = 0.0f; // hatches at end of level
+			StartGrowing();
+		}
+		else
+		{
+			this.growingDuration = difficulty.EnemyEggCreationTime;
+			this.hatchingDuration = difficulty.EnemyEggHatchingTime;
+			StartGrowing();
+			SetHatchingTime();
+		}
+	}
+	
+	public void StartGrowing()
+	{
+		SetGrownTime();
 		Grow();
 	}
 	
-	public void SetHatchingTime(float hatchingTime)
+	private void SetGrownTime()
+	{
+		if (this.Side == Side.Player)
+		{
+			this.grownTime = Managers.GameClock.Time + this.growingDuration;
+		}
+		else
+		{
+			this.grownTime = Managers.GameClock.Time + this.growingDuration;				
+		}
+	}
+	
+	public void SetHatchingTime()
 	{
 		if (this.grownTime == 0.0f)
 		{
-			this.grownTime = Managers.GameClock.Time + SerpentConsts.TimeToLayEgg;
+			SetGrownTime();
 		}
-		this.hatchingTime = this.grownTime + hatchingTime;
+		this.hatchingTime = this.grownTime + this.hatchingDuration;
 		this.shouldHatch = true;		
 	}
 	
@@ -56,7 +90,7 @@ public class Egg : Creature
 		// Begin animation of scaling up
 		this.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 		Vector3 finalScale = new Vector3(1.0f, 1.0f, 1.0f);
-		TweenScale scaleTween = TweenScale.Begin(this.gameObject, SerpentConsts.TimeToLayEgg, finalScale);
+		TweenScale scaleTween = TweenScale.Begin(this.gameObject, this.growingDuration, finalScale);
 		
 		EventDelegate tweenFinished = new EventDelegate(this, "ScaledUp");
 		scaleTween.onFinished.Add ( tweenFinished );

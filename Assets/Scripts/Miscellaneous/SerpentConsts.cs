@@ -119,28 +119,10 @@ public static class SerpentConsts
 	#endregion Direction-related
 	
 	#region Eggs
-	
-	public static float PlayerEggFrequency = 60.0f;
-	public static float EnemyEggFrequency = 10.0f;
-	public static float TimeToLayEgg = 10.0f;
-	public static float EnemyEggHatchingTime = 20.0f;
+		
 	public static float EggShakeDuration = 2.0f;
 	public static int EggNumShakes = 15;
 	public static float EggShakeDisplacement = 1.5f;
-	
-	public static float FrogRespawnDelay = 10.0f;
-	
-	public static float GetEggLayingFrequency( Side side )
-	{
-		if (side == Side.Player)
-		{
-			return PlayerEggFrequency;
-		}
-		else
-		{
-			return EnemyEggFrequency;
-		}
-	}
 	
 	#endregion Eggs
 	
@@ -174,25 +156,6 @@ public static class SerpentConsts
 	public static int ScoreForEatingFrogOrEgg = 50;
 	
 	#endregion Score
-	
-	#region Speed
-	
-	public static float StartingSpeedMultiplier = 1.0f;
-	public static float SpeedIncreasePerLevel = 0.1f;
-	public static float ClassicSpeedMultiplier = 1.5f;
-	
-	public static float FrogSpeed = 250.0f;
-	public static float FrogMovementDelay = 3.0f;
-	
-	// player snake speed
-	// player snake speed penalty per segment
-	
-	// enemy snake speed
-	// enemy snake speed penalty per segment
-	
-	// How do these change on harder difficulties? -> bring them closer together.
-	
-	#endregion Speed
 	
 	#region Player Snake Colours
 		

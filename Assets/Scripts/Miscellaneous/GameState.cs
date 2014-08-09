@@ -115,11 +115,9 @@ public class GameState
 	
 	public void RecalculateSpeed()
 	{
-		this.gameSpeed = SerpentConsts.StartingSpeedMultiplier + SerpentConsts.SpeedIncreasePerLevel * (this.level - 1);
-		if (this.difficulty == Difficulty.Classic)
-		{
-			this.gameSpeed *= SerpentConsts.ClassicSpeedMultiplier;
-		}
+		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+	
+		this.gameSpeed = difficulty.GameSpeedMultiplier + difficulty.GameSpeedIncreasePerLevel * (this.level - 1);
 	}
 	
 	// TODO move this code out of GameState

@@ -5,20 +5,22 @@ using Serpent;
 
 public class Frog : MobileCreature
 {
-	private float			currentMovementDelay;
+	private float			jumpingDelay;
+	private float			currentJumpingDelay;
 	private FrogController	frogController;
 	
-	public Frog()
+	public void Start()
 	{
-		this.Speed = SerpentConsts.FrogSpeed;
-		this.currentMovementDelay = SerpentConsts.FrogMovementDelay;
+		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		this.Speed = difficulty.FrogJumpingSpeed;
+		this.jumpingDelay = difficulty.FrogJumpingDelay;
+		this.currentJumpingDelay = this.jumpingDelay;
 	}
 	
 	public void SetUp(GameManager gameManager, MazeController mazeController)
-	{
+	{	
 		base.SetUp(mazeController);
 		
-		//this.Visible = false;
 		this.Dead = false;
 
 		this.frogController = new FrogController(this, gameManager, mazeController);		
@@ -28,13 +30,13 @@ public class Frog : MobileCreature
 	public override void Update()
 	{
 		// Decrement movement delay and don't move if the delay hasn't expired
-		if (this.currentMovementDelay > 0.0f)
+		if (this.currentJumpingDelay > 0.0f)
 		{
 			float delta = RealTime.deltaTime;
 			if (delta > 0.1f) { delta = 0.1f; }
 			
-			this.currentMovementDelay -= delta;
-			if (this.currentMovementDelay > 0.0f)
+			this.currentJumpingDelay -= delta;
+			if (this.currentJumpingDelay > 0.0f)
 			{
 				return;
 			}
@@ -60,7 +62,7 @@ public class Frog : MobileCreature
 	{
 		// TODO If the frog has moved off-screen then kill it.
 		
-		this.currentMovementDelay = SerpentConsts.FrogMovementDelay;
+		this.currentJumpingDelay = this.jumpingDelay;
 		this.CurrentDirection = Direction.None; // not currently moving but should we really be resetting direction?
 		
 		base.ArrivedAtDestination(remainingDisplacement);

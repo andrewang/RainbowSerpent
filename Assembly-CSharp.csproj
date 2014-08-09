@@ -145,6 +145,7 @@
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeHead.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeSegment.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeTrail.cs" />
+     <Compile Include="Assets\Scripts\Managers\DifficultyManager.cs" />
      <Compile Include="Assets\Scripts\Managers\GameClock.cs" />
      <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
      <Compile Include="Assets\Scripts\Managers\Managers.cs" />
@@ -154,6 +155,7 @@
      <Compile Include="Assets\Scripts\Maps\Maze.cs" />
      <Compile Include="Assets\Scripts\Maps\MazeCell.cs" />
      <Compile Include="Assets\Scripts\Maps\Wall.cs" />
+     <Compile Include="Assets\Scripts\Miscellaneous\DifficultySettings.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\GameState.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\IntVector2.cs" />
      <Compile Include="Assets\Scripts\Miscellaneous\MiniJSON.cs" />

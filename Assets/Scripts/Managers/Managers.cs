@@ -15,6 +15,9 @@ public class Managers : MonoBehaviour
 	public static ScriptCache SnakeBodyCache;
 	[SerializeField] GameObject snakeBodyCachePrefab = null;
 	
+	public static DifficultyManager DifficultyManager;
+	[SerializeField] GameObject difficultyManagerPrefab = null;
+	
 	public static GameState GameState;
 	
 	void Start()
@@ -30,6 +33,9 @@ public class Managers : MonoBehaviour
 		
 		GameObject snakeBodyCacheInst = InstantiateManager(this.snakeBodyCachePrefab);
 		Managers.SnakeBodyCache = snakeBodyCacheInst.GetComponent<ScriptCache>();
+		
+		GameObject difficultyManagerInst = InstantiateManager(this.difficultyManagerPrefab);
+		Managers.DifficultyManager = difficultyManagerInst.GetComponent<DifficultyManager>();
 		
 		Managers.GameState = new GameState();
 	}

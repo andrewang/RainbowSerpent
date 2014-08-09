@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
 	private Egg[] eggs = new Egg[2];
 	private float[] eggTimers = new float[2];
 	
-	private Frog frog;
+	private Frog frog = null;
 	private float frogTimer;
 	
 	private LevelTheme theme;
@@ -436,7 +436,8 @@ public class GameManager : MonoBehaviour
 	
 	private void SetFrogTimer()
 	{
-		this.frogTimer = Managers.GameClock.Time + SerpentConsts.FrogRespawnDelay;
+		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		this.frogTimer = Managers.GameClock.Time + difficulty.FrogRespawnDelay;
 	}
 	
 	private void ClearFrogTimer()
@@ -517,13 +518,8 @@ public class GameManager : MonoBehaviour
 			int i = UnityEngine.Random.Range( 0, qualifiedSnakes.Count );
 			Snake snake = qualifiedSnakes[i];
 			Egg e = CreateEgg(snake);
-			SetEgg( side, e );		
-			
-			// Enemy snakes have a timed hatching period, while player snakes hatch at the end of the level.
-			if (side == Side.Enemy)
-			{
-				e.SetHatchingTime( SerpentConsts.EnemyEggHatchingTime );			                
-			}
+			SetEgg( side, e );
+			e.Setup();
 			
 			ClearEggTimer(side);
 		}		
@@ -537,7 +533,16 @@ public class GameManager : MonoBehaviour
 			// already set, don't delay it any further
 			return;
 		}
-		this.eggTimers[(int)side] = Managers.GameClock.Time + SerpentConsts.GetEggLayingFrequency(side);				
+		
+		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		if (side == Side.Player)
+		{
+			this.eggTimers[(int)side] = Managers.GameClock.Time + difficulty.PlayerEggLayingDelay;
+		}
+		else
+		{
+			this.eggTimers[(int)side] = Managers.GameClock.Time + difficulty.EnemyEggLayingDelay;
+		}
 	}
 	
 	private void ClearEggTimer(Side side)
