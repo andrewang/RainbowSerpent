@@ -58,7 +58,9 @@ public class ScreenShotFileManager : MonoBehaviour
 		byte[] byteArray = File.ReadAllBytes(path);
 		
 		// The texture will be resized by reading it in.
-		Texture2D screenShotTexture = new Texture2D(4, 4);
+		// Make sure not to create any mipmaps - this created fuzziness (low resolution)
+		// in the simulator!
+		Texture2D screenShotTexture = new Texture2D(4, 4, TextureFormat.ARGB32, false);
 		screenShotTexture.LoadImage(byteArray);
 		return screenShotTexture;
 	}
