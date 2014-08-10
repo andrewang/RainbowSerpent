@@ -15,7 +15,7 @@ public class SnakeTrail
 			this.Position = pos;
 		}
 	}
-
+ 
 	private List<SnakePosition> positions; 
 	public List<SnakePosition> Positions
 	{
@@ -109,18 +109,25 @@ public class SnakeTrail
 	}
 	
 	// Loop through all segments and set their positions.
-	public void PositionSegments( SnakeHead head )
+	public void PositionSegments( SnakeHead head, float sinusoidalAnimationFrame )
 	{
 		int positionIndex = 0;
 		SnakeBody bodySegment = head.NextSegment;
 		while( bodySegment != null )
 		{
-			positionIndex = SetSegmentPositionAndRotation( bodySegment, positionIndex );
+			positionIndex = SetSegmentPositionAndRotation( bodySegment, positionIndex, sinusoidalAnimationFrame );
 			bodySegment = bodySegment.NextSegment;
+			
+			// each segment is one frame behind the one in front.
+			sinusoidalAnimationFrame -= 1.0f;
+			if (sinusoidalAnimationFrame < 0.0f)
+			{
+				sinusoidalAnimationFrame += (float) SerpentConsts.SinusoidalPosition.Length;
+			}
 		}
 	}
 	
-	private int SetSegmentPositionAndRotation( SnakeBody bodySegment, int startingIndex )
+	private int SetSegmentPositionAndRotation( SnakeBody bodySegment, int startingIndex, float sinusoidalAnimationFrame )
 	{
 		// get the last position index in the trail, prior to the location of the specified body segment 
 		int indexBefore = GetPositionIndexBefore( bodySegment.DistanceFromHead, startingIndex );
@@ -144,11 +151,36 @@ public class SnakeTrail
 		}
 		
 		SnakePosition posBefore = this.positions[indexBefore];
-		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (bodySegment.DistanceFromHead - posBefore.DistanceFromHead);
-		bodySegment.transform.localPosition = posBefore.Position + displacement;
-		
 		SetSegmentRotation( bodySegment, posBefore );
+		
+		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (bodySegment.DistanceFromHead - posBefore.DistanceFromHead);
+		float sinusoidalMultiplier = GetSinusoidalPositionMultiplier(sinusoidalAnimationFrame);
+		Vector3 newPos = GetSinusoidalPosition(sinusoidalMultiplier, bodySegment, posBefore.Position + displacement, posBefore.UnitVectorToPreviousPosition);
+		bodySegment.transform.localPosition = newPos;
+		
 		return indexBefore;
+	}
+	
+	private float GetSinusoidalPositionMultiplier(float sinusoidalAnimationFrame)
+	{
+		float wholePart = Mathf.Floor(sinusoidalAnimationFrame);
+		float fractionalPart = sinusoidalAnimationFrame - wholePart;
+		int index = (int)wholePart;
+		float firstValue = SerpentConsts.SinusoidalPosition[index];
+		int secondIndex = (index + 1) % SerpentConsts.SinusoidalPosition.Length;
+		float secondValue = SerpentConsts.SinusoidalPosition[secondIndex];
+		
+		float finalValue = firstValue + (secondValue - firstValue) * fractionalPart;
+		return finalValue;
+	}
+	
+	private Vector3 GetSinusoidalPosition(float sinusoidalMultiplier, SnakeSegment bodySegment, Vector3 basePosition, Vector3 unitVectorToPrevious)
+	{
+		Direction currentDirection = bodySegment.CurrentDirection;
+		int intRightAngleDirection = ((int)currentDirection + 1) % (int)Direction.Count;
+		Vector3 rightAngleUnitVector = SerpentConsts.DirectionVector3[ intRightAngleDirection ];
+		basePosition = basePosition + rightAngleUnitVector * sinusoidalMultiplier;
+		return basePosition;
 	}
 	
 	private void SetSegmentRotation( SnakeSegment bodySegment, SnakePosition position )

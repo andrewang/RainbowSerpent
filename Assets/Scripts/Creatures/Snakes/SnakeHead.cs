@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class SnakeHead : SnakeSegment
-{
+{	
 	/// <summary>
 	/// Updates the position of the head
 	/// </summary>

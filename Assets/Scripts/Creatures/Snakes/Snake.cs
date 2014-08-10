@@ -76,6 +76,9 @@ public class Snake : MobileCreature
 	public event Action<Snake> SnakeSegmentsChanged = null;
 	public event Action<Side, Vector3> SnakeSegmentEaten = null;
 	
+	// This sinusoidalAnimationFrame is tracked here so we have one value tracked for the snake
+	private float sinusoidalAnimationFrame;
+	
 	protected override Vector3 GetPosition()	
 	{
 		return this.head.transform.localPosition;
@@ -414,11 +417,17 @@ public class Snake : MobileCreature
 		{
 			return; 
 		}
-		
+			
 		// Update position of head based on speed and direction.  When we reach the centre of a tile, make a callback
 		// to the Controller.
 		if (this.CurrentDirection != Direction.None)
 		{
+			// Moving so update animation of side to side.D
+			this.sinusoidalAnimationFrame += Time.smoothDeltaTime * SerpentConsts.SinusoidalFPS;
+			if (this.sinusoidalAnimationFrame > (float) SerpentConsts.SinusoidalPosition.Length)
+			{
+				this.sinusoidalAnimationFrame -= SerpentConsts.SinusoidalPosition.Length;
+			}
 			UpdatePosition();
 		}
 		else
@@ -445,7 +454,7 @@ public class Snake : MobileCreature
 	
 	private void PositionBodySegments()
 	{
-		this.trail.PositionSegments( this.head );
+		this.trail.PositionSegments( this.head, this.sinusoidalAnimationFrame );
 	}
 	
 	#endregion Update

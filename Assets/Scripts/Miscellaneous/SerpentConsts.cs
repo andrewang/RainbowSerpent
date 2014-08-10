@@ -103,6 +103,15 @@ public static class SerpentConsts
 		Direction.None		
 	};
 	
+	public static float[] SinusoidalPosition = new float[]
+	{
+		0f,
+		2.0f,
+		0f,
+		-2.0f,
+	};
+	public static float SinusoidalFPS = 2.0f;
+	
 	public static Direction GetDirectionForVector( Vector3 v )
 	{
 		for(int i = 0; i < SerpentConsts.DirectionVector3.Length; ++i)
