@@ -39,6 +39,32 @@ public class CreatureController
 		List<Direction> availableDirections = cell.UnblockedDirections;		
 		return availableDirections;
 	}
+	
+	protected Direction GetBestDirection(int currX, int currY, int targetX, int targetY)
+	{
+		int diffX = Math.Abs(targetX - currX);
+		int diffY = Math.Abs(targetY - currY);
+		if (diffX > diffY)
+		{
+			return GetBestXDirection(currX, targetX);
+		}
+		else if (diffX < diffY)
+		{
+			return GetBestYDirection(currY, targetY);
+		}
+		else
+		{
+			// random selection
+			if (UnityEngine.Random.Range(0, 2) == 0)
+			{
+				return GetBestXDirection(currX, targetX);				
+			}
+			else
+			{
+				return GetBestYDirection(currY, targetY);				
+			}
+		}
+	}
 		
 	protected Direction GetBestYDirection(int currY, int targetY)
 	{

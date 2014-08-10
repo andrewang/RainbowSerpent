@@ -160,8 +160,6 @@ public class PlayerSnakeController : SnakeController
 		List<Direction> availableDirections = GetAvailableDirections();
 		availableDirections.Remove(oppositeDirection);
 		
-		// TODO REFACTOR, THIS IS CLUNKY!
-
 		// Handle no-turn situations.		
 		if (availableDirections.Count == 0) 
 		{
@@ -172,49 +170,73 @@ public class PlayerSnakeController : SnakeController
 			return availableDirections[0];
 		}
 		
-		// We're at an intersection with a chioce.
-				
-		Direction bestYDir = GetBestYDirection(headMazeCell.Y, targetPos.y);
-		Direction bestXDir = GetBestXDirection(headMazeCell.X, targetPos.x);
+		return DecideAtIntersection(targetPos, availableDirections);
+	}
+	
+	private Direction DecideAtIntersection(IntVector2 targetPos, List<Direction> availableDirections)
+	{
+		MazeCell headMazeCell = GetCellForHeadPosition();
 		
-		Direction bestDir;
-		Direction secondBestDir;
+		Direction[] prioritizedDirections = new Direction[(int)Direction.Count];
 		
-		// Figure out our preferred and second-preferred directions
-		if (bestYDir == Direction.None)
+		// We're at an intersection with a choice.
+		Direction bestDirection = GetBestDirection(headMazeCell.X, headMazeCell.Y, targetPos.x, targetPos.y);
+		Direction worstDirection = SerpentConsts.OppositeDirection[ (int)bestDirection ];
+		
+		prioritizedDirections[0] = bestDirection;
+		prioritizedDirections[(int)(Direction.Count - 1)] = worstDirection;
+		
+		// Look at the axis which isn't equal to best now, and fill in indexes 1 and 2
+		if (bestDirection == Direction.N || bestDirection == Direction.S)
 		{
-			// Can't turn towards where we want to go on the Y axis, so take the X-axis direction.
-			bestDir = bestXDir;
-			secondBestDir = bestYDir;
+			// W/E
+			Direction bestXDir = GetBestXDirection(headMazeCell.X, targetPos.x);
+			if (bestXDir == Direction.None)
+			{
+				// X values are equal, so do a random selection
+				int random = UnityEngine.Random.Range(0,2);
+				if (random == 0)
+				{
+					bestXDir = Direction.W;
+				}
+				else
+				{
+					bestXDir = Direction.E;
+				}
+			}
+			prioritizedDirections[1] = bestXDir;
+			prioritizedDirections[2] = SerpentConsts.OppositeDirection[ (int)bestXDir ];
 		}
-		else if (bestXDir == Direction.None)
-		{
-			// Can't turn towards where we want to go on the X axis, so take the Y-axis direction.
-			bestDir = bestYDir;
-			secondBestDir = bestXDir;
-		}		
-		// Prefer x choice over y, if both are available.  This assumes there's a clear path along the
-		// leftmost column to the player start (so it's sort of cheating?)
 		else
 		{
-			bestDir = bestXDir;
-			secondBestDir = bestYDir;
+			// N/S
+			Direction bestYDir = GetBestYDirection(headMazeCell.Y, targetPos.y);
+			if (bestYDir == Direction.None)
+			{
+				// Y values are equal, so do a random selection
+				int random = UnityEngine.Random.Range(0,2);
+				if (random == 0)
+				{
+					bestYDir = Direction.N;
+				}
+				else
+				{
+					bestYDir = Direction.S;
+				}
+			}
+			prioritizedDirections[1] = bestYDir;
+			prioritizedDirections[2] = SerpentConsts.OppositeDirection[ (int)bestYDir ];
 		}
-			
-		if (availableDirections.Contains(bestDir))
+		
+		for (int index = 0; index < prioritizedDirections.Length; ++index)
 		{
-			return bestDir;
+			if (availableDirections.Contains(prioritizedDirections[index]))
+			{
+				return prioritizedDirections[index];
+			}
 		}
-		else if (secondBestDir != Direction.None && availableDirections.Contains(secondBestDir))
-		{
-			return secondBestDir;
-		}
-		else
-		{
-			// pick something at random...
-			int randomIndex = UnityEngine.Random.Range(0, availableDirections.Count);			
-			return availableDirections[randomIndex];
-		}
+		
+		return Direction.None;
 	}
 	
 	private MazeCell GetCellForHeadPosition()
