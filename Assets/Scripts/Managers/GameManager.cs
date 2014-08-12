@@ -83,6 +83,16 @@ public class GameManager : MonoBehaviour
 		int levelNum = ((rawLevelNum - 1) % Managers.GameState.NumLevels) + 1;
 		int themeNum = ((rawLevelNum - 1) % Managers.GameState.NumThemes) + 1;
 		
+		// New rule for casual: only have 1 snake per level until that value equals MaxNumEnemySnakes.
+		if (Managers.GameState.Difficulty == Difficulty.Easy)
+		{
+			this.maxNumEnemySnakes = Math.Min(levelNum, SerpentConsts.MaxNumEnemySnakes);
+		}
+		else
+		{
+			this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
+		}
+		
 		LoadTheme(themeNum);
 		
 		// NOTE: snakes need to be created before input can be configured.  So snakes need to be created here.
@@ -286,9 +296,7 @@ public class GameManager : MonoBehaviour
 		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();		
 		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
 		
-		//this.enemySnakeConfig = this.theme.EnemySnakeConfig;
 		this.enemySnakeConf = this.theme.EnemySnakeConfig;
-		this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
 		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
 		{
 			CreateEnemySnake(SerpentConsts.EnemySnakeLength);
