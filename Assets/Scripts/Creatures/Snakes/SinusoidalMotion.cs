@@ -5,7 +5,6 @@ using Serpent;
 public class SinusoidalMotion
 {
 	private SnakeTrail trail;
-	private MazeController mazeController;
 	
 	// These rotations have to be filled in based on the maximum of sideways displacement and the speed of the snake.
 	private Vector3[] sinusoidalRotation = new Vector3[]
@@ -16,31 +15,23 @@ public class SinusoidalMotion
 		new Vector3( 0, 0, 0.0f ),
 	};
 	
-	public SinusoidalMotion(SnakeTrail trail, MazeController mazeController)
+	public SinusoidalMotion(SnakeTrail trail)
 	{
 		// to handle curves, we want access to all the trail data.
 		this.trail = trail;
-		this.mazeController = mazeController;
 	}
 	
 	// Loop through all segments and set their positions.
-	public void PositionSegments( Snake snake, float sinusoidalAnimationFrame )
+	public void PositionSegments( Snake snake )
 	{		
 		SnakeHead head = snake.Head;
 		float speed = snake.Speed;
 		
-		SetSegmentSinusoidalPosition(head, head.transform.localPosition, speed, sinusoidalAnimationFrame);
+		SetSegmentSinusoidalPosition(head, head.transform.localPosition, speed);
 		SnakeSegment bodySegment = head.NextSegment;
 		while (bodySegment != null)
 		{
-			// each segment is one frame behind the one in front.
-			sinusoidalAnimationFrame -= 1.0f;
-			if (sinusoidalAnimationFrame < 0.0f)
-			{
-				sinusoidalAnimationFrame += (float) SerpentConsts.SinusoidalPosition.Length;
-			}
-			
-			SetSegmentSinusoidalPosition(bodySegment, bodySegment.transform.localPosition, speed, sinusoidalAnimationFrame);	
+			SetSegmentSinusoidalPosition(bodySegment, bodySegment.transform.localPosition, speed);	
 			bodySegment = bodySegment.NextSegment;			
 		}
 	}	
@@ -66,14 +57,13 @@ public class SinusoidalMotion
 		this.sinusoidalRotation[2].z = exteriorAngleInDegrees;
 	}
 	
-	private void SetSegmentSinusoidalPosition(SnakeSegment segment, Vector3 basePosition, float snakeSpeed, float sinusoidalAnimationFrame)
+	private void SetSegmentSinusoidalPosition(SnakeSegment segment, Vector3 basePosition, float snakeSpeed)
 	{
 		SnakeTrail.SnakePosition lastCorner = this.trail.GetClosestCornerBehind(segment);
 		
 		float distanceInCellsSinceCorner = GetDistanceInCellsSinceLastCorner(segment, lastCorner.Position);
 		float sinInterpolationPercent = GetInterpolationPercent(distanceInCellsSinceCorner);
 		
-
 		if (distanceInCellsSinceCorner < 0.5f)
 		{			
 			// Calculate where based on sin we WANT to end up in half a tile.
@@ -93,37 +83,6 @@ public class SinusoidalMotion
 			segment.transform.eulerAngles = sinAngles;
 		}
 	}
-	
-	/*
-	private float GetInterpolationPercent(float sinusoidalAnimationFrame)
-	{
-		return sinusoidalAnimationFrame / this.sinusoidalRotation.Length;
-	}
-
-	private float GetInterpolationPercent(SnakeSegment segment)
-	{
-		Vector3 nextCellCentre = this.mazeController.GetNextCellCentre(segment.transform.localPosition, segment.CurrentDirection);
-		Vector3 toNextCellCentre = nextCellCentre - segment.transform.localPosition;
-		float distToNextCellCentre = toNextCellCentre.magnitude;
-		float fullDist;
-		if (segment.CurrentDirection == Direction.N || segment.CurrentDirection == Direction.S)	
-		{
-			fullDist = SerpentConsts.CellHeight;
-		}
-		else // W/E
-		{
-			fullDist = SerpentConsts.CellWidth;			
-		}
-		// If we want the snakes to go through the sin function at an increased rate, this is the place to change it.
-		float percent = distToNextCellCentre / fullDist;
-		if (percent >= 1.0f)
-		{
-			// wtf
-			percent = percent - Mathf.Floor(percent);
-		}
-		return percent;
-	}
-	*/
 	
 	private float GetInterpolationPercent(float distanceInCells)
 	{	

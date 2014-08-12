@@ -76,10 +76,7 @@ public class Snake : MobileCreature
 	
 	public event Action<Snake> SnakeSegmentsChanged = null;
 	public event Action<Side, Vector3> SnakeSegmentEaten = null;
-	
-	// This sinusoidalAnimationFrame is tracked here so we have one value tracked for the snake
-	private float sinusoidalAnimationFrame;
-	
+		
 	protected override Vector3 GetPosition()	
 	{
 		return this.head.transform.localPosition;
@@ -96,7 +93,7 @@ public class Snake : MobileCreature
 		this.Dead = false;
 		
 		this.trail = new SnakeTrail();
-		this.sinusoidalMotion = new SinusoidalMotion(this.trail, this.mazeController);
+		this.sinusoidalMotion = new SinusoidalMotion(this.trail);
 		
 		if (config.Player)
 		{
@@ -427,12 +424,7 @@ public class Snake : MobileCreature
 		// to the Controller.
 		if (this.CurrentDirection != Direction.None)
 		{
-			// Moving so update animation of side to side.D
-			this.sinusoidalAnimationFrame += Time.smoothDeltaTime * SerpentConsts.SinusoidalFPS;
-			if (this.sinusoidalAnimationFrame > (float) SerpentConsts.SinusoidalPosition.Length)
-			{
-				this.sinusoidalAnimationFrame -= SerpentConsts.SinusoidalPosition.Length;
-			}
+			// Moving so update animation of side to side.
 			UpdatePosition();
 		}
 		else
@@ -469,7 +461,7 @@ public class Snake : MobileCreature
 		this.trail.PositionSegments( this.head );
 		
 		// Cache head position based on the trail alone (before adjustment for sinusoidal motion)		
-		this.sinusoidalMotion.PositionSegments( this, this.sinusoidalAnimationFrame );
+		this.sinusoidalMotion.PositionSegments( this );
 	}
 	
 	#endregion Update

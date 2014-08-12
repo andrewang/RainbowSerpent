@@ -5,7 +5,7 @@ using Serpent;
 
 public static class SerpentConsts
 {
-	public const string Version = "0.3.2";
+	public const string Version = "0.3.3";
 	
 	#region Level Data Keys
 	
@@ -103,15 +103,7 @@ public static class SerpentConsts
 		Direction.None		
 	};
 	
-	public static float SinusoidalFPS = 2.0f;
 	public static float SinusoidalAmplitude = 2.0f;
-	public static float[] SinusoidalPosition = new float[]
-	{
-		0f,
-		SinusoidalAmplitude,
-		0f,
-		-SinusoidalAmplitude,
-	};
 	
 	public static Direction GetDirectionForVector( Vector3 v )
 	{
@@ -167,7 +159,7 @@ public static class SerpentConsts
 	}
 	
 	public static int InitialNumPlayerSnakes = 3;
-	public static int MaxNumEnemySnakes = 0; //3;
+	public static int MaxNumEnemySnakes = 3;
 	public static int EnemySnakeLength = 5;
 	public static int SmallEnemySnakeLength = 3;
 	public static int PlayerSnakeLength = 3;
