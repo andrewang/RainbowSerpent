@@ -23,7 +23,7 @@ public class Creature : MonoBehaviour
 		
 	public event Action<Creature> CreatureDied;
 		
-	public MazeController MazeController { get; set; }
+	protected MazeController mazeController;
 	
 	// Default creature behavior uses the creature object's own transform as its position.  Not the case with snakes
 	protected virtual Vector3 GetPosition()	
@@ -33,7 +33,7 @@ public class Creature : MonoBehaviour
 	
 	public void SetUp(MazeController mazeController)
 	{
-		this.MazeController = mazeController;
+		this.mazeController = mazeController;
 		
 		// default side is enemy
 		this.Side = Side.Enemy;

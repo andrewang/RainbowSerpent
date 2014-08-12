@@ -303,7 +303,8 @@ public class MazeController : MonoBehaviour
 		GameObject newObj = (GameObject) Instantiate(this.screenShotPrefab, new Vector3(0,0,0), Quaternion.identity);
 		newObj.transform.parent = this.transform;
 		newObj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		newObj.transform.localPosition = new Vector3(0,0);
+		// For some reason screenshots seem to be shown slightly versus the real thing
+		newObj.transform.localPosition = new Vector3(0.0f,-1.0f);
 		return newObj;
 	}
 	

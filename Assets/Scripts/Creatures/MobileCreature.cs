@@ -160,13 +160,13 @@ public class MobileCreature : Creature
 	/// </summary>
 	protected virtual void UpdateDestination()
 	{
-		Vector3 newPos = this.MazeController.GetNextCellCentre( this.transform.localPosition, this.CurrentDirection );
+		Vector3 newPos = this.mazeController.GetNextCellCentre( this.transform.localPosition, this.CurrentDirection );
 		this.CurrentDestination = newPos;		
 	}
 	
 	protected virtual bool IsMotionBlocked( Direction direction )
 	{
-		return this.MazeController.IsMotionBlocked( GetPosition(), direction );
+		return this.mazeController.IsMotionBlocked( GetPosition(), direction );
 	}
 	
 	protected virtual void OnDirectionChange()

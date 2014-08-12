@@ -72,6 +72,7 @@ public class Snake : MobileCreature
 	}
 	
 	private SnakeTrail trail;
+	private SinusoidalMotion sinusoidalMotion;
 	
 	public event Action<Snake> SnakeSegmentsChanged = null;
 	public event Action<Side, Vector3> SnakeSegmentEaten = null;
@@ -95,6 +96,7 @@ public class Snake : MobileCreature
 		this.Dead = false;
 		
 		this.trail = new SnakeTrail();
+		this.sinusoidalMotion = new SinusoidalMotion(this.trail, this.mazeController);
 		
 		if (config.Player)
 		{
@@ -172,6 +174,8 @@ public class Snake : MobileCreature
 		{
 			this.Speed *= 2.0f;
 		}
+				
+		this.sinusoidalMotion.UpdateAngles(this);
 	}
 	
 	public override void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)
@@ -182,6 +186,8 @@ public class Snake : MobileCreature
 		// Set head location to the desired position
 		// Each body segment should be laid out in opposite direction
 		this.head.transform.localPosition = position;
+		this.trail.UpdateHeadPosition(position);
+		
 		
 		Direction oppositeDirection = SerpentConsts.OppositeDirection[ (int) facingDirection ];
 		Vector3 oppositeVector = SerpentConsts.DirectionVector3[ (int) oppositeDirection ];
@@ -196,7 +202,6 @@ public class Snake : MobileCreature
 	
 		this.trail.AddPosition( tailPos );
 
-		this.trail.UpdateHeadPosition(position);
 		PositionBodySegments();
 	}
 	
@@ -439,8 +444,13 @@ public class Snake : MobileCreature
 	
 	public override bool MoveForward( float displacement, out float remainingDisplacement )
 	{
+		// RESTORE head position based on the trail alone
+		this.head.transform.localPosition = this.trail.GetHeadPosition();
+		
 		bool arrived = this.head.MoveForward( displacement, out remainingDisplacement );			
+		// The trail position always uses the centred position, not the actual position
 		this.trail.UpdateHeadPosition( this.head.transform.localPosition );
+		
 		PositionBodySegments();
 		
 		return arrived;
@@ -453,8 +463,11 @@ public class Snake : MobileCreature
 	}
 	
 	private void PositionBodySegments()
-	{
-		this.trail.PositionSegments( this.head, this.sinusoidalAnimationFrame );
+	{		
+		this.trail.PositionSegments( this.head );
+		
+		// Cache head position based on the trail alone (before adjustment for sinusoidal motion)		
+		this.sinusoidalMotion.PositionSegments( this, this.sinusoidalAnimationFrame );
 	}
 	
 	#endregion Update
@@ -480,7 +493,7 @@ public class Snake : MobileCreature
 	
 	protected override void OpenDoor( Direction direction )
 	{
-		this.MazeController.OpenDoor( GetPosition(), direction );
+		this.mazeController.OpenDoor( GetPosition(), direction );
 	}
 	
 	protected override void CloseDoors()
@@ -497,7 +510,7 @@ public class Snake : MobileCreature
 		for (Direction direction = Direction.First; direction <= Direction.Last; ++direction)
 		{
 			if (direction == tailDir) { continue; }
-			this.MazeController.CloseDoor( tail.transform.localPosition, direction );
+			this.mazeController.CloseDoor( tail.transform.localPosition, direction );
 		}
 	}
 	
@@ -543,7 +556,7 @@ public class Snake : MobileCreature
 	/// </summary>
 	protected override void UpdateDestination()
 	{
-		Vector3 newPos = this.MazeController.GetNextCellCentre( this.head.transform.localPosition, this.CurrentDirection );
+		Vector3 newPos = this.mazeController.GetNextCellCentre( this.head.transform.localPosition, this.CurrentDirection );
 		this.CurrentDestination = newPos;		
 		this.head.CurrentDestination = newPos;
 	}

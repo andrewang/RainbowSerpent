@@ -37,14 +37,28 @@ public class SnakeSegment : MonoBehaviour
 	{
 		get
 		{
-			return currentDirection;
+			return this.currentDirection;
 		}
 		set
 		{
 			this.currentDirection = value;
 			this.currentDirectionVector = SerpentConsts.DirectionVector3[ (int)value ];
 			// change the rotation of the segment
-			this.transform.eulerAngles = SerpentConsts.RotationVector3[ (int)value ];
+			this.CurrentFacing = SerpentConsts.RotationVector3[ (int)value ];
+		}
+	}
+	
+	private Vector3 currentFacing;
+	public Vector3 CurrentFacing
+	{
+		get
+		{
+			return this.currentFacing;
+		}
+		set
+		{
+			this.currentFacing = value;
+			this.transform.eulerAngles = value;
 		}
 	}
 	

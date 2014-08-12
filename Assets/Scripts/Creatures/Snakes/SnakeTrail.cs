@@ -75,6 +75,11 @@ public class SnakeTrail
 		}
 	}
 	
+	public Vector3 GetHeadPosition()
+	{
+		return this.positions[0].Position;
+	}
+	
 	public void AddPosition( Vector3 pos )
 	{
 		// If this position is a duplicate of the one just behind the head then don't add it.
@@ -97,7 +102,7 @@ public class SnakeTrail
 		UpdateUnitVector( 0 );
 	}
 	
-	public void UpdateUnitVector( int index )
+	private void UpdateUnitVector( int index )
 	{
 		if (index + 1 >= this.positions.Count) { return; }
 		Vector3 pos1 = this.positions[index].Position;
@@ -109,25 +114,28 @@ public class SnakeTrail
 	}
 	
 	// Loop through all segments and set their positions.
-	public void PositionSegments( SnakeHead head, float sinusoidalAnimationFrame )
-	{
+	public void PositionSegments( SnakeHead head )
+	{		
+		SetHeadPosition(head);
+		
 		int positionIndex = 0;
 		SnakeBody bodySegment = head.NextSegment;
-		while( bodySegment != null )
+		while (bodySegment != null)
 		{
-			positionIndex = SetSegmentPositionAndRotation( bodySegment, positionIndex, sinusoidalAnimationFrame );
+			positionIndex = SetSegmentPositionAndRotation( bodySegment, positionIndex );
 			bodySegment = bodySegment.NextSegment;
-			
-			// each segment is one frame behind the one in front.
-			sinusoidalAnimationFrame -= 1.0f;
-			if (sinusoidalAnimationFrame < 0.0f)
-			{
-				sinusoidalAnimationFrame += (float) SerpentConsts.SinusoidalPosition.Length;
-			}
 		}
 	}
 	
-	private int SetSegmentPositionAndRotation( SnakeBody bodySegment, int startingIndex, float sinusoidalAnimationFrame )
+	private void SetHeadPosition( SnakeHead head )
+	{
+		// This resets the head's transform's position which may have been adjusted by sinusoidal code.
+		// TODO move out to Snake
+		SnakePosition posBefore = this.positions[0];
+		head.transform.localPosition = posBefore.Position;
+	}
+	
+	private int SetSegmentPositionAndRotation( SnakeBody bodySegment, int startingIndex )
 	{
 		// get the last position index in the trail, prior to the location of the specified body segment 
 		int indexBefore = GetPositionIndexBefore( bodySegment.DistanceFromHead, startingIndex );
@@ -152,35 +160,12 @@ public class SnakeTrail
 		
 		SnakePosition posBefore = this.positions[indexBefore];
 		SetSegmentRotation( bodySegment, posBefore );
-		
+
 		Vector3 displacement = posBefore.UnitVectorToPreviousPosition * (bodySegment.DistanceFromHead - posBefore.DistanceFromHead);
-		float sinusoidalMultiplier = GetSinusoidalPositionMultiplier(sinusoidalAnimationFrame);
-		Vector3 newPos = GetSinusoidalPosition(sinusoidalMultiplier, bodySegment, posBefore.Position + displacement, posBefore.UnitVectorToPreviousPosition);
+		Vector3 newPos = posBefore.Position + displacement;
 		bodySegment.transform.localPosition = newPos;
 		
 		return indexBefore;
-	}
-	
-	private float GetSinusoidalPositionMultiplier(float sinusoidalAnimationFrame)
-	{
-		float wholePart = Mathf.Floor(sinusoidalAnimationFrame);
-		float fractionalPart = sinusoidalAnimationFrame - wholePart;
-		int index = (int)wholePart;
-		float firstValue = SerpentConsts.SinusoidalPosition[index];
-		int secondIndex = (index + 1) % SerpentConsts.SinusoidalPosition.Length;
-		float secondValue = SerpentConsts.SinusoidalPosition[secondIndex];
-		
-		float finalValue = firstValue + (secondValue - firstValue) * fractionalPart;
-		return finalValue;
-	}
-	
-	private Vector3 GetSinusoidalPosition(float sinusoidalMultiplier, SnakeSegment bodySegment, Vector3 basePosition, Vector3 unitVectorToPrevious)
-	{
-		Direction currentDirection = bodySegment.CurrentDirection;
-		int intRightAngleDirection = ((int)currentDirection + 1) % (int)Direction.Count;
-		Vector3 rightAngleUnitVector = SerpentConsts.DirectionVector3[ intRightAngleDirection ];
-		basePosition = basePosition + rightAngleUnitVector * sinusoidalMultiplier;
-		return basePosition;
 	}
 	
 	private void SetSegmentRotation( SnakeSegment bodySegment, SnakePosition position )
@@ -208,6 +193,20 @@ public class SnakeTrail
 		
 		return -1;
 	}
+	
+	// Return information on the closest corner behind a particular segment, for use in smoothing the path at corners
+	public SnakePosition GetClosestCornerBehind( SnakeSegment segment )
+	{
+		float distanceFromHead = 0.0f;
+		if (segment is SnakeBody)
+		{
+			SnakeBody body = segment as SnakeBody;			
+			distanceFromHead = body.DistanceFromHead;
+		}
+		int indexBefore = GetPositionIndexBefore( distanceFromHead, 0 );
+		return this.positions[indexBefore];
+	}
+	
 }
 
 

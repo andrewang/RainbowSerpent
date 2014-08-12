@@ -139,6 +139,7 @@
      <Compile Include="Assets\Scripts\Creatures\Egg.cs" />
      <Compile Include="Assets\Scripts\Creatures\Frog.cs" />
      <Compile Include="Assets\Scripts\Creatures\MobileCreature.cs" />
+     <Compile Include="Assets\Scripts\Creatures\Snakes\SinusoidalMotion.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\Snake.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeBody.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeConfig.cs" />
