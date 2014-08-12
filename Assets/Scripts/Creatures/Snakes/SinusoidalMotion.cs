@@ -68,21 +68,33 @@ public class SinusoidalMotion
 	
 	private void SetSegmentSinusoidalPosition(SnakeSegment segment, Vector3 basePosition, float snakeSpeed, float sinusoidalAnimationFrame)
 	{
-		// Need to take corner into account!  How close is this segment to a corner?  If it is less than 1/2 tile from the
-		// last corner, the calculations are totally different.
-		//SnakeTrail.SnakePosition lastCorner = this.trail.GetClosestCornerBehind(segment);
-		//Vector3 toLastCorner = lastCorner.Position - segment.transform.localPosition;
-		//float distanceToLastCorner = toLastCorner.magnitude;
+		SnakeTrail.SnakePosition lastCorner = this.trail.GetClosestCornerBehind(segment);
 		
-		// shift to not use sinusoidalAnimationFrame but map-based calculation.
-		//float interpolationPercent = GetInterpolationPercent(sinusoidalAnimationFrame);
-		float interpolationPercent = GetInterpolationPercent(segment);
+		float distanceInCellsSinceCorner = GetDistanceInCellsSinceLastCorner(segment, lastCorner.Position);
+		float sinInterpolationPercent = GetInterpolationPercent(distanceInCellsSinceCorner);
 		
-		float sidewaysDisplacement = GetSidewaysDisplacement(interpolationPercent);
-		segment.transform.localPosition = GetSinusoidalPosition(segment, sidewaysDisplacement, basePosition);		
-		segment.transform.eulerAngles = GetSinusoidalAngle(segment, interpolationPercent);
+
+		if (distanceInCellsSinceCorner < 0.5f)
+		{			
+			// Calculate where based on sin we WANT to end up in half a tile.
+			Vector3 sinPosition = GetSinusoidalPosition(segment, sinInterpolationPercent, basePosition);			
+			segment.transform.localPosition = sinPosition;
+			
+			float angleInterpolation = Mathf.Sqrt(distanceInCellsSinceCorner / 0.5f);
+			
+			Vector3 angles = InterpolateFacing(segment, lastCorner, angleInterpolation);
+			segment.transform.eulerAngles = angles;				
+		}
+		else
+		{
+			Vector3 sinPosition = GetSinusoidalPosition(segment, sinInterpolationPercent, basePosition);
+			Vector3 sinAngles = GetSinusoidalAngle(segment, sinInterpolationPercent);
+			segment.transform.localPosition = sinPosition;
+			segment.transform.eulerAngles = sinAngles;
+		}
 	}
 	
+	/*
 	private float GetInterpolationPercent(float sinusoidalAnimationFrame)
 	{
 		return sinusoidalAnimationFrame / this.sinusoidalRotation.Length;
@@ -103,7 +115,6 @@ public class SinusoidalMotion
 			fullDist = SerpentConsts.CellWidth;			
 		}
 		// If we want the snakes to go through the sin function at an increased rate, this is the place to change it.
-		//fullDist *= 2.0f; 
 		float percent = distToNextCellCentre / fullDist;
 		if (percent >= 1.0f)
 		{
@@ -112,17 +123,44 @@ public class SinusoidalMotion
 		}
 		return percent;
 	}
+	*/
+	
+	private float GetInterpolationPercent(float distanceInCells)
+	{	
+		// Go through the whole animation over the distance of 2 cells.
+		float numReptitionsOfAnimation = distanceInCells / 2.0f;
+		float percent = numReptitionsOfAnimation - Mathf.Floor(numReptitionsOfAnimation);
+		return percent;
+	}
+	
+	private float GetDistanceInCellsSinceLastCorner(SnakeSegment segment, Vector3 lastCorner)
+	{
+		Vector3 fromLastTurn = segment.transform.localPosition - lastCorner;
+		float cellLength;
+		if (segment.CurrentDirection == Direction.N || segment.CurrentDirection == Direction.S)	
+		{
+			cellLength = SerpentConsts.CellHeight;
+		}
+		else // W/E
+		{
+			cellLength = SerpentConsts.CellWidth;			
+		}
+		float distanceInCells = fromLastTurn.magnitude / cellLength;
+		return distanceInCells;
+	}
 	
 	private float GetSidewaysDisplacement(float interpolationPercent)
 	{		
 		// The sideways displacement is governed by the sin function since we want a trig function
 		// which has the property of returning 0 at time=0 and at end time.		
-		float finalValue = Mathf.Sin (interpolationPercent * 2 * Mathf.PI);
+		float finalValue = Mathf.Sin(interpolationPercent * 2 * Mathf.PI) * SerpentConsts.SinusoidalAmplitude;
 		return finalValue;
 	}
 	
-	private Vector3 GetSinusoidalPosition(SnakeSegment segment, float sidewaysDisplacement, Vector3 basePosition)
+	private Vector3 GetSinusoidalPosition(SnakeSegment segment, float interpolationPercent, Vector3 basePosition)
 	{		
+		float sidewaysDisplacement = GetSidewaysDisplacement(interpolationPercent);
+		
 		Direction currentDirection = segment.CurrentDirection;
 		int intRightAngleDirection = ((int)currentDirection + 1) % (int)Direction.Count;
 		Vector3 rightAngleUnitVector = SerpentConsts.DirectionVector3[ intRightAngleDirection ];
@@ -148,6 +186,31 @@ public class SinusoidalMotion
 		Vector3 adjustment = firstValue + (secondValue - firstValue) * fractionalPart;
 		Vector3 finalValue = segment.CurrentFacing + adjustment;
 		return finalValue;
+	}
+	
+	private Vector3 InterpolateFacing(SnakeSegment segment, SnakeTrail.SnakePosition lastCorner, float interpolation)
+	{
+		Vector3 firstDirectionVector = lastCorner.UnitVectorToPreviousPosition * -1.0f;
+		Direction firstDirection = SerpentConsts.GetDirectionForVector(firstDirectionVector);
+		Direction secondDirection = segment.CurrentDirection;
+		
+		Vector3 firstEulerAngles = SerpentConsts.RotationVector3[(int)firstDirection];
+		Vector3 secondEulerAngles = SerpentConsts.RotationVector3[(int)secondDirection];
+		// Compare the sign of the angles and make sure they are both positive or both negative to account for the circle.
+		if (firstEulerAngles.z * secondEulerAngles.z < 0.0f)
+		{
+			// sign problem to do with west (90) and south (-180)
+			if (firstEulerAngles.z < -90.0f)
+			{
+				firstEulerAngles *= -1.0f;
+			}
+			else
+			{
+				secondEulerAngles *= -1.0f;
+			}
+		}
+		Vector3 currentEulerAngles = firstEulerAngles * (1.0f - interpolation) + secondEulerAngles * interpolation;
+		return currentEulerAngles;		
 	}
 	
 }

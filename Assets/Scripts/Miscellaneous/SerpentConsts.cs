@@ -104,7 +104,7 @@ public static class SerpentConsts
 	};
 	
 	public static float SinusoidalFPS = 2.0f;
-	public static float SinusoidalAmplitude = 1.5f;
+	public static float SinusoidalAmplitude = 2.0f;
 	public static float[] SinusoidalPosition = new float[]
 	{
 		0f,
@@ -117,7 +117,10 @@ public static class SerpentConsts
 	{
 		for(int i = 0; i < SerpentConsts.DirectionVector3.Length; ++i)
 		{
-			if (v == SerpentConsts.DirectionVector3[i])
+			// account for floating point error in normalizing unit vectors.
+			Vector3 vDiff = v - SerpentConsts.DirectionVector3[i];
+			if (vDiff.sqrMagnitude < 0.001f)
+			//if (v == SerpentConsts.DirectionVector3[i])
 			{
 				return (Direction)i;
 			}
@@ -164,7 +167,7 @@ public static class SerpentConsts
 	}
 	
 	public static int InitialNumPlayerSnakes = 3;
-	public static int MaxNumEnemySnakes = 0; // 3;
+	public static int MaxNumEnemySnakes = 0; //3;
 	public static int EnemySnakeLength = 5;
 	public static int SmallEnemySnakeLength = 3;
 	public static int PlayerSnakeLength = 3;

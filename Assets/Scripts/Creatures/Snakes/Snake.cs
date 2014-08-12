@@ -174,7 +174,7 @@ public class Snake : MobileCreature
 		{
 			this.Speed *= 2.0f;
 		}
-				
+								
 		this.sinusoidalMotion.UpdateAngles(this);
 	}
 	
@@ -459,7 +459,9 @@ public class Snake : MobileCreature
 	protected override void OnDirectionChange()
 	{
 		this.head.CurrentDirection = this.CurrentDirection;
-		this.trail.AddPosition(this.head.transform.localPosition);
+		// We can't use the local position of the head because it can be modified by sinusoidal code.
+		Vector3 headPosition = this.trail.GetHeadPosition();
+		this.trail.AddPosition(headPosition);
 	}
 	
 	private void PositionBodySegments()

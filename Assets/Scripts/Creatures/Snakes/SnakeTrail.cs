@@ -203,8 +203,14 @@ public class SnakeTrail
 			SnakeBody body = segment as SnakeBody;			
 			distanceFromHead = body.DistanceFromHead;
 		}
-		int indexBefore = GetPositionIndexBefore( distanceFromHead, 0 );
-		return this.positions[indexBefore];
+				
+		int index = GetPositionIndexBefore( distanceFromHead, 0 ) + 1;
+		if (index < 0) 
+		{
+			// use the head
+			index = 0;
+		}
+		return this.positions[index];
 	}
 	
 }
