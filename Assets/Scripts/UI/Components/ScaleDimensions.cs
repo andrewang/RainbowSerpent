@@ -58,6 +58,31 @@ public class ScaleDimensions : MonoBehaviour
 			this.heightScale = smaller;
 		}
 		
+		// If this is a sprite, resize it in case it's sliced, instead of setting the scale.
+		UIWidget widget = this.GetComponent<UIWidget>();
+		UISprite sprite = widget as UISprite;
+		if (sprite != null)
+		{
+			sprite.width = (int) ( (float)sprite.width * this.widthScale );
+			sprite.height = (int) ( (float)sprite.height * this.heightScale );
+			return;	
+		}
+		UILabel label = widget as UILabel;
+		if (label != null)
+		{
+			// We always want to keep the text proportionate, so increase scale by the smaller of the two.
+			// But if the proportions aren't the same, increase the label width/height by the difference.
+			float smaller = Mathf.Min(this.widthScale, this.heightScale);	
+			float larger = Mathf.Max(this.widthScale, this.heightScale);
+			float ratio = larger/smaller;
+			
+			label.width = (int) ( (float)label.width * ratio );
+			label.height = (int) ( (float)label.height * ratio );
+			
+			this.widthScale = smaller;
+			this.heightScale = smaller;
+		}
+		
 		Vector3 scale = this.transform.localScale;
 		if (this.applyToHorizontal)		
 		{

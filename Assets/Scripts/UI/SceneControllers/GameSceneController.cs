@@ -16,6 +16,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private GameObject textContainer = null;	
 	[SerializeField] private UISprite background = null;	
 	[SerializeField] private UILabel[] labels;
+	[SerializeField] private UISprite[] sprites;
 	[SerializeField] private UILabel levelLabel = null;
 	[SerializeField] private UILabel scoreLabel = null;
 	[SerializeField] private UILabel livesLabel = null;	
@@ -41,6 +42,7 @@ public class GameSceneController : RSSceneController
 		if (this.scoreLabel == null) { Debug.LogError("GameSceneController: scoreLabel is null"); }
 		if (this.livesLabel == null) { Debug.LogError("GameSceneController: livesLabel is null"); }
 		if (this.labels == null || this.labels.Length == 0) { Debug.LogError("GameSceneController: labels is null/empty"); }
+		if (this.sprites == null || this.sprites.Length == 0) { Debug.LogError("GameSceneController: sprites is null/empty"); }
 		if (this.buttonsContainer == null) { Debug.LogError("GameSceneController: buttonsContainer is null/empty"); }
 		if (this.gameOverUIContainer == null) { Debug.LogError("GameSceneController: gameOverUIContainer is null"); } 
 		
@@ -73,7 +75,11 @@ public class GameSceneController : RSSceneController
 		// Set initial colours
 		foreach( UILabel label in this.labels )
 		{
-			label.color = theme.TextColour;
+			label.color = theme.UIColour;
+		}
+		foreach( UISprite sprite in this.sprites )
+		{
+			sprite.color = theme.UIColour;
 		}
 		this.background.color = theme.BackgroundColour;
 	}

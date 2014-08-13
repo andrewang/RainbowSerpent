@@ -1,7 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Egg.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/Components/ScaleDimensions.cs">
     <Files>
+      <File FileName="Assets/Scripts/UI/Components/ScreenShotFileManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/SplashSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/MainMenuSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/CyclicSettingsLabel.cs" Line="1" Column="1" />
@@ -14,7 +15,6 @@
       <File FileName="Assets/NGUI/Scripts/Internal/EventDelegate.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Interaction/UIPlayTween.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Maps/Maze.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/ScreenShotFileManager.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Interaction/UIButton.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Interaction/UIButtonMessage.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
@@ -26,7 +26,7 @@
       <File FileName="Assets/Scripts/UI/SceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/ScreenManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/OptionsSceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="66" Column="69" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/AISnakeController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/FrogController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/GameClock.cs" Line="1" Column="1" />
@@ -37,8 +37,7 @@
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/SnakeController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Frog.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/DifficultySettings.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="89" Column="42" />
       <File FileName="Assets/Scripts/Managers/DifficultyManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/InputController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
@@ -49,7 +48,12 @@
       <File FileName="Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/UI/UICamera.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/MobileCreature.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="134" Column="51" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SinusoidalMotion.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="22" Column="43" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/ResizePanel.cs" Line="1" Column="1" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -66,7 +70,6 @@
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Egg.cs" line="249" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/CyclicSettingsLabel.cs" line="52" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/Egg.cs" line="35" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Miscellaneous/SerpentConsts.cs" line="142" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

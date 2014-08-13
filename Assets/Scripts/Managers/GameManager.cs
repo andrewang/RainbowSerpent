@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
 		// New rule for casual: only have 1 snake per level until that value equals MaxNumEnemySnakes.
 		if (Managers.GameState.Difficulty == Difficulty.Easy)
 		{
-			this.maxNumEnemySnakes = Math.Min(levelNum, SerpentConsts.MaxNumEnemySnakes);
+			this.maxNumEnemySnakes = Math.Min(rawLevelNum, SerpentConsts.MaxNumEnemySnakes);
 		}
 		else
 		{

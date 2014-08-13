@@ -33,14 +33,11 @@ public class ResizePanel : MonoBehaviour
 	{
 	}
 	
-	// To ensure that this script is only executed once, but after any scale scripts:
-	// execute in the Update and then disable itself
-	void Update()
+	public void ResizeThePanel()
 	{
 		DeterminePositions();
 		SetAtMidpoint();
 		SizePanel();
-		this.enabled = false;
 	}
 	
 	private void DeterminePositions()

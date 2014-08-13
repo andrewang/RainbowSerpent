@@ -62,6 +62,13 @@ public class MazeController : MonoBehaviour
 	{
 		if (this.scaleSet == false)
 		{
+			// Check for a resize component on the panel and make it run FIRST.
+			ResizePanel resizeScript = this.panel.GetComponent<ResizePanel>();
+			if (resizeScript != null)
+			{
+				resizeScript.ResizeThePanel();
+			}
+		
 			DetermineMazeScale();
 			this.scaleSet = true;
 			
