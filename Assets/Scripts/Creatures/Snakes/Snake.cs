@@ -170,9 +170,7 @@ public class Snake : MobileCreature
 		if (Managers.GameState.LevelState == LevelState.LevelEnd)
 		{
 			this.Speed *= 2.0f;
-		}
-								
-		this.sinusoidalMotion.UpdateAngles(this);
+		}								
 	}
 	
 	public override void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)

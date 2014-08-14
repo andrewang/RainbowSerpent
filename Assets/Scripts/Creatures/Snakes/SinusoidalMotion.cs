@@ -5,16 +5,7 @@ using Serpent;
 public class SinusoidalMotion
 {
 	private SnakeTrail trail;
-	
-	// These rotations have to be filled in based on the maximum of sideways displacement and the speed of the snake.
-	private Vector3[] sinusoidalRotation = new Vector3[]
-	{
-		new Vector3( 0, 0, -1.0f ),
-		new Vector3( 0, 0, 0.0f ),
-		new Vector3( 0, 0, 1.0f ),
-		new Vector3( 0, 0, 0.0f ),
-	};
-	
+		
 	public SinusoidalMotion(SnakeTrail trail)
 	{
 		// to handle curves, we want access to all the trail data.
@@ -34,27 +25,6 @@ public class SinusoidalMotion
 			SetSegmentSinusoidalPosition(bodySegment, bodySegment.transform.localPosition, speed);	
 			bodySegment = bodySegment.NextSegment;			
 		}
-	}	
-	
-	public void UpdateAngles( Snake snake )
-	{
-		// Determine what the angle array should contain based on the speed and max sideways displacement of the snake.
-		
-		// To do this, we do a bit of trig.  First we want the angle in a triangle with
-		// height Snake.speed
-		// width twice amplitude 
-		// (because snake motion goes from one side of the central line to the other)
- 		// Then we want to calculate 90 degrees minus that angle to get the maximum amount of the snake segment rotation.
-		float amplitude = SerpentConsts.SinusoidalAmplitude;
-		float twiceAmplitude = amplitude * 2.0f;
-		float speed = snake.Speed;
-		float hypoteneuseLength = Mathf.Sqrt((speed * speed) + (twiceAmplitude * twiceAmplitude));
-		float sinInteriorAngle = speed/hypoteneuseLength;
-		float interiorAngle = Mathf.Asin(sinInteriorAngle);
-		float interiorAngleInDegrees = interiorAngle * Mathf.Rad2Deg;
-		float exteriorAngleInDegrees = 90.0f - interiorAngleInDegrees;
-		this.sinusoidalRotation[0].z = -exteriorAngleInDegrees;
-		this.sinusoidalRotation[2].z = exteriorAngleInDegrees;
 	}
 	
 	private void SetSegmentSinusoidalPosition(SnakeSegment segment, Vector3 basePosition, float snakeSpeed)
@@ -108,6 +78,18 @@ public class SinusoidalMotion
 		return distanceInCells;
 	}
 	
+	private float GetLengthOfSinPeriod(SnakeSegment segment)
+	{
+		if (segment.CurrentDirection == Direction.N || segment.CurrentDirection == Direction.S)	
+		{
+			return 2.0f * SerpentConsts.CellHeight;
+		}
+		else // W/E
+		{
+			return 2.0f * SerpentConsts.CellWidth;			
+		}
+	}
+	
 	private float GetSidewaysDisplacement(float interpolationPercent)
 	{		
 		// The sideways displacement is governed by the sin function since we want a trig function
@@ -129,22 +111,44 @@ public class SinusoidalMotion
 	
 	private Vector3 GetSinusoidalAngle(SnakeSegment segment, float interpolationPercent)
 	{
-		if (interpolationPercent == 1) { interpolationPercent = 0.0f; }
-		float sinusoidalAnimationFrame = this.sinusoidalRotation.Length * interpolationPercent;
-	
-		float wholePart = Mathf.Floor(sinusoidalAnimationFrame);
-		float fractionalPart = sinusoidalAnimationFrame - wholePart;
-		int index = (int)wholePart;
-		Vector3 firstValue = this.sinusoidalRotation[index];
-		int secondIndex = (index + 1) % this.sinusoidalRotation.Length;
-		Vector3 secondValue = this.sinusoidalRotation[secondIndex];
+		if (interpolationPercent == 0.0f) 
+		{
+			Debug.Log(@"start");
+		}
 		
-		Vector3 addition = secondValue - firstValue;
-		addition *= fractionalPart;
+		// Remember, the snake will travel sideways a distance equal to 2x sideways displacement while it travels
+		// a distance of 2 x cells
+		float instantLength = 0.001f;
 		
-		Vector3 adjustment = firstValue + (secondValue - firstValue) * fractionalPart;
-		Vector3 finalValue = segment.CurrentFacing + adjustment;
-		return finalValue;
+		// Determine the length of the distance that will be travelled forward during this instant
+		float sinPeriod = GetLengthOfSinPeriod(segment);		
+		float futureForwardDisplacement = sinPeriod * instantLength;
+		
+		// Determine what the sideways displacement will be in that future instant
+		float futureInstantPercent = interpolationPercent + instantLength;		
+		float currentSidewaysDisplacement = GetSidewaysDisplacement(interpolationPercent);
+		float futureSidewaysDisplacement = GetSidewaysDisplacement(futureInstantPercent);
+		
+		float sidewaysDisplacementDelta = futureSidewaysDisplacement - currentSidewaysDisplacement;
+		
+		// remove but remember the sign.  We have to actually do a subtraction normally rather than addition for this to work right, so...
+		float signOfAjustment = -1.0f;
+		if (sidewaysDisplacementDelta < 0.0f)
+		{
+			signOfAjustment = 1.0f;
+			sidewaysDisplacementDelta *= -1.0f;
+		}
+		
+		float hypoteneuseLength = Mathf.Sqrt((futureForwardDisplacement * futureForwardDisplacement) + (sidewaysDisplacementDelta * sidewaysDisplacementDelta));
+		float sinInteriorAngle = futureForwardDisplacement/hypoteneuseLength;
+		float interiorAngle = Mathf.Asin(sinInteriorAngle);
+		float interiorAngleInDegrees = interiorAngle * Mathf.Rad2Deg;
+		float exteriorAngleInDegrees = 90.0f - interiorAngleInDegrees;
+		
+		float angleAdjustment = exteriorAngleInDegrees * signOfAjustment;
+		Vector3 facing = segment.CurrentFacing;
+		facing.z += angleAdjustment;
+		return facing;
 	}
 	
 	private Vector3 InterpolateFacing(SnakeSegment segment, SnakeTrail.SnakePosition lastCorner, float interpolation)
