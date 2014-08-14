@@ -17,6 +17,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UISprite background = null;	
 	[SerializeField] private UILabel[] labels;
 	[SerializeField] private UISprite[] sprites;
+	[SerializeField] private UIButton[] buttons;
 	[SerializeField] private UILabel levelLabel = null;
 	[SerializeField] private UILabel scoreLabel = null;
 	[SerializeField] private UILabel livesLabel = null;	
@@ -43,6 +44,7 @@ public class GameSceneController : RSSceneController
 		if (this.livesLabel == null) { Debug.LogError("GameSceneController: livesLabel is null"); }
 		if (this.labels == null || this.labels.Length == 0) { Debug.LogError("GameSceneController: labels is null/empty"); }
 		if (this.sprites == null || this.sprites.Length == 0) { Debug.LogError("GameSceneController: sprites is null/empty"); }
+		if (this.buttons == null || this.buttons.Length == 0) { Debug.LogError("GameSceneController: buttons is null/empty"); }
 		if (this.buttonsContainer == null) { Debug.LogError("GameSceneController: buttonsContainer is null/empty"); }
 		if (this.gameOverUIContainer == null) { Debug.LogError("GameSceneController: gameOverUIContainer is null"); } 
 		
@@ -56,6 +58,7 @@ public class GameSceneController : RSSceneController
 	
 	override public void OnLoad()
 	{
+		base.OnLoad();
 		Managers.GameClock.Reset();
 		this.gameManager.GameOver += this.GameOver;
 		LoadGameLevel(Managers.GameState.Level);
@@ -80,6 +83,13 @@ public class GameSceneController : RSSceneController
 		foreach( UISprite sprite in this.sprites )
 		{
 			sprite.color = theme.UIColour;
+		}
+		foreach( UIButton button in this.buttons )
+		{
+			button.defaultColor = theme.UIColour;
+			button.pressed = theme.PressedButtonColour;
+			// This hover colour really only matters for testing, but it's annoying for it not to be set.
+			button.hover = theme.UIColour;
 		}
 		this.background.color = theme.BackgroundColour;
 	}
@@ -126,14 +136,28 @@ public class GameSceneController : RSSceneController
 			if (screenShotContainer) 
 			{
 				Vector3 scale = screenShotContainer.transform.localScale;
-				debugInfo = debugInfo + "Screenshot scale: " + scale.x + ", " + scale.y;
+				debugInfo = debugInfo + "Screenshot scale: " + scale.y;
+				
+				Transform t = screenShotContainer.transform.parent;
+				while (t != null)
+				{
+					debugInfo = debugInfo + ", " + t.localScale.y;
+					t = t.parent;
+				}
+				
+				debugInfo = debugInfo + "\n";
+				UITexture screenShotTexture = screenShotContainer.GetComponentInChildren<UITexture>();
+				if (screenShotTexture != null)
+				{
+					debugInfo = debugInfo + "SS Size: " + screenShotTexture.width + " by " + screenShotTexture.height;
+				}
+				
 			}
 		}
 		
 		// screen dimensions
 		debugInfo = debugInfo + "\n";
-		debugInfo = debugInfo + "  Screen W: " + Screen.width + " H: " + Screen.height;
-		debugInfo = debugInfo + "  Text W scale: " + this.textContainer.transform.localScale.x;
+		debugInfo = debugInfo + "Screen Size: " + Screen.width + " by " + Screen.height;
 				
 		this.debugInfoLabel.text = debugInfo;
 		

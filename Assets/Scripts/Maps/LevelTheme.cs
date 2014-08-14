@@ -7,6 +7,7 @@ public class LevelTheme : MonoBehaviour
 	public Color BackgroundColour;
 	
 	public Color UIColour;
+	public Color PressedButtonColour;
 	
 	public Color EnemySnakeColour;
 	public Color WeakEnemySnakeColour;	

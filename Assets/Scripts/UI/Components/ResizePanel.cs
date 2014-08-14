@@ -50,7 +50,7 @@ public class ResizePanel : MonoBehaviour
 		else
 		{
 			// use upper right corner of screen
-			this.positions[Top] = Managers.ScreenManager.ScreenHeight * 0.5f;
+			this.positions[Top] = Managers.ScreenManager.Height * 0.5f;
 			this.dimensions[Top] = 0f;
 		} 
 		
@@ -62,7 +62,7 @@ public class ResizePanel : MonoBehaviour
 		else
 		{
 			// use lower left corner of screen
-			this.positions[Bottom] = - Managers.ScreenManager.ScreenHeight * 0.5f;
+			this.positions[Bottom] = - Managers.ScreenManager.Height * 0.5f;
 			this.dimensions[Bottom] = 0f;		
 		}
 		
@@ -74,7 +74,7 @@ public class ResizePanel : MonoBehaviour
 		else
 		{
 			// use lower left corner of screen
-			this.positions[Left] = - Managers.ScreenManager.ScreenWidth * 0.5f;
+			this.positions[Left] = - Managers.ScreenManager.Width * 0.5f;
 			this.dimensions[Left] = 0f;			
 		}
 		
@@ -85,7 +85,7 @@ public class ResizePanel : MonoBehaviour
 		}
 		else
 		{
-			this.positions[Right] = Managers.ScreenManager.ScreenWidth * 0.5f;
+			this.positions[Right] = Managers.ScreenManager.Width * 0.5f;
 			this.dimensions[Right] = 0f;			
 		}
 	}

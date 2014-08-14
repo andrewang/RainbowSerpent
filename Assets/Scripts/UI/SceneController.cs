@@ -6,7 +6,7 @@ public class SceneController : MonoBehaviour
 	[SerializeField] GameObject scalingRoot;
 
 	// Use this for initialization
-	void Start () 
+	virtual public void Start() 
 	{
 		Managers.SceneManager.RegisterSceneController(this);
 		VerifySerializeFields();
@@ -15,7 +15,7 @@ public class SceneController : MonoBehaviour
 		if (this.scalingRoot == null) { return; }
 		if (Managers.ScreenManager == null) { return; }
 		
-		float scale = Managers.ScreenManager.ScreenScale;
+		float scale = Managers.ScreenManager.Scale;
 		Vector3 scaleVector = this.scalingRoot.transform.localScale;
 		scaleVector /= scale;
 		this.scalingRoot.transform.localScale = scaleVector;
@@ -23,7 +23,6 @@ public class SceneController : MonoBehaviour
 
 	void Initialize()
 	{
-
 	}
 
 	public virtual void VerifySerializeFields()
@@ -35,6 +34,12 @@ public class SceneController : MonoBehaviour
 	/// </summary>
 	public virtual void OnLoad()
 	{
+		if (Managers.ScreenManager.ScreenRotated)
+		{
+			Camera camera = this.GetComponentInChildren<Camera>();			
+			UIAnchor anchor = camera.GetComponentInChildren<UIAnchor>();
+			anchor.transform.eulerAngles = new Vector3(0,0,90);
+		}
 	}
 
 	/// <summary>

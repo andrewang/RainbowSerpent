@@ -40,8 +40,8 @@ public class ScaleDimensions : MonoBehaviour
 	
 	private void DetermineScales()
 	{
-		this.widthScale = Managers.ScreenManager.ScreenWidth / this.baseWidth ;
-		this.heightScale = Managers.ScreenManager.ScreenHeight / this.baseHeight ;
+		this.widthScale = Managers.ScreenManager.Width / this.baseWidth;
+		this.heightScale = Managers.ScreenManager.Height / this.baseHeight;
 		
 		if (this.maintainProportionsScaledByWidth)
 		{

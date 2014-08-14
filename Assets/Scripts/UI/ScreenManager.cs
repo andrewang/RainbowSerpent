@@ -3,25 +3,42 @@ using UnityEngine;
 
 public class ScreenManager : MonoBehaviour
 {
-	[SerializeField] float screenScale = 1.0f;
+	[SerializeField] private float screenScale = 1.0f;
+	[SerializeField] private bool screenRotated = false;
 	
-	public float ScreenWidth
+	public bool ScreenRotated
 	{
 		get
 		{
+			return this.screenRotated;
+		}
+	}
+	
+	public float Width
+	{
+		get
+		{
+			if (screenRotated)
+			{
+				return Screen.height * this.screenScale;
+			}
 			return Screen.width * this.screenScale;
 		}
 	}
 	
-	public float ScreenHeight
+	public float Height
 	{
 		get
 		{
+			if (screenRotated)
+			{
+				return Screen.height * this.screenScale;
+			}
 			return Screen.height * this.screenScale;
 		}
 	}
 	
-	public float ScreenScale	
+	public float Scale	
 	{
 		get
 		{

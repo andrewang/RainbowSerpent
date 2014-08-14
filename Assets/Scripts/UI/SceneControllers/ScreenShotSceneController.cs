@@ -33,6 +33,7 @@ public class ScreenShotSceneController : RSSceneController
 	
 	override public void OnLoad()
 	{
+		base.OnLoad();
 		LoadGameLevel(1);
 	}
 	

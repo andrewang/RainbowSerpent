@@ -366,7 +366,7 @@ public class MazeController : MonoBehaviour
 		
 		Vector3 relativePosition = this.transform.GetLocalPositionRelativeTo( this.screenShotTaker.transform );
 		
-		float screenRescaling = Managers.ScreenManager.ScreenScale;
+		float screenRescaling = Managers.ScreenManager.Scale;
 		int shotWidth = (int) (this.panel.clipRange.z / screenRescaling);
 		int shotHeight = (int) (this.panel.clipRange.w / screenRescaling);
 		
@@ -414,7 +414,7 @@ public class MazeController : MonoBehaviour
 	{
 		if (this.screenShotContainer == null) { return; }
 
-		float screenRescaling = Managers.ScreenManager.ScreenScale;
+		float screenRescaling = Managers.ScreenManager.Scale;
 		
 		Vector3 mazeScale = this.transform.localScale;
 		Vector3 textureScale = this.screenShotContainer.transform.localScale;

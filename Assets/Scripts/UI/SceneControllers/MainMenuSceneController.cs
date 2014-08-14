@@ -7,6 +7,8 @@ public class MainMenuSceneController : RSSceneController
 	
 	void Start()
 	{
+		base.Start();
+		
 		if (this.versionLabel == null) { return; }
 		this.versionLabel.text = SerpentConsts.Version;
 	}
