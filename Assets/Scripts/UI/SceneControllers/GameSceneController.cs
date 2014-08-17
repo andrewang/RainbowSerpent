@@ -12,9 +12,9 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private MazeController mazeController = null;
 	[SerializeField] private InputController inputController = null; 
 	
-	// UI elements
-	[SerializeField] private GameObject textContainer = null;	
-	[SerializeField] private UISprite background = null;	
+	// UI elements	
+	//[SerializeField] private GameObject textContainer = null;	
+	[SerializeField] private Camera sceneCamera = null;
 	[SerializeField] private UILabel[] labels;
 	[SerializeField] private UISprite[] sprites;
 	[SerializeField] private UIButton[] buttons;
@@ -29,6 +29,8 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UIPanel mazePanel = null; 
 	[SerializeField] private UILabel debugInfoLabel = null;
 	
+	private bool paused;
+	
 	#endregion Serialized Fields
 		
 	#region Verify Serialize Fields
@@ -38,7 +40,6 @@ public class GameSceneController : RSSceneController
 		if (this.mazeController == null) { Debug.LogError("GameSceneController: mazeController is null"); }
 		if (this.inputController == null) { Debug.LogError("GameSceneController: inputController is null"); }
 		if (this.gameManager == null) { Debug.LogError("GameSceneController: gameManager is null"); }
-		if (this.background == null) { Debug.LogError("GameSceneController: background is null"); }
 		if (this.levelLabel == null) { Debug.LogError("GameSceneController: levelLabel is null"); }
 		if (this.scoreLabel == null) { Debug.LogError("GameSceneController: scoreLabel is null"); }
 		if (this.livesLabel == null) { Debug.LogError("GameSceneController: livesLabel is null"); }
@@ -91,7 +92,7 @@ public class GameSceneController : RSSceneController
 			// This hover colour really only matters for testing, but it's annoying for it not to be set.
 			button.hover = theme.UIColour;
 		}
-		this.background.color = theme.BackgroundColour;
+		this.sceneCamera.backgroundColor = theme.BackgroundColour;
 	}
 	
 	private void ConfigureInput()
@@ -105,11 +106,23 @@ public class GameSceneController : RSSceneController
 
 	#region Update
 	
-	private void Update()
+	public new void Update()
 	{
 		if (this.gameManager.PlayerSnake == null) { return; } 
 		
 		UpdateText();
+		
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+		{
+			if (this.paused)
+			{
+				Application.Quit();
+			}
+			else
+			{		
+				PauseGame();				
+			}
+		}
 	}
 	
 	private void UpdateText()
@@ -182,6 +195,8 @@ public class GameSceneController : RSSceneController
 	
 	private void RestartGame()
 	{
+		this.paused = false;
+		
 		Managers.GameClock.Paused = false;			
 		Managers.GameState.Reset();
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);		
@@ -189,6 +204,8 @@ public class GameSceneController : RSSceneController
 		
 	private void PauseGame()
 	{
+		this.paused = true;
+		
 		this.buttonsContainer.SetActive(false);
 		this.pauseUIContainer.gameObject.SetActive(true);	
 		Managers.GameState.Paused = true;
@@ -197,7 +214,10 @@ public class GameSceneController : RSSceneController
 	
 	private void ResumeGame()
 	{
-		this.buttonsContainer.SetActive(true);
+		this.paused = false;
+		
+		this.buttonsContainer.
+		SetActive(true);
 		this.pauseUIContainer.gameObject.SetActive(false);	
 		Managers.GameState.Paused = false;
 		Managers.GameClock.Paused = false;		

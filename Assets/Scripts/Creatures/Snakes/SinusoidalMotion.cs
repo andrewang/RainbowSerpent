@@ -110,12 +110,7 @@ public class SinusoidalMotion
 	}
 	
 	private Vector3 GetSinusoidalAngle(SnakeSegment segment, float interpolationPercent)
-	{
-		if (interpolationPercent == 0.0f) 
-		{
-			Debug.Log(@"start");
-		}
-		
+	{		
 		// Remember, the snake will travel sideways a distance equal to 2x sideways displacement while it travels
 		// a distance of 2 x cells
 		float instantLength = 0.001f;

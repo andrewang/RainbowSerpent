@@ -48,4 +48,12 @@ public class SceneController : MonoBehaviour
 	public virtual void OnUnload()
 	{
 	}
+	
+	public void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape)) 
+		{
+			Application.Quit(); 
+		}
+	}
 }
