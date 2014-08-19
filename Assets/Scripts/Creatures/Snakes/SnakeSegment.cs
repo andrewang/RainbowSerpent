@@ -140,22 +140,22 @@ public class SnakeSegment : MonoBehaviour
 		this.sprite.type = UISprite.Type.Filled;
 	}
 		
-	public bool TouchesSegment( SnakeSegment otherSegment )
+	public float DistanceSquaredTo( SnakeSegment otherSegment )
 	{
 		Vector3 positionDiff = this.transform.localPosition - otherSegment.transform.localPosition;
 		float distanceSq = positionDiff.sqrMagnitude;
 		float radii = this.Radius + otherSegment.Radius;
 		float radiiSq = radii * radii;
-		return (distanceSq <= radiiSq);
+		return distanceSq - radiiSq;
 	}
 	
-	public bool TouchesCreature( Creature otherCreature )
+	public float DistanceSquaredToCreature( Creature otherCreature )
 	{
 		Vector3 positionDiff = this.transform.localPosition - otherCreature.transform.localPosition;
 		float distanceSq = positionDiff.sqrMagnitude;
 		float radii = this.Radius + otherCreature.Radius;
 		float radiiSq = radii * radii;
-		return (distanceSq <= radiiSq);		
+		return distanceSq - radiiSq;		
 	}
 	
 	public virtual void OnDestroy()

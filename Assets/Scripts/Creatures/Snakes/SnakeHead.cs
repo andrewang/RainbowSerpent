@@ -3,6 +3,8 @@ using System.Collections;
 
 public class SnakeHead : SnakeSegment
 {		
+	[SerializeField] private UISprite biteAnimation;
+	
 	/// <summary>
 	/// Updates the position of the head
 	/// </summary>
@@ -32,4 +34,14 @@ public class SnakeHead : SnakeSegment
 		remainingDisplacement = displacement - toDest.magnitude;
 		return true;
 	}	
+	
+	public void PlayTongueAnimation()
+	{
+		// set namePrefix on tongue animation
+	}
+	
+	public void PlayBiteAnimation()
+	{
+		// set namePrefix on tongue animation
+	}
 }

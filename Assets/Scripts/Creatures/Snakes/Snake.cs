@@ -152,7 +152,7 @@ public class Snake : MobileCreature
 		
 	public void UpdateSpeed()
 	{
-		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 		float baseSpeed = 0.0f;
 		float penaltyPerSegment = 0.0f;
 		if (this.Side == Side.Player)
@@ -564,8 +564,11 @@ public class Snake : MobileCreature
 		}
 		
 		// Otherwise test with the snake's head versus the other creature's own transform position
-		if (this.head.TouchesCreature(otherCreature))
+		float distanceSquared = this.head.DistanceSquaredToCreature(otherCreature);
+		if (distanceSquared <= 0.0f)
 		{
+			this.head.PlayBiteAnimation();
+			
 			if (otherCreature is Egg || otherCreature is Frog)
 			{
 				if (this.Side == Side.Player)
@@ -586,19 +589,20 @@ public class Snake : MobileCreature
 	private bool TestForInteraction(Snake otherSnake)
 	{	
 		SnakeHead head = this.head;
-		if (CanBiteHead(otherSnake))
+		bool bitingHead = CanBiteHead(otherSnake);
+		if (bitingHead)
 		{
-			otherSnake.SeverAtSegment(otherSnake.Head);
-			AddSegment();			
-			otherSnake.Die();
-			return true;		
+			return true;
 		}
 		
 		SnakeSegment otherSegment = otherSnake.Head.NextSegment;
 		while( otherSegment != null )
 		{
-			if (head.TouchesSegment( otherSegment ))
+			float distanceSquared = head.DistanceSquaredTo( otherSegment );
+			if (distanceSquared <= 0.0f)
 			{
+				this.head.PlayBiteAnimation();
+				
 				// Sever the snake at that point.
 				bool willDie = otherSnake.SeverAtSegment(otherSegment);
 				if (willDie)
@@ -619,7 +623,8 @@ public class Snake : MobileCreature
 	private bool CanBiteHead( Snake otherSnake )
 	{
 		SnakeHead otherHead = otherSnake.Head;
-		if (head.TouchesSegment(otherHead))
+		float distanceSquared = head.DistanceSquaredTo(otherHead);
+		if (distanceSquared <= 0.0f)
 		{
 			// If this is a head-head collision, check if we can bite this snake.  If not, do nothing
 			int numSegments = this.NumSegments;
@@ -636,8 +641,17 @@ public class Snake : MobileCreature
 					return false;
 				}
 			}
+			
+			this.head.PlayBiteAnimation();
+			
+			otherSnake.SeverAtSegment(otherSnake.Head);
+			AddSegment();			
+			otherSnake.Die();
 			return true;
 		}
+		
+		// Check for bite animation
+		
 		
 		return false;
 	}

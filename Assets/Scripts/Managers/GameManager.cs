@@ -265,7 +265,13 @@ public class GameManager : MonoBehaviour
 	
 	private void EndLevel()
 	{
+		// Remove any unlaid player egg (because it might hatch in the start zone!) and
+		// put the player under AI control so it can zoom back to the start zone.		
+		
 		Managers.GameState.LevelState = LevelState.LevelEnd;			
+		
+		RemoveUnlaidPlayerEgg();
+		
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		if (psc == null) { return; }
 		psc.PlayerControlled = false;
@@ -447,7 +453,7 @@ public class GameManager : MonoBehaviour
 	
 	private void SetFrogTimer()
 	{
-		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 		this.frogTimer = Managers.GameClock.Time + difficulty.FrogRespawnDelay;
 	}
 	
@@ -507,7 +513,6 @@ public class GameManager : MonoBehaviour
 	
 	#region Snake Eggs	
 
-	
 	private void HandleEggs(Side side)
 	{
 		int intSide = (int) side;
@@ -545,7 +550,7 @@ public class GameManager : MonoBehaviour
 			return;
 		}
 		
-		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 		if (side == Side.Player)
 		{
 			this.eggTimers[(int)side] = Managers.GameClock.Time + difficulty.PlayerEggLayingDelay;
@@ -619,6 +624,15 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	
+	private void RemoveUnlaidPlayerEgg()
+	{
+		// Do a direct access of the eggs array because GetEgg() screens out eggs which aren't laid
+		Egg egg = this.eggs[(int)Side.Player];
+		if (egg && egg.IsFullyGrown == false)
+		{
+			this.playerSnake.Tail.RemoveEgg();
+		}
+	}
 	
 	public List<Creature> GetEggs()
 	{
@@ -720,9 +734,11 @@ public class GameManager : MonoBehaviour
 	private void PlayerDeathSequence ()
 	{
 		HandleEggsAfterPlayerDeath();
-		
+
+		// reset stuff		
 		ResetSnakes();
 		ResetFrog();
+		SetTimers();
 		
 		PlaceSnakes();	
 	}
@@ -740,6 +756,8 @@ public class GameManager : MonoBehaviour
 			}
 			e.Die();
 		}
+		
+		
 	}
 	
 	private void ResetSnakes()

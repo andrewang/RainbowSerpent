@@ -32,7 +32,7 @@ public class Egg : Creature
 	
 	public void Setup()
 	{
-		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 		if (this.Side == Side.Player)
 		{
 			this.growingDuration = difficulty.PlayerEggCreationTime;

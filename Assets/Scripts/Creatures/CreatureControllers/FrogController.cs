@@ -32,14 +32,14 @@ public class FrogController : CreatureController
 		bool snakeNearby = SnakeIsNearby();
 		if (nearestEgg == null || snakeNearby)
 		{
-			MoveRandomly();
+			MoveRandomly(snakeNearby);
 			return;
 		}
 		
 		MoveTowardsEgg(nearestEgg);
 	}
 	
-	private void MoveRandomly()
+	private void MoveRandomly(bool urgent)
 	{
 		// Random move?  NOTE: this pays attention to walls...
 		List<Direction> availableDirections = this.GetAvailableDirections();
@@ -48,7 +48,7 @@ public class FrogController : CreatureController
 		int roll = UnityEngine.Random.Range(0, availableDirections.Count);		
 		Direction chosenDir = availableDirections[roll];
 		StartMoving(chosenDir);		
-		TakeLongJump(chosenDir);		
+		TakeJump(chosenDir, urgent);
 	}
 	
 	public override void StartMoving(Direction dir)
@@ -65,7 +65,7 @@ public class FrogController : CreatureController
 		if (availableDirections.Count == 0) 
 		{
 			// Do a random jump instead
-			MoveRandomly();
+			MoveRandomly(false);
 			return;
 		}
 		
@@ -92,7 +92,7 @@ public class FrogController : CreatureController
 			}
 		}
 		
-		TakeLongJump(chosenDir);
+		TakeJump(chosenDir, true);
 	}
 	
 	#region Utilities
@@ -222,13 +222,32 @@ public class FrogController : CreatureController
 		return true;
 	}
 	
-	private void TakeLongJump(Direction dir)
+	private void TakeJump(Direction dir, bool urgent)
 	{
 		Vector3 position = this.frog.transform.localPosition;
 		MazeCell cell = this.mazeController.GetCellForPosition( position );
 		
 		IntVector2 nextPos = new IntVector2(cell.X, cell.Y);
-		for (int i = 0; i < LongJumpDistance; ++i)
+		int jumpLength = 1;
+		if (urgent)
+		{
+			// 2/3 chance of long jump
+			if (Random.Range(0,3) > 0)
+			{
+				jumpLength = LongJumpDistance;
+			}
+		}
+		else
+		{
+			// 1/3 chance of long jump
+			if (Random.Range(0,3) == 0)
+			{
+				// long jump
+				jumpLength = LongJumpDistance;
+			}
+		}
+		
+		for (int i = 0; i < jumpLength; ++i)
 		{
 			nextPos = nextPos + SerpentConsts.DirectionVector[ (int) dir ];
 			if (AcceptableDestination(nextPos.x, nextPos.y) == false)
@@ -243,32 +262,6 @@ public class FrogController : CreatureController
 		this.frog.CurrentDestination = newDest;
 	}
 	
-	/*
-	private bool CanTakeLongJump(Direction dir)
-	{
-		Vector3 position = this.frog.transform.localPosition;
-		MazeCell cell = this.mazeController.GetCellForPosition( position );
-		
-		IntVector2 nextPos = new IntVector2(cell.X, cell.Y);
-		for (int i = 0; i < LongJumpDistance; ++i)
-		{
-			nextPos = nextPos + SerpentConsts.DirectionVector[ (int) dir ];
-			if (AcceptableDestination(nextPos.x, nextPos.y) == false)
-			{
-				return false;
-			}
-		}
-		
-		return true;
-	}
-	*/
-	
-	/*
-	private IntVector2 GetLongJumpDestination(Direction dir)
-	{
-		
-	}
-	*/
 	#endregion Utilities
 }
 

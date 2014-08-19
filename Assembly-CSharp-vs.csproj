@@ -146,11 +146,11 @@
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeHead.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeSegment.cs" />
      <Compile Include="Assets\Scripts\Creatures\Snakes\SnakeTrail.cs" />
-     <Compile Include="Assets\Scripts\Managers\DifficultyManager.cs" />
      <Compile Include="Assets\Scripts\Managers\GameClock.cs" />
      <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
      <Compile Include="Assets\Scripts\Managers\Managers.cs" />
      <Compile Include="Assets\Scripts\Managers\SceneManager.cs" />
+     <Compile Include="Assets\Scripts\Managers\SettingsManager.cs" />
      <Compile Include="Assets\Scripts\Maps\Door.cs" />
      <Compile Include="Assets\Scripts\Maps\LevelTheme.cs" />
      <Compile Include="Assets\Scripts\Maps\Maze.cs" />

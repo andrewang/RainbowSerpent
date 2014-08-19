@@ -11,7 +11,7 @@ public class Frog : MobileCreature
 	
 	public void Start()
 	{
-		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 		this.Speed = difficulty.FrogJumpingSpeed;
 		this.jumpingDelay = difficulty.FrogJumpingDelay;
 		this.currentJumpingDelay = this.jumpingDelay;

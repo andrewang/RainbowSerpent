@@ -28,16 +28,15 @@ public class GameState
 		}
 	}
 	
-	private Difficulty difficulty = 0;
 	public Difficulty Difficulty
 	{
 		get
 		{
-			return this.difficulty;
+			return Managers.SettingsManager.Difficulty;
 		}
 		set
 		{
-			this.difficulty = value;
+			Managers.SettingsManager.Difficulty = value;
 			RecalculateSpeed();
 		}
 	}
@@ -115,7 +114,7 @@ public class GameState
 	
 	public void RecalculateSpeed()
 	{
-		DifficultySettings difficulty = Managers.DifficultyManager.GetCurrentSettings();
+		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 	
 		this.gameSpeed = difficulty.GameSpeedMultiplier + difficulty.GameSpeedIncreasePerLevel * (this.level - 1);
 	}
