@@ -71,6 +71,9 @@ public class SettingsManager : MonoBehaviour
 		string text = File.ReadAllText(path);
 		Dictionary<string,object> dict = Json.Deserialize(text) as Dictionary<string,object>;
 		
+		// int version = dict.GetInt ("version");
+		// nothing to do with version at the moment.		
+		
 		int intDiff = dict.GetInt("difficulty");
 		this.difficulty = (Difficulty) intDiff;
 	}
@@ -78,6 +81,8 @@ public class SettingsManager : MonoBehaviour
 	public void Save()
 	{
 		Dictionary<string,object> saveDict = new Dictionary<string,object>();
+		
+		saveDict.Add("version", SerpentConsts.SettingsVersion);
 		
 		int intDiff = (int) this.Difficulty;
 		saveDict.Add("difficulty", intDiff);

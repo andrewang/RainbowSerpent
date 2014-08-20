@@ -45,9 +45,9 @@ public class Creature : MonoBehaviour
 	/// </summary>
 	/// <returns><c>true</c>, if the other creature should die, <c>false</c> otherwise.</returns>
 	/// <param name="otherCreature">Other creature.</param>
-	public virtual bool TestForInteraction(Creature otherCreature)
+	public virtual InteractionState TestForInteraction(Creature otherCreature)
 	{		
-		return false;
+		return InteractionState.Nothing;
 	}
 	
 	public virtual void Die()

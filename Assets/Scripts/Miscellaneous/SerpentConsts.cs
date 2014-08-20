@@ -6,6 +6,7 @@ using Serpent;
 public static class SerpentConsts
 {
 	public const string Version = "1.0.0";
+	public const int SettingsVersion = 1;
 	public const int ScreenShotVersion = 7;
 	
 	#region Level Data Keys
@@ -167,6 +168,12 @@ public static class SerpentConsts
 	public static int SmallPlayerSnakeLength = 2;
 	
 	#endregion Snake Lengths
+	
+	#region Animations
+	
+	public static float BiteDistSq = (float) (CellHeight * CellHeight);
+	
+	#endregion Animations
 	
 	#region Score
 	

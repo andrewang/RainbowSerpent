@@ -555,7 +555,7 @@ public class Snake : MobileCreature
 
 	#region Interaction with other creatures
 	
-	public override bool TestForInteraction(Creature otherCreature)
+	public override InteractionState TestForInteraction(Creature otherCreature)
 	{
 		Snake otherSnake = otherCreature as Snake;
 		if (otherSnake != null)	
@@ -566,9 +566,7 @@ public class Snake : MobileCreature
 		// Otherwise test with the snake's head versus the other creature's own transform position
 		float distanceSquared = this.head.DistanceSquaredToCreature(otherCreature);
 		if (distanceSquared <= 0.0f)
-		{
-			this.head.PlayBiteAnimation();
-			
+		{			
 			if (otherCreature is Egg || otherCreature is Frog)
 			{
 				if (this.Side == Side.Player)
@@ -580,19 +578,19 @@ public class Snake : MobileCreature
 			otherCreature.Die();
 			
 			// returning true may now be irrelevant.
-			return true;
+			return InteractionState.KilledSomething;
 		}
 		
-		return false;
+		return InteractionState.Nothing;
 	}
 	
-	private bool TestForInteraction(Snake otherSnake)
+	private InteractionState TestForInteraction(Snake otherSnake)
 	{	
 		SnakeHead head = this.head;
-		bool bitingHead = CanBiteHead(otherSnake);
-		if (bitingHead)
+		InteractionState result = TryToBiteHead(otherSnake);
+		if (result != InteractionState.Nothing)
 		{
-			return true;
+			return result;
 		}
 		
 		SnakeSegment otherSegment = otherSnake.Head.NextSegment;
@@ -600,27 +598,31 @@ public class Snake : MobileCreature
 		{
 			float distanceSquared = head.DistanceSquaredTo( otherSegment );
 			if (distanceSquared <= 0.0f)
-			{
-				this.head.PlayBiteAnimation();
-				
+			{				
 				// Sever the snake at that point.
 				bool willDie = otherSnake.SeverAtSegment(otherSegment);
 				if (willDie)
 				{
 					// Other snake dies, but don't gain a segment
-					otherSnake.Die();					
+					otherSnake.Die();
+					return InteractionState.KilledSomething;					
 				}
 						
-				return willDie;
+				return InteractionState.BitSomething;
+			}
+			else if (distanceSquared <= SerpentConsts.BiteDistSq)
+			{
+				// remember that the snake is close to an enemy segment
+				result = InteractionState.CloseToSomething;
 			}
 			
 			otherSegment = otherSegment.NextSegment;
 		}
 		
-		return false;
+		return result;
 	}
 	
-	private bool CanBiteHead( Snake otherSnake )
+	private InteractionState TryToBiteHead( Snake otherSnake )
 	{
 		SnakeHead otherHead = otherSnake.Head;
 		float distanceSquared = head.DistanceSquaredTo(otherHead);
@@ -631,29 +633,30 @@ public class Snake : MobileCreature
 			int otherSegments = otherSnake.NumSegments;
 			if (numSegments < otherSegments)				
 			{
-				return false;
+				return InteractionState.CloseToSomething;
 			}
 			else if (numSegments == otherSnake.NumSegments)
 			{
 				// Note that player snakes lose a tied biting contest
 				if (this.Controller is PlayerSnakeController)
 				{
-					return false;
+					return InteractionState.CloseToSomething;
 				}
 			}
-			
-			this.head.PlayBiteAnimation();
-			
+						
 			otherSnake.SeverAtSegment(otherSnake.Head);
 			AddSegment();			
 			otherSnake.Die();
-			return true;
+			return InteractionState.KilledSomething;
+		}
+		else if (distanceSquared <= SerpentConsts.BiteDistSq)
+		{
+			return InteractionState.CloseToSomething;
 		}
 		
-		// Check for bite animation
+		// Check for being close
 		
-		
-		return false;
+		return InteractionState.Nothing;
 	}
 	
 	#endregion Interaction with other creatures

@@ -191,6 +191,8 @@ public class GameManager : MonoBehaviour
 	{
 		Egg playerEgg = GetEgg( Side.Player );
 		
+		InteractionState playerInteractionState = InteractionState.Nothing;
+		
 		bool enemySnakeDied = false;
 		// Test for snake interactions, based on enemies first
 		List<Snake> enemySnakes = GetEnemySnakes();
@@ -204,8 +206,12 @@ public class GameManager : MonoBehaviour
 			}
 			
 			// Do reciprocal tests for snake interaction
-			bool enemyDies = this.playerSnake.TestForInteraction(enemySnake);
-			if (enemyDies)
+			InteractionState tempInteractionState = this.playerSnake.TestForInteraction(enemySnake);
+			if (tempInteractionState > playerInteractionState)
+			{
+				playerInteractionState = tempInteractionState;
+			}
+			if (tempInteractionState == InteractionState.KilledSomething)
 			{
 				// By removing a snake from enemySnakes, we move all the snakes after it up one in the list
 				// So we continue the loop by reiterating with the same 'i' value as before.
@@ -216,31 +222,45 @@ public class GameManager : MonoBehaviour
 			
 			// TODO: snake death should be triggered by the head so that any reason for a snake to die, works.  Currently
 			// PlayerSnakeDied is not invoked if the player dies due to egg-laying. 
-			bool playerDies = enemySnake.TestForInteraction(playerSnake);
-			if (playerDies)
+			InteractionState enemyInteractionState = enemySnake.TestForInteraction(playerSnake);
+			if (enemyInteractionState == InteractionState.KilledSomething)
 			{
-				// stop everything!
+				// player died!  stop everything!
 				return;
 			}
 			
 			// Test for frog
 			if (this.frog != null)
 			{
-				enemySnake.TestForInteraction(this.frog);
+				InteractionState state = enemySnake.TestForInteraction(this.frog);
+				if (enemyInteractionState < state)
+				{
+					enemyInteractionState = state;
+				}
 			}
 			
 			// Test for eating player egg
 			if (playerEgg != null)
 			{
-				enemySnake.TestForInteraction(playerEgg);				
+				InteractionState state = enemySnake.TestForInteraction(playerEgg);				
+				if (enemyInteractionState < state)
+				{
+					enemyInteractionState = state;
+				}
 			}
+			
+			enemySnake.Head.UpdateInteractionState(enemyInteractionState);
 			
 			++i;
 		}
 		
 		if (this.frog != null)
 		{
-			this.playerSnake.TestForInteraction(this.frog);
+			InteractionState result =  this.playerSnake.TestForInteraction(this.frog);
+			if (result > playerInteractionState)
+			{
+				playerInteractionState = result;
+			}
 		}		
 		
 		// Check for player eating enemy egg
@@ -248,7 +268,12 @@ public class GameManager : MonoBehaviour
 		bool enemyEggDied = false;
 		if (enemyEgg != null)
 		{
-			enemyEggDied = this.playerSnake.TestForInteraction(enemyEgg);
+			InteractionState result = this.playerSnake.TestForInteraction(enemyEgg);
+			enemyEggDied = (result == InteractionState.KilledSomething);
+			if (result > playerInteractionState)
+			{
+				playerInteractionState = result;
+			}			
 		}
 		
 		if (enemySnakeDied && enemySnakes.Count == 0 && enemyEgg == null)
@@ -261,6 +286,8 @@ public class GameManager : MonoBehaviour
 			// egg eaten and no enemy snakes exist
 			EndLevel();			
 		}
+		
+		this.playerSnake.Head.UpdateInteractionState(playerInteractionState);
 	}
 	
 	private void EndLevel()

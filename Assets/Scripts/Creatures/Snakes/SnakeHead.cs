@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Serpent;
 
 public class SnakeHead : SnakeSegment
 {		
-	[SerializeField] private UISprite biteAnimation;
+	[SerializeField] private UISpriteAnimation biteAnimation;
+	
+	private InteractionState interactionState = InteractionState.Nothing;
 	
 	/// <summary>
 	/// Updates the position of the head
@@ -37,11 +40,35 @@ public class SnakeHead : SnakeSegment
 	
 	public void PlayTongueAnimation()
 	{
-		// set namePrefix on tongue animation
+		// set namePrefix on animation
+		if (this.biteAnimation == null) { return; }
+		
+		this.biteAnimation.namePrefix = "Tongue";
 	}
 	
 	public void PlayBiteAnimation()
 	{
-		// set namePrefix on tongue animation
+		// set namePrefix on animation
+		if (this.biteAnimation == null) { return; }
+
+		this.biteAnimation.namePrefix = "Bite";
+	}
+	
+	public void UpdateInteractionState(InteractionState interactionState)
+	{
+		if (interactionState == this.interactionState) 
+		{
+			return;
+		}		
+		this.interactionState = interactionState;
+		
+		if (interactionState == InteractionState.Nothing)
+		{
+			PlayTongueAnimation();
+		}
+		else
+		{
+			PlayBiteAnimation();
+		}
 	}
 }

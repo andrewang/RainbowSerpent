@@ -33,5 +33,12 @@ namespace Serpent
 		Classic
 	}
 	
+	public enum InteractionState
+	{
+		Nothing = 0,
+		CloseToSomething,
+		BitSomething,
+		KilledSomething
+	}
 }
 

@@ -76,18 +76,18 @@ public class Frog : MobileCreature
 	
 	#region Eating eggs
 	
-	public override bool TestForInteraction(Creature otherCreature)
+	public override InteractionState TestForInteraction(Creature otherCreature)
 	{
-		if (!(otherCreature is Egg)) { return false; }
+		if (!(otherCreature is Egg)) { return InteractionState.Nothing; }
 		
 		if (this.TouchesCreature(otherCreature))
 		{
 			// make it die.
 			otherCreature.Die();
-			return true;
+			return InteractionState.KilledSomething;
 		}
 		    
-		 return false;
+		 return InteractionState.Nothing;
 	}
 		    
 	#endregion Eating eggs
