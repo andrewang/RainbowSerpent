@@ -588,8 +588,9 @@ public class Snake : MobileCreature
 	{	
 		SnakeHead head = this.head;
 		InteractionState result = TryToBiteHead(otherSnake);
-		if (result != InteractionState.Nothing)
+		if (result == InteractionState.KilledSomething) 
 		{
+			// killed it, nothing else to check.
 			return result;
 		}
 		
@@ -607,10 +608,13 @@ public class Snake : MobileCreature
 					otherSnake.Die();
 					return InteractionState.KilledSomething;					
 				}
-						
-				return InteractionState.BitSomething;
+				
+				if (result < InteractionState.BitSomething)
+				{
+					result = InteractionState.BitSomething;
+				}
 			}
-			else if (distanceSquared <= SerpentConsts.BiteDistSq)
+			else if (distanceSquared <= SerpentConsts.BiteDistSq && result < InteractionState.CloseToSomething)
 			{
 				// remember that the snake is close to an enemy segment
 				result = InteractionState.CloseToSomething;

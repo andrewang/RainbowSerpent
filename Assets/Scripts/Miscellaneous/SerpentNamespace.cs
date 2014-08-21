@@ -40,5 +40,13 @@ namespace Serpent
 		BitSomething,
 		KilledSomething
 	}
+	
+	public enum EventIdentifier
+	{
+		None,
+		PlayerEggLaying,
+		EnemyEggLaying,
+		CreateFrog,
+	}
 }
 

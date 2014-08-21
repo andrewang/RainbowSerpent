@@ -1,4 +1,5 @@
 using UnityEngine;
+using Serpent;
 
 public class DifficultySettings : MonoBehaviour
 {
@@ -19,5 +20,17 @@ public class DifficultySettings : MonoBehaviour
 	public float FrogRespawnDelay;
 	public float FrogJumpingSpeed;
 	public float FrogJumpingDelay;
+	
+	public float GetEggLayingDelay(Side side)
+	{
+		if (side == Side.Player)
+		{
+			return PlayerEggLayingDelay;
+		}
+		else
+		{
+			return EnemyEggLayingDelay;
+		}
+	}
 }
 

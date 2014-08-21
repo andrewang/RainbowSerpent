@@ -36,10 +36,8 @@ public class GameManager : MonoBehaviour
 	private bool updateSnakeColours = false;
 		
 	private Egg[] eggs = new Egg[2];
-	private float[] eggTimers = new float[2];
 	
 	private Frog frog = null;
-	private float frogTimer;
 	
 	private LevelTheme theme;
 	
@@ -96,7 +94,6 @@ public class GameManager : MonoBehaviour
 		LoadTheme(themeNum);
 		
 		// NOTE: snakes need to be created before input can be configured.  So snakes need to be created here.
-		SetTimers();
 		CreateSnakes();		
 		
 		LoadMapData(levelNum);
@@ -104,7 +101,10 @@ public class GameManager : MonoBehaviour
 	
 	public void Begin()
 	{
+		Managers.GameClock.Reset();
+	
 		PlaceSnakes();
+		CreateFrogCreationEvent();
 	}
 	
 	public void LoadTheme(int levelNum)
@@ -122,17 +122,7 @@ public class GameManager : MonoBehaviour
 		// Only place snakes once the map screenshot has been made.  So we pass a reference to the Begin method in here to be invoked when CreateScreenShot is done.
 		this.mazeController.CreateScreenshot(Begin);		
 	}
-	
-	private void SetTimers()
-	{	
-		// Set the egg timers so no timers are counting down, but start the countdown before spawning a frog.	
-		for (int i = 0; i < this.eggs.Length; ++i)
-		{
-			this.eggTimers[i] = 0.0f;
-		}
-		SetFrogTimer();
-	}
-	
+		
 	private void PlaceCreature(Creature creature, int x, int y, Direction direction)
 	{		
 		Vector3 position = this.mazeController.GetCellCentre(x, y);
@@ -168,23 +158,7 @@ public class GameManager : MonoBehaviour
 		{
 			UpdateEnemySnakeColours();
 			this.updateSnakeColours = false;
-		}
-		
-		if (GetEgg(Side.Enemy) == null)
-		{
-			List<Snake> enemySnakes = GetEnemySnakes();
-			if (enemySnakes.Count < this.maxNumEnemySnakes)
-			{
-				HandleEggs(Side.Enemy);
-			}
-		}
-		
-		if (GetEgg(Side.Player) == null && this.playerSnake != null)
-		{		
-			HandleEggs(Side.Player);
-		}		
-		
-		HandleFrogCreation();
+		}			
 	}
 	
 	private void UpdateSnakes()
@@ -395,7 +369,7 @@ public class GameManager : MonoBehaviour
 		psc.PlayerControlled = false;
 		
 		// Every time we place the player snake, reset the lay-egg timer.
-		SetEggTimer(Side.Player);
+		CreateEggLayingEvent(Side.Player);
 				
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
@@ -459,51 +433,34 @@ public class GameManager : MonoBehaviour
 	
 	#region Frogs
 	
-	private void HandleFrogCreation()
-	{
-		if (this.frog != null) { return; }
-		
-		if (this.frogTimer == 0.0f)
-		{
-			// Frog is dead, but timer isn't set.  We can now set the timer.
-			SetFrogTimer();
-			return;
-		}
-		
-		if (Managers.GameClock.Time > this.frogTimer)
-		{
-			// spawn frog and clear the timer
-			CreateFrog();
-			ClearFrogTimer();
-		}
-	}
-	
-	private void SetFrogTimer()
+	private void CreateFrogCreationEvent()
 	{
 		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
-		this.frogTimer = Managers.GameClock.Time + difficulty.FrogRespawnDelay;
+		float delay =  difficulty.FrogRespawnDelay;
+		
+		Managers.GameClock.RegisterEvent(delay, CreateFrog, EventIdentifier.CreateFrog);		
 	}
 	
-	private void ClearFrogTimer()
+	private void FrogDied(Creature frog)
 	{
-		this.frogTimer = 0.0f;
+		CreateFrogCreationEvent();
 	}
 	
-	private void ResetFrog()
+	private void RemoveFrog()
 	{
 		if (this.frog != null)
 		{
 			this.frog.Die();
 			this.frog = null;
 		}
-		
-		ClearFrogTimer();
 	}
 	
 	private void CreateFrog()
 	{
 		this.frog = SerpentUtils.Instantiate<Frog>(this.frogPrefab, this.mazeController.transform);
 		if (this.frog == null) { return; }
+		
+		this.frog.CreatureDied += FrogDied;
 		this.frog.SetUp(this, this.mazeController);
 		
 		// Randomize frog placement.
@@ -538,59 +495,65 @@ public class GameManager : MonoBehaviour
 		
 	#endregion Frogs
 	
-	#region Snake Eggs	
-
-	private void HandleEggs(Side side)
+	#region Snake Egg
+	
+	private bool EggLayingEventExists(Side side)
 	{
-		int intSide = (int) side;
-		if (this.eggTimers[intSide] == 0.0f)
-		{
-			// Do nothing.  No timer set.
-		}
-		else if (Managers.GameClock.Time > this.eggTimers[intSide])
-		{
-			// time for a random snake to start laying an egg.  But we need a snake with 3+ segments.
-			List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.NumSegments >= 3 );
-			if (qualifiedSnakes.Count == 0)
-			{
-				// Can't spawn an egg right now.  Reset the timer until later
-				SetEggTimer(side);
-				return;
-			}
-			
-			int i = UnityEngine.Random.Range( 0, qualifiedSnakes.Count );
-			Snake snake = qualifiedSnakes[i];
-			Egg e = CreateEgg(snake);
-			SetEgg( side, e );
-			e.Setup();
-			
-			ClearEggTimer(side);
-		}		
+		EventIdentifier id = (side == Side.Player) ? EventIdentifier.PlayerEggLaying : EventIdentifier.EnemyEggLaying;
+		GameEvent e = Managers.GameClock.GetEvent(id);
+		return (e != null);
 	}
 	
-	// This method should be called when an enemy snake dies or an enemy egg is eaten
-	private void SetEggTimer(Side side)
+	private void CreateEggLayingEvent(Side side)
 	{
-		if (this.eggTimers[(int)side] > 0.0f) 
+		if (EggLayingEventExists(side))
 		{
-			// already set, don't delay it any further
+			// event exists - abort!
 			return;
 		}
 		
 		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
+		float delay = difficulty.GetEggLayingDelay(side);
+		
+		EventIdentifier id = (side == Side.Player) ? EventIdentifier.PlayerEggLaying : EventIdentifier.EnemyEggLaying;
+		
 		if (side == Side.Player)
 		{
-			this.eggTimers[(int)side] = Managers.GameClock.Time + difficulty.PlayerEggLayingDelay;
+			Managers.GameClock.RegisterEvent(delay, CheckIfPlayerEggLayingPossible, id);
 		}
 		else
 		{
-			this.eggTimers[(int)side] = Managers.GameClock.Time + difficulty.EnemyEggLayingDelay;
+			Managers.GameClock.RegisterEvent(delay, CheckIfEnemyEggLayingPossible, id);
 		}
 	}
 	
-	private void ClearEggTimer(Side side)
+	private void CheckIfPlayerEggLayingPossible()
 	{
-		this.eggTimers[(int)side] = 0.0f;				
+		CheckIfEggLayingPossible(Side.Player);
+	}
+
+	private void CheckIfEnemyEggLayingPossible()
+	{
+		CheckIfEggLayingPossible(Side.Enemy);
+	}
+	
+	private void CheckIfEggLayingPossible(Side side)
+	{
+		// time for a random snake to start laying an egg.  But we need a snake with 3+ segments.
+		// TODO allow player snake to lay egg when only 2 segments!
+		List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.NumSegments >= 3 );
+		if (qualifiedSnakes.Count == 0)
+		{
+			// Can't spawn an egg right now.  Reset the timer until later
+			CreateEggLayingEvent(side);
+			return;
+		}
+		
+		int i = UnityEngine.Random.Range(0, qualifiedSnakes.Count);
+		Snake snake = qualifiedSnakes[i];
+		Egg e = CreateEgg(snake);
+		SetEgg( side, e );
+		e.Setup();
 	}
 	
 	private Egg CreateEgg(Snake snake)
@@ -647,7 +610,7 @@ public class GameManager : MonoBehaviour
 		
 		if (e.Side == Side.Enemy)
 		{
-			SetEggTimer(Side.Enemy);
+			CreateEggLayingEvent(Side.Enemy);
 		}
 	}
 	
@@ -749,7 +712,7 @@ public class GameManager : MonoBehaviour
 		snake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
 		this.snakes.Remove(snake);
 		
-		SetEggTimer(Side.Enemy);
+		CreateEggLayingEvent(Side.Enemy);
 	}
 	
 	private void TriggerPlayerDeathSequence()
@@ -764,10 +727,9 @@ public class GameManager : MonoBehaviour
 
 		// reset stuff		
 		ResetSnakes();
-		ResetFrog();
-		SetTimers();
+		RemoveFrog();
 		
-		PlaceSnakes();	
+		Begin();	
 	}
 	
 	private void HandleEggsAfterPlayerDeath()

@@ -1,11 +1,13 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Serpent;
 
 public class GameEvent
 {
 	public float ExecutionTime { get; set; }
 	public Action Action { get; set; }
+	public EventIdentifier Identifier { get; set; }
 }
 
 public class GameClock : MonoBehaviour
@@ -36,11 +38,12 @@ public class GameClock : MonoBehaviour
 	
 	#region Event Queue
 	
-	public void RegisterEvent(float timeInFuture, Action action)
+	public void RegisterEvent(float timeInFuture, Action action, EventIdentifier identifier = EventIdentifier.None)
 	{
 		GameEvent newEvent = new GameEvent();
 		newEvent.ExecutionTime = this.time + timeInFuture;
-		newEvent.Action = action;	
+		newEvent.Action = action;
+		newEvent.Identifier = identifier;
 		InsertInEventQueue(newEvent);
 	}
 	
@@ -67,6 +70,18 @@ public class GameClock : MonoBehaviour
 		this.eventQueue.Add(newEvent);
 	}
 	
+	public GameEvent GetEvent(EventIdentifier identifier)
+	{
+		foreach( GameEvent e in this.eventQueue)
+		{
+			if (e.Identifier == identifier)
+			{
+				return e;
+			}
+		}
+		return null;
+	}
+	
 	private void CheckEventQueue()
 	{
 		// A while loop is required in case there are multiple events triggered
@@ -77,7 +92,7 @@ public class GameClock : MonoBehaviour
 			if (existingEvent.ExecutionTime < this.time)
 			{
 				existingEvent.Action();
-				this.eventQueue.RemoveAt(0);
+				this.eventQueue.Remove(existingEvent);
 				continue;
 			}
 			break;
