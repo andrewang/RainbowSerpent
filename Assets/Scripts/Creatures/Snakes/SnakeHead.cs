@@ -3,7 +3,8 @@ using System.Collections;
 using Serpent;
 
 public class SnakeHead : SnakeSegment
-{		
+{	
+	[SerializeField] private UISprite biteAnimationSprite;
 	[SerializeField] private UISpriteAnimation biteAnimation;
 	
 	private InteractionState interactionState = InteractionState.Nothing;
@@ -70,5 +71,14 @@ public class SnakeHead : SnakeSegment
 		{
 			PlayBiteAnimation();
 		}
+	}
+	
+	public override void SetSpriteDepth(int depth)
+	{
+		base.SetSpriteDepth(depth);
+		
+		// make sure the animation sprite depth stays the same relative to base sprite
+		int animSpriteDepth = this.biteAnimationSprite.depth;
+		this.biteAnimationSprite.depth = depth + animSpriteDepth;
 	}
 }

@@ -169,7 +169,7 @@ public class SnakeSegment : MonoBehaviour
 	
 	#region Sprite
 	
-	public void SetSpriteDepth(int depth)
+	public virtual void SetSpriteDepth(int depth)
 	{
 		this.sprite.depth = depth;
 	}

@@ -1,14 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Snakes/Snake.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs">
     <Files>
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="663" Column="26" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="593" Column="40" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/FrogController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="111" Column="60" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="168" Column="37" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="241" Column="51" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="175" Column="3" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="80" Column="57" />
+      <File FileName="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="467" Column="13" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

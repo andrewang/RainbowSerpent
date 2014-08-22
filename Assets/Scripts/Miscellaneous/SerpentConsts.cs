@@ -5,7 +5,7 @@ using Serpent;
 
 public static class SerpentConsts
 {
-	public const string Version = "1.0.0";
+	public const string Version = "0.7.0";
 	public const int SettingsVersion = 1;
 	public const int ScreenShotVersion = 7;
 	
@@ -171,7 +171,8 @@ public static class SerpentConsts
 	
 	#region Animations
 	
-	public static float BiteDistSq = (float) (CellHeight * CellHeight);
+	// NOTE: x 0.5 x 0.5 added in order to allow easy rescaling of the unsquared distance
+	public static float BiteDistSq = (float) (CellHeight * CellHeight) * (1.0f * 1.0f);
 	
 	#endregion Animations
 	
