@@ -7,7 +7,7 @@ public static class SerpentConsts
 {
 	public const string Version = "0.7.0";
 	public const int SettingsVersion = 1;
-	public const int ScreenShotVersion = 7;
+	public const int ScreenShotVersion = 9;
 	
 	#region Level Data Keys
 	
@@ -28,7 +28,7 @@ public static class SerpentConsts
 	
 	// Pixel sizes of cells.
 	public const int CellWidth = 32;
-	public const int CellHeight = 26;	
+	public const int CellHeight = 28;	
 
 	public const int WallIntersectionOverlap = 1;
 	

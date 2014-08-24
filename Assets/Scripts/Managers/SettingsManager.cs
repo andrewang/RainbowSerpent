@@ -12,7 +12,7 @@ public class SettingsManager : MonoBehaviour
 	
 	private string settingsFileName = "settings.json";
 	
-	private Difficulty difficulty;
+	private Difficulty difficulty = Difficulty.Easy;
 	public Difficulty Difficulty 
 	{ 
 		get
@@ -24,7 +24,35 @@ public class SettingsManager : MonoBehaviour
 			this.difficulty = value;
 			Save();
 		}
-	}	
+	}
+	
+	private float soundVolume = 1.0f;
+	public float SoundVolume
+	{
+		get
+		{
+			return this.soundVolume;
+		}
+		set		
+		{
+			this.soundVolume = value;
+			Save();
+		}
+	}
+	
+	private float musicVolume = 1.0f;
+	public float MusicVolume
+	{
+		get
+		{
+			return this.musicVolume;
+		}
+		set		
+		{
+			this.musicVolume = value;
+			Save();
+		}
+	}
 
 	public DifficultySettings GetDifficultySettings(Difficulty difficulty)
 	{
@@ -76,6 +104,9 @@ public class SettingsManager : MonoBehaviour
 		
 		int intDiff = dict.GetInt("difficulty");
 		this.difficulty = (Difficulty) intDiff;
+		
+		this.soundVolume = dict.GetFloat("soundVolume");
+		this.musicVolume = dict.GetFloat("musicVolume");
 	}
 	
 	public void Save()
@@ -86,6 +117,8 @@ public class SettingsManager : MonoBehaviour
 		
 		int intDiff = (int) this.Difficulty;
 		saveDict.Add("difficulty", intDiff);
+		saveDict.Add("soundVolume", this.soundVolume);
+		saveDict.Add("musicVolume", this.musicVolume);
 		
 		string jsonText = Json.Serialize(saveDict);
 		File.WriteAllText(SettingsFilePath(), jsonText);

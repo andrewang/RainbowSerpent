@@ -1,16 +1,27 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/SceneControllers/OptionsSceneController.cs">
     <Files>
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="168" Column="37" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="241" Column="51" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="175" Column="3" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="80" Column="57" />
-      <File FileName="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="467" Column="13" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
+      <File FileName="Assets/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="1" Column="1" />
+      <File FileName="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Maps/Maze.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/SplashSceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Managers/SceneManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets/NGUI/Scripts/Tweening/UISlider.cs" Line="392" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/OptionsSceneController.cs" Line="19" Column="48" />
+      <File FileName="Assets/Scripts/Managers/SettingsManager.cs" Line="123" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Managers/SettingsManager.cs" line="108" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

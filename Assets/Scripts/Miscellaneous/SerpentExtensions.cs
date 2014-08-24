@@ -44,6 +44,32 @@ namespace SerpentExtensions
 
 			return 0;
 		}
+		
+		/// <summary>
+		/// Gets a float contained in a dictionary with the given key		
+		/// </summary>
+		/// <returns>The float.</returns>
+		/// <param name="dict">Dict.</param>
+		/// <param name="key">Key.</param>
+		static public float GetFloat(this Dictionary<string,object> dict, string key)
+		{
+			if (dict.ContainsKey(key) == false)	{ return 0.0f; }
+			object o = dict[key];
+			if (o is float) 
+			{
+				return (float) o; 
+			}
+			if (o is double)
+			{
+				double longFloat = (double) o;
+				float f = (float)longFloat;
+				return f;
+			}
+			
+			// could be an int/long			
+			int temp = GetInt(dict,key);			
+			return (float)temp;
+		}
 
 		/// <summary>
 		/// Gets an object from a dictionary with a given key
