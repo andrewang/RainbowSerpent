@@ -168,6 +168,7 @@
      <Compile Include="Assets\Scripts\Miscellaneous\SerpentUtils.cs" />
      <Compile Include="Assets\Scripts\UI\AnimatedSprite.cs" />
      <Compile Include="Assets\Scripts\UI\AnimationManager.cs" />
+     <Compile Include="Assets\Scripts\UI\AudioVolumeControl.cs" />
      <Compile Include="Assets\Scripts\UI\Components\CyclicSettingsLabel.cs" />
      <Compile Include="Assets\Scripts\UI\Components\InputController.cs" />
      <Compile Include="Assets\Scripts\UI\Components\MazeController.cs" />

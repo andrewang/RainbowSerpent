@@ -29,6 +29,8 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UIPanel mazePanel = null; 
 	[SerializeField] private UILabel debugInfoLabel = null;
 	
+	[SerializeField] private AudioSource musicSource;
+	
 	private bool paused;
 	
 	#endregion Serialized Fields
@@ -51,6 +53,8 @@ public class GameSceneController : RSSceneController
 		
 		if (this.mazePanel == null) { Debug.LogError("GameSceneController: mazePanel is null"); }
 		if (this.debugInfoLabel == null) { Debug.LogError("GameSceneController: debugInfoLabel is null"); }
+		
+		if (this.musicSource == null) { Debug.LogError("GameSceneController: musicSource is null"); }
 	}
 
 	#endregion Verify Serialize Fields
@@ -198,6 +202,8 @@ public class GameSceneController : RSSceneController
 		this.paused = false;
 		
 		Managers.GameClock.Paused = false;			
+		Managers.GameClock.Reset(); 
+		
 		Managers.GameState.Reset();
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);		
 	}
@@ -210,6 +216,8 @@ public class GameSceneController : RSSceneController
 		this.pauseUIContainer.gameObject.SetActive(true);	
 		Managers.GameState.Paused = true;
 		Managers.GameClock.Paused = true;
+		
+		this.musicSource.Pause();
 	}
 	
 	private void ResumeGame()
@@ -220,13 +228,19 @@ public class GameSceneController : RSSceneController
 		SetActive(true);
 		this.pauseUIContainer.gameObject.SetActive(false);	
 		Managers.GameState.Paused = false;
-		Managers.GameClock.Paused = false;		
+		Managers.GameClock.Paused = false;	
+		
+		this.musicSource.Play();	
 	}
 	
 	private void ReturnToMainMenu()
 	{
-		Managers.GameClock.Paused = false;		
+		// Clear the game clock of all events and state
+		Managers.GameClock.Paused = false;
+		Managers.GameClock.Reset(); 
+		
 		Managers.GameState.Reset();
+		
 		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Main);
 	}
 	
