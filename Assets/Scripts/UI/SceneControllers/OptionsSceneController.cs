@@ -9,15 +9,13 @@ public class OptionsSceneController : RSSceneController, CyclicSettingsDataSourc
 	
 	override public void Start()
 	{
-		base.Start();
-		//this.soundSlider.value = Managers.SettingsManager.SoundVolume;
-		
+		base.Start();		
 	}
 	
 	override public void OnLoad()
 	{
-		Debug.Log("Setting music slider volume to " + Managers.SettingsManager.MusicVolume);	
 		this.musicSlider.value = Managers.SettingsManager.MusicVolume;		
+		this.soundSlider.value = Managers.SettingsManager.SoundVolume;		
 	}
 
 	private void OnMainMenuButtonPressed()
@@ -51,34 +49,12 @@ public class OptionsSceneController : RSSceneController, CyclicSettingsDataSourc
 	public void OnSoundSliderChange()
 	{
 		float newValue = this.soundSlider.value;
-		if (newValue < 0.0f)
-		{
-			this.soundSlider.value = 0.0f;
-			return;
-		}
-		else if (newValue > 1.0f)
-		{
-			this.soundSlider.value = 1.0f;
-			return;
-		}
 		Managers.SettingsManager.SoundVolume = newValue;
 	}
 	
 	public void OnMusicSliderChange()
 	{
 		float newValue = this.musicSlider.value;
-		/*
-		if (newValue < 0.0f)
-		{
-			this.musicSlider.value = 0.0f;
-			return;
-		}
-		else if (newValue > 1.0f)
-		{
-			this.musicSlider.value = 1.0f;
-			return;
-		}
-		*/
 		Managers.SettingsManager.MusicVolume = newValue;
 	}
 	
