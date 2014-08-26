@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SceneManager : MonoBehaviour 
 {
-	SceneController currentController = null;
+	public SceneController CurrentController = null;
 
 	// Use this for initialization
 	void Start () 
@@ -24,11 +24,11 @@ public class SceneManager : MonoBehaviour
 
 	private IEnumerator LoadSceneCoroutine(string sceneName)
 	{
-		if (this.currentController != null)
+		if (this.CurrentController != null)
 		{
-			this.currentController.OnUnload();
-			Destroy(this.currentController.gameObject);
-			this.currentController = null;
+			this.CurrentController.OnUnload();
+			Destroy(this.CurrentController.gameObject);
+			this.CurrentController = null;
 		}
 
 		// Load loading scene first?
@@ -43,7 +43,7 @@ public class SceneManager : MonoBehaviour
 
 	public void RegisterSceneController(SceneController controller)
 	{
-		this.currentController = controller;
+		this.CurrentController = controller;
 		// Handle this in some other way?  TODO FIX.
 		controller.OnLoad();
 	}

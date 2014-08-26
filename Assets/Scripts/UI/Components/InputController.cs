@@ -3,7 +3,19 @@ using Serpent;
 
 public class InputController : MonoBehaviour
 {
-	public Snake PlayerSnake { get; set; }
+	private Snake playerSnake;
+	public Snake PlayerSnake
+	{
+		get
+		{
+			return playerSnake;
+		}
+		set
+		{
+			this.playerSnake = value;
+			this.playerSnakeController = this.playerSnake.Controller as PlayerSnakeController;
+		}
+	}
 	private PlayerSnakeController playerSnakeController;
 	
 	public InputController ()
@@ -35,11 +47,6 @@ public class InputController : MonoBehaviour
 	private void OnPressDirection(Direction direction)
 	{
 		if (this.PlayerSnake.Dead) { return; }
-		if (this.playerSnakeController == null)
-		{
-			this.playerSnakeController = this.PlayerSnake.Controller as PlayerSnakeController;
-			if (this.playerSnakeController == null) { return; }
-		}
 		if (this.playerSnakeController.PlayerControlled == false) 
 		{ 
 			this.playerSnakeController.SetDesiredDirection(direction);

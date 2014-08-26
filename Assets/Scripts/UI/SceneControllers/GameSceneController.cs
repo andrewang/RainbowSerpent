@@ -13,7 +13,6 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private InputController inputController = null; 
 	
 	// UI elements	
-	//[SerializeField] private GameObject textContainer = null;	
 	[SerializeField] private Camera sceneCamera = null;
 	[SerializeField] private UILabel[] labels;
 	[SerializeField] private UISprite[] sprites;
@@ -31,6 +30,7 @@ public class GameSceneController : RSSceneController
 	
 	[SerializeField] private AudioSource musicSource;
 	
+	private int levelLoaded = -1;
 	private bool paused;
 	
 	#endregion Serialized Fields
@@ -63,21 +63,36 @@ public class GameSceneController : RSSceneController
 	
 	override public void OnLoad()
 	{
-		base.OnLoad();
-		// Speed needs to be rechecked here because it may have otherwise been calculated before 
-		// SettingsManager was loaded.
-		Managers.GameState.RecalculateSpeed();
+		base.OnLoad();		
 		
-		Managers.GameClock.Reset();
 		this.gameManager.GameOver += this.GameOver;
 		LoadGameLevel(Managers.GameState.Level);
 	}
 
-	private void LoadGameLevel(int levelNum)
+	public void LoadGameLevel(int levelNum)
 	{
+		if (this.levelLoaded >= 1)
+		{
+			// Throw out old stuff
+			ResetForNewLevel();
+		}
+		this.levelLoaded = levelNum;
+		
+		Managers.GameClock.Reset();
+
+		// Speed needs to be rechecked here because it may have otherwise been calculated before 
+		// SettingsManager was loaded.
+		Managers.GameState.RecalculateSpeed();
+		
 		this.gameManager.Setup(levelNum);		
 		ConfigureUI();
 		ConfigureInput();
+	}
+	
+	private void ResetForNewLevel()
+	{
+		// Everything that should need to be reset ought to be stuff in the maze.
+		this.mazeController.Reset();
 	}
 	
 	private void ConfigureUI()

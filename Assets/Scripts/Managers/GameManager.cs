@@ -109,6 +109,10 @@ public class GameManager : MonoBehaviour
 	
 	public void LoadTheme(int levelNum)
 	{
+		if (this.theme != null)
+		{
+			Destroy(this.theme);
+		}
 		UnityEngine.Object prefab = Resources.Load("theme" + levelNum.ToString());
 		GameObject obj = Instantiate(prefab) as GameObject;
 		this.theme = obj.GetComponent<LevelTheme>();
@@ -426,7 +430,16 @@ public class GameManager : MonoBehaviour
 		
 		// Time to go to the next level.		
 		Managers.GameState.Level += 1;		
-		Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
+		//Managers.SceneManager.LoadScene(SerpentConsts.SceneNames.Game);
+		GameSceneController gsc = Managers.SceneManager.CurrentController as GameSceneController;
+		if (gsc == null)
+		{
+			// should never happen
+			return;
+		}
+		
+		gsc.LoadGameLevel(Managers.GameState.Level);
+		
 	}
 	
 	#endregion Snakes
