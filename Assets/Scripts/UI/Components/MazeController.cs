@@ -9,7 +9,10 @@ using SerpentExtensions;
 public class MazeController : MonoBehaviour
 {
 	[SerializeField] public Maze Maze = null;
+	
 	[SerializeField] private GameObject wallSpritePrefab = null;
+	[SerializeField] private GameObject[] cornerPrefabs = new GameObject[0];
+	
 	[SerializeField] private GameObject screenShotPrefab = null;	
 	[SerializeField] private UIPanel panel = null;
 	[SerializeField] private bool useScreenShots = true;
@@ -129,6 +132,11 @@ public class MazeController : MonoBehaviour
 
 		CreateHorizontalWallSprites();
 		CreateVerticalWallSprites();
+		
+		if (this.screenShotLoaded == false)
+		{	
+			CreateCornerSprites();
+		}
 	}
 	
 	private void CreateHorizontalWallSprites()
@@ -163,10 +171,10 @@ public class MazeController : MonoBehaviour
 			newWallSprite.color = this.wallColour;			
 			
 			// Configure as horizontal.
-			newWallSprite.width = SerpentConsts.CellWidth * (endX - startX + 1) + SerpentConsts.WallIntersectionOverlap * 2;
+			newWallSprite.width = SerpentConsts.CellWidth * (endX - startX + 1) - 7; // + SerpentConsts.WallIntersectionOverlap * 2;
 			float x = (float)(startX + endX) * 0.5f;			
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
-			pos.x -= newWallSprite.width * 0.5f;
+			//pos.x -= newWallSprite.width * 0.5f;
 			newWall.transform.localPosition = pos;	
 			
 			return newWallSprite;		
@@ -212,11 +220,11 @@ public class MazeController : MonoBehaviour
 			}
 			newWallSprite.color = this.wallColour;			
 			
-			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1) + SerpentConsts.WallIntersectionOverlap * 2;
+			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1) - 7; // + SerpentConsts.WallIntersectionOverlap * 2;
 			
 			float y = (float)(startY + endY) * 0.5f;
 			Vector3 pos = GetCellSideCentre( x, y, intSide);			
-			pos.y -= newWallSprite.width * 0.5f;
+			//pos.y -= newWallSprite.width * 0.5f;
 			newWall.transform.localPosition = pos;			
 
 			// Rotate the sprite to be vertical
@@ -245,7 +253,7 @@ public class MazeController : MonoBehaviour
 		for (int loop = 0; loop < loopLimit; ++loop)
 		{
 			Wall wall = getWallFunction(loop);
-			bool wallEnds = (start >= 0 && (wall == null || wall is Door));
+			bool wallEnds = (start >= 0); // && (wall == null || wall is Door));
 			if (wallEnds && !this.screenShotLoaded)
 			{
 				UISprite sprite = createSpriteFunction(start, loop - 1);
@@ -272,6 +280,169 @@ public class MazeController : MonoBehaviour
 			UISprite sprite = createSpriteFunction(start, loopLimit - 1);
 			this.wallSprites.Add(sprite);
 		}
+	}
+	
+	// Loop through all intersections of walls
+	// Where there is an end or a corner, add a corner graphic.
+	private void CreateCornerSprites()
+	{
+		// How iteration for creating *corners* works:
+		// We are iterating on squares (not corners).  At each cell, we will check to see if we
+		// should create a corner graphic in the UPPER RIGHT of the cell.
+		for (int y = 0; y < this.Maze.Height - 1; ++y)
+		{
+			for (int x = 0; x < this.Maze.Width - 1; ++x)
+			{
+				CreateCornerSpriteAt(x, y);
+			}
+		}
+	}
+	
+	private void CreateCornerSpriteAt(int x, int y)
+	{
+		Wall northWall;
+		Wall southWall;
+		Wall westWall;
+		Wall eastWall;
+		
+		MazeCell cell = this.Maze.Cells[x,y];
+		southWall = cell.Walls[(int) Direction.E];
+		westWall = cell.Walls[(int) Direction.N];
+		
+		MazeCell swCell = this.Maze.Cells[x+1,y+1];
+		northWall = swCell.Walls[(int) Direction.W];
+		eastWall = swCell.Walls[(int) Direction.S];
+		
+		Wall[] walls = new Wall[(int)Direction.Count];
+		walls[(int)Direction.N] = northWall;
+		walls[(int)Direction.S] = southWall;
+		walls[(int)Direction.W] = westWall;
+		walls[(int)Direction.E] = eastWall;
+		
+		int numWalls = 0;
+		for (int i = 0; i < (int)Direction.Count; ++i)
+		{
+			if (walls[i] != null)
+			{
+				++numWalls;
+			}
+		}
+		
+		if (numWalls == 0)
+		{
+			return;
+		}
+		
+		Vector3 cornerLocation = GetUpperRightCorner((float)x, (float)y);
+		
+		GameObject prefab = this.cornerPrefabs[numWalls - 1];
+		Direction orientation = Direction.N;
+		if (numWalls == 1)
+		{
+			// end piece
+			for (int i = 0; i < (int)Direction.Count; ++i)
+			{
+				if (walls[i] != null)
+				{
+					// We need the corner to be opposite to this direction to meet the wall graphic.
+					orientation = SerpentConsts.OppositeDirection[i];
+					//Debug.Log("Wall position is " + walls[i].transform.localPosition);
+				}
+			}
+		}
+		else if (numWalls == 2)
+		{
+			// elbow or through piece
+			if ((walls[(int)Direction.N] != null && walls[(int)Direction.S] != null) || (walls[(int)Direction.W] != null && walls[(int)Direction.E] != null))
+			{
+				// through piece uses the wall sprite instead of a corner
+				prefab = this.wallSpritePrefab;
+				if (walls[(int)Direction.W] != null)		
+				{
+					orientation = Direction.N;
+				}
+				else
+				{
+					orientation = Direction.W;
+				}
+			}
+			else
+			{
+				prefab = this.cornerPrefabs[1];
+				if (walls[(int)Direction.W] != null)
+				{
+					if (walls[(int)Direction.N] != null)
+					{
+						// W and N
+						orientation = Direction.S;
+					}
+					else
+					{
+						// W and S
+						orientation = Direction.E;
+					}
+				}
+				else
+				{
+					if (walls[(int)Direction.N] != null)
+					{
+						// E and N
+						orientation = Direction.W;
+					}
+					else
+					{
+						// W and S
+						orientation = Direction.N;
+					}
+				}
+			}
+			
+		}
+		else if (numWalls == 3)
+		{
+			// T intersection
+			// The T corner graphic is oriented to match the missing wall if the missing wall is in the north.
+			if (walls[(int)Direction.S] == null)
+			{
+				orientation = Direction.S;
+			}
+			else if (walls[(int)Direction.W] == null)
+			{
+				orientation = Direction.W;
+			}
+			else if (walls[(int)Direction.E] == null)
+			{
+				orientation = Direction.E;
+			}
+			
+		}
+		else
+		{
+			// + intersection
+			// Works in all directions.
+		}
+		
+		if (prefab == null) { return; }
+		
+		GameObject instantiated = (GameObject) Instantiate(prefab, new Vector3(0,0,0), Quaternion.identity);
+		instantiated.transform.parent = this.transform;
+		instantiated.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		instantiated.transform.localPosition = cornerLocation;
+		instantiated.transform.localEulerAngles = SerpentConsts.RotationVector3[(int)orientation];
+		
+		UISprite sprite = instantiated.GetComponent<UISprite>();
+		sprite.color = this.wallColour;
+		
+		// Special handling to set the length of through pieces.
+		if (prefab == this.wallSpritePrefab)
+		{
+			// get the size of the corner prefab
+			UISprite cornerSprite = this.cornerPrefabs[0].GetComponent<UISprite>();
+			sprite.width = cornerSprite.width;
+			sprite.height = cornerSprite.height;
+		}
+		
+		this.wallSprites.Add(sprite);
 	}
 	
 	/// <summary>
@@ -311,7 +482,7 @@ public class MazeController : MonoBehaviour
 		newObj.transform.parent = this.transform;
 		newObj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 		// For some reason screenshots seem to be shown slightly versus the real thing
-		newObj.transform.localPosition = new Vector3(0.0f,-0.5f,0.0f);
+		newObj.transform.localPosition = new Vector3(0.0f,0.0f,0.0f);
 		return newObj;
 	}
 	
@@ -562,14 +733,21 @@ public class MazeController : MonoBehaviour
 	/// Gets the centre position of a cell
 	/// </summary>
 	/// <returns>The cell centre.</returns>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
+	/// <param name="x">The x coordinate (cells).</param>
+	/// <param name="y">The y coordinate (cells).</param>
 	// TODO move this method into MazeCell if possible. Or make it take a MazeCell or IntVector2 instead.
 	public Vector3 GetCellCentre(float x, float y)
 	{
 		Vector3 pos = this.lowerLeftCellCentre;
 		pos.x += x * SerpentConsts.CellWidth;
 		pos.y += y * SerpentConsts.CellHeight;
+		return pos;
+	}
+	
+	
+	private Vector3 GetUpperRightCorner(float x, float y)
+	{
+		Vector3 pos = GetCellCentre( x + 0.5f, y + 0.5f);	
 		return pos;
 	}
 	

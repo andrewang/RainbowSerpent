@@ -64,6 +64,10 @@ public class GameSceneController : RSSceneController
 	override public void OnLoad()
 	{
 		base.OnLoad();
+		// Speed needs to be rechecked here because it may have otherwise been calculated before 
+		// SettingsManager was loaded.
+		Managers.GameState.RecalculateSpeed();
+		
 		Managers.GameClock.Reset();
 		this.gameManager.GameOver += this.GameOver;
 		LoadGameLevel(Managers.GameState.Level);

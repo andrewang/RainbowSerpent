@@ -5,9 +5,9 @@ using Serpent;
 
 public static class SerpentConsts
 {
-	public const string Version = "0.7.0";
+	public const string Version = "0.7.1";
 	public const int SettingsVersion = 1;
-	public const int ScreenShotVersion = 9;
+	public const int ScreenShotVersion = 10;
 	
 	#region Level Data Keys
 	

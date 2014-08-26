@@ -5,6 +5,8 @@ using Serpent;
 
 public class Frog : MobileCreature
 {
+	[SerializeField] private AudioSource		bounceSound;
+	
 	private float			jumpingDelay;
 	private float			currentJumpingDelay;
 	private FrogController	frogController;
@@ -56,6 +58,8 @@ public class Frog : MobileCreature
 		base.StartMoving(direction);
 		// rotate in direction of movement.
 		this.transform.eulerAngles = SerpentConsts.RotationVector3[ (int)direction ];
+		
+		this.bounceSound.Play();
 	}
 	
 	public override void ArrivedAtDestination(float remainingDisplacement)

@@ -37,7 +37,6 @@ public class GameState
 		set
 		{
 			Managers.SettingsManager.Difficulty = value;
-			RecalculateSpeed();
 		}
 	}
 	
