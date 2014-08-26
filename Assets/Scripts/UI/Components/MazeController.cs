@@ -69,11 +69,9 @@ public class MazeController : MonoBehaviour
 		this.scaleSet = false;
 		this.lowerLeftCellCentre = new Vector3(0,0,0);
 		
-		Debug.Log ("Destroying stuff...");
 		RemoveExistingWallSprites();
 		foreach( Transform child in this.Maze.transform )
 		{
-			Debug.Log ("This should destroy " + child.gameObject.name);
 			Destroy(child.gameObject);
 		}
 	}
