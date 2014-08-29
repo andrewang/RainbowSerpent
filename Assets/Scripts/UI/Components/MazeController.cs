@@ -201,7 +201,7 @@ public class MazeController : MonoBehaviour
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
 			if (door)
 			{	
-				pos.x -= SerpentConsts.CellWidth * 0.5f;			
+				pos.x -= newWallSprite.width * 0.5f;			
 			}			
 			newWall.transform.localPosition = pos;	
 			
@@ -262,7 +262,7 @@ public class MazeController : MonoBehaviour
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
 			if (door)
 			{	
-				pos.y -= SerpentConsts.CellHeight * 0.5f;			
+				pos.y -= newWallSprite.width * 0.5f;			
 			}
 			newWall.transform.localPosition = pos;			
 
