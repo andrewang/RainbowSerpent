@@ -14,8 +14,9 @@ public class Maze : MonoBehaviour
 	public IntVector2 PlayerStartPosition { get; private set; }
 	public Direction PlayerStartFacing { get; private set; }
 	
-	public IntVector2 PlayerStartZoneExit { get; private set; }
 	public IntVector2 PlayerStartZoneEntrance { get; private set; }
+	public IntVector2 PlayerStartZoneCentre { get; private set; }
+	public IntVector2 PlayerStartZoneExit { get; private set; }
 	
 	public IntVector2 EnemyStartPosition { get; private set; }
 	public Direction EnemyStartFacing { get; private set; }
@@ -74,6 +75,11 @@ public class Maze : MonoBehaviour
 		
 		// Create walls
 		CreateWalls(wallData, doorData);
+		
+		// Mark the "centre position" of the player start
+		int x = Math.Min(this.PlayerStartZoneEntrance.x, this.PlayerStartZoneExit.x);
+		int y = Math.Min(this.PlayerStartZoneEntrance.y, this .PlayerStartZoneExit.y);
+		this.PlayerStartZoneCentre = new IntVector2(x,y);
 		
 	}
 	
@@ -265,8 +271,9 @@ public class Maze : MonoBehaviour
 		{
 			// In order to be useful we want this position to be beyond the actual door, INSIDE the player zone, rather 
 			// than the position right in front of the player zone. 
-			IntVector2 otherSideOfDoor = GetNextCellPosition(position, dir);
-			this.PlayerStartZoneEntrance = otherSideOfDoor;
+			//IntVector2 otherSideOfDoor = GetNextCellPosition(position, dir);
+			//this.PlayerStartZoneEntrance = otherSideOfDoor;
+			this.PlayerStartZoneEntrance = position;
 		}
 	}
 	

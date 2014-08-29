@@ -11,6 +11,7 @@ public class PlayerSnakeController : SnakeController
 	/// </summary>
 	private Direction desiredDirection = Direction.None;
 	private bool reachedPlayerZone = false;
+	private bool insidePlayerZone = false;
 	
 	private bool playerControlled;
 	public bool PlayerControlled 
@@ -47,6 +48,7 @@ public class PlayerSnakeController : SnakeController
 	{
 		this.desiredDirection = Direction.None;
 		this.reachedPlayerZone = false;
+		this.insidePlayerZone = false;
 	}
 	
 	public void SetDesiredDirection(Direction direction)
@@ -116,6 +118,15 @@ public class PlayerSnakeController : SnakeController
 		}
 		
 		if (this.reachedPlayerZone == true)
+		{
+			dir = HeadTowards(maze.PlayerStartZoneCentre);
+			if (dir == Direction.None)
+			{
+				this.insidePlayerZone = true;
+			}
+		}
+		
+		if (this.insidePlayerZone == true)
 		{
 			dir = HeadTowards(maze.PlayerStartZoneExit);
 			if (dir == Direction.None)
