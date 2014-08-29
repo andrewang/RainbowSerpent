@@ -176,7 +176,7 @@ public class MazeController : MonoBehaviour
 		// This function creates a horizontal wall sprite stretching from startX to 
 		// endX in maze coordinates.  
 		//
-		Func<int, int, bool, UISprite> createSpriteFunction = delegate( int startX, int endX, bool door)
+		Func<int, bool, UISprite> createSpriteFunction = delegate( int startX, bool door)
 		{			
 			GameObject newWall;
 			if (door)
@@ -196,8 +196,8 @@ public class MazeController : MonoBehaviour
 			
 			// Configure as horizontal.
 			// Something special for doors...?
-			newWallSprite.width = SerpentConsts.CellWidth - 7;
-			float x = (float)(startX + endX) * 0.5f;			
+			newWallSprite.width = SerpentConsts.CellWidth - SerpentConsts.WallCornerSize;
+			float x = startX;
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
 			if (door)
 			{	
@@ -238,7 +238,7 @@ public class MazeController : MonoBehaviour
 		// This function creates a vertical wall sprite stretching from startY to 
 		// endY in maze coordinates.  
 		//
-		Func<int, int, bool, UISprite> createSpriteFunction = delegate( int startY, int endY, bool door )
+		Func<int, bool, UISprite> createSpriteFunction = delegate( int startY, bool door )
 		{
 			GameObject newWall;
 			if (door)
@@ -256,9 +256,9 @@ public class MazeController : MonoBehaviour
 			}
 			newWallSprite.color = this.wallColour;			
 			
-			newWallSprite.width = SerpentConsts.CellHeight * (endY - startY + 1) - 7;
+			newWallSprite.width = SerpentConsts.CellHeight - SerpentConsts.WallCornerSize;
 			
-			float y = (float)(startY + endY) * 0.5f;
+			float y = startY;
 			Vector3 pos = GetCellSideCentre( x, y, intSide);
 			if (door)
 			{	
@@ -286,7 +286,7 @@ public class MazeController : MonoBehaviour
 	/// <param name="loopLimit">Loop limit.</param>
 	/// <param name="getWallAction">Get wall action.</param>
 	/// <param name="createSpriteFunction">Create sprite action.</param>
-	private void CreateWalls(int loopLimit, Func<int, Wall> getWallFunction, Func<int, int, bool, UISprite> createSpriteFunction)
+	private void CreateWalls(int loopLimit, Func<int, Wall> getWallFunction, Func<int, bool, UISprite> createSpriteFunction)
 	{
 		int start = -1;
 		for (int loop = 0; loop < loopLimit; ++loop)
@@ -295,7 +295,7 @@ public class MazeController : MonoBehaviour
 			bool wallEnds = (start >= 0); // && (wall == null || wall is Door));
 			if (wallEnds && !this.screenShotLoaded)
 			{
-				UISprite sprite = createSpriteFunction(start, loop - 1, false);
+				UISprite sprite = createSpriteFunction(start, false);
 				this.wallSprites.Add(sprite);
 				start = -1;			
 			}
@@ -303,7 +303,7 @@ public class MazeController : MonoBehaviour
 			{
 				Door door = wall as Door;
 				// Create a sprite for the door.
-				UISprite doorSprite = createSpriteFunction(loop, loop, true);	
+				UISprite doorSprite = createSpriteFunction(loop, true);	
 				door.Sprite = doorSprite;			
 			}
 			else if (wall != null && start == -1)
@@ -316,7 +316,7 @@ public class MazeController : MonoBehaviour
 		// Any final wall at the end?
 		if (start != -1 && !this.screenShotLoaded)
 		{
-			UISprite sprite = createSpriteFunction(start, loopLimit - 1, false);
+			UISprite sprite = createSpriteFunction(start, false);
 			this.wallSprites.Add(sprite);
 		}
 	}

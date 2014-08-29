@@ -30,7 +30,7 @@ public static class SerpentConsts
 	public const int CellWidth = 32;
 	public const int CellHeight = 28;	
 
-	public const int WallIntersectionOverlap = 1;
+	public const int WallCornerSize = 7;
 	
 	public const int BorderWidth = 1;
 	
