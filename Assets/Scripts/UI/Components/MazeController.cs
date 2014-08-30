@@ -89,15 +89,9 @@ public class MazeController : MonoBehaviour
 			DetermineMazeScale();
 			this.scaleSet = true;
 			
-			if (this.useScreenShots == false) { return; }
-			
-			if (this.screenShotContainer == null)
+			if (this.useScreenShots == true && this.screenShotContainer == null)
 			{
 				CreateScreenshot(this.screenShotCompletedAction);
-			}
-			else
-			{
-				SetScreenShotScale();				
 			}
 		}
 	}
@@ -532,9 +526,9 @@ public class MazeController : MonoBehaviour
 	private GameObject CreateScreenshotObject()
 	{
 		GameObject newObj = (GameObject) Instantiate(this.screenShotPrefab, new Vector3(0,0,0), Quaternion.identity);
-		newObj.transform.parent = this.transform;
+		// Now create screenshot object parallel to the maze instead of inside it.
+		newObj.transform.parent = this.transform.parent;
 		newObj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		// For some reason screenshots seem to be shown slightly versus the real thing
 		newObj.transform.localPosition = new Vector3(0.0f,0.0f,0.0f);
 		return newObj;
 	}
@@ -627,25 +621,6 @@ public class MazeController : MonoBehaviour
 		uiTexture.depth = depth - 10;
 		
 		RemoveWallSprites();
-		
-		if (this.scaleSet)
-		{
-			SetScreenShotScale();
-		}
-	}
-	
-	private void SetScreenShotScale()
-	{
-		if (this.screenShotContainer == null) { return; }
-
-		float screenRescaling = Managers.ScreenManager.Scale;
-		
-		Vector3 mazeScale = this.transform.localScale;
-		Vector3 textureScale = this.screenShotContainer.transform.localScale;
-		textureScale.x /= mazeScale.x;
-		textureScale.y /= mazeScale.y;
-		textureScale *= screenRescaling;
-		this.screenShotContainer.transform.localScale = textureScale;
 	}
 	
 	private void RemoveWallSprites()
