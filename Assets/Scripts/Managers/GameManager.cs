@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
 	
 	private LevelTheme theme;
 	
+	private int levelNum;
+	
 	#endregion Fields
 	
 	#region Properties
@@ -74,29 +76,32 @@ public class GameManager : MonoBehaviour
 	
 	#region Setup
 	
-	public void Setup(int rawLevelNum)
+	public void Setup(int levelNum)
 	{
 		Managers.GameState.LevelState = LevelState.LevelStart;
 		
-		int levelNum = ((rawLevelNum - 1) % Managers.GameState.NumLevels) + 1;
-		int themeNum = ((rawLevelNum - 1) % Managers.GameState.NumThemes) + 1;
+		this.levelNum = levelNum;
+		
+		// The level # and theme # to use depends on how many are available!
+		int levelToUse = ((levelNum - 1) % Managers.GameState.NumLevels) + 1;
+		int themeToUse = ((levelNum - 1) % Managers.GameState.NumThemes) + 1;
 		
 		// New rule for casual: only have 1 snake per level until that value equals MaxNumEnemySnakes.
 		if (Managers.GameState.Difficulty == Difficulty.Easy)
 		{
-			this.maxNumEnemySnakes = Math.Min(rawLevelNum, SerpentConsts.MaxNumEnemySnakes);
+			this.maxNumEnemySnakes = Math.Min(levelNum, SerpentConsts.MaxNumEnemySnakes);
 		}
 		else
 		{
 			this.maxNumEnemySnakes = SerpentConsts.MaxNumEnemySnakes;
 		}
 		
-		LoadTheme(themeNum);
+		LoadTheme(themeToUse);
 		
 		// NOTE: snakes need to be created before input can be configured.  So snakes need to be created here.
 		CreateSnakes();	
 		
-		LoadMapData(levelNum);
+		LoadMapData(levelToUse);
 	}
 	
 	public void Begin()
@@ -306,7 +311,7 @@ public class GameManager : MonoBehaviour
 	{
 		// Delete any existing snakes first.
 		// Cache the length of the player's snake?
-		int playerSnakeLength = SerpentConsts.PlayerSnakeLength;
+		int playerSnakeLength = SerpentConsts.GetSnakeLength(Side.Player, this.levelNum);
 		if (this.playerSnake != null && this.playerSnake.Dead == false)
 		{
 			playerSnakeLength = this.playerSnake.NumSegments;
@@ -321,9 +326,11 @@ public class GameManager : MonoBehaviour
 		List<Snake> enemySnakes = GetEnemySnakes();
 		int currNumEnemySnakes = enemySnakes.Count;
 		
+		int snakeLength = SerpentConsts.GetSnakeLength(Side.Enemy, this.levelNum);
+		
 		for (int i = 0; i < (this.maxNumEnemySnakes - currNumEnemySnakes); ++i)
 		{
-			CreateEnemySnake(SerpentConsts.EnemySnakeLength);
+			CreateEnemySnake(snakeLength);
 		}
 	}
 	

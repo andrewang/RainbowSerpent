@@ -160,12 +160,29 @@ public static class SerpentConsts
 		}
 	}
 	
+	public static int GetSnakeLength( Side side, int level )
+	{
+		if (side == Side.Player)
+		{
+			return PlayerSnakeLength;
+		}
+		else if (level == 1)
+		{
+			return EnemyFirstLevelSnakeLength;
+		}
+		else
+		{
+			return EnemySnakeLength;
+		}
+	}
+	
 	public static int InitialNumPlayerSnakes = 3;
 	public static int MaxNumEnemySnakes = 3;
-	public static int EnemySnakeLength = 5;
-	public static int SmallEnemySnakeLength = 3;
-	public static int PlayerSnakeLength = 3;
-	public static int SmallPlayerSnakeLength = 2;
+	private static int EnemyFirstLevelSnakeLength = 5;
+	private static int EnemySnakeLength = 7;
+	private static int SmallEnemySnakeLength = 2;
+	private static int PlayerSnakeLength = 3;
+	private static int SmallPlayerSnakeLength = 2;
 	
 	#endregion Snake Lengths
 	
