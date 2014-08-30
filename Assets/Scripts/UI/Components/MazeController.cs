@@ -30,6 +30,7 @@ public class MazeController : MonoBehaviour
 	private bool scaleSet = false;
 	
 	private List<UISprite> wallSprites = new List<UISprite>();
+	private List<UISprite> doorSprites = new List<UISprite>();
 
 	/// <summary>
 	/// The centre position of the lower leftmost cell in the maze
@@ -64,17 +65,14 @@ public class MazeController : MonoBehaviour
 	
 	public void Reset()
 	{
-		this.screenShotContainer = null;
+		RemoveScreenShot();
+		RemoveWallSprites();
+		RemoveDoors();
+		
 		this.screenShotCompletedAction = null;
 		this.screenShotLoaded = false;
 		this.scaleSet = false;
-		this.lowerLeftCellCentre = new Vector3(0,0,0);
-		
-		RemoveExistingWallSprites();
-		foreach( Transform child in this.Maze.transform )
-		{
-			Destroy(child.gameObject);
-		}
+		this.lowerLeftCellCentre = new Vector3(0,0,0);		
 	}
 	
 	void LateUpdate()
@@ -502,10 +500,14 @@ public class MazeController : MonoBehaviour
 	/// <returns>The new wall object.</returns>
 	private GameObject CreateDoorObject()
 	{
-		GameObject newWall = (GameObject) Instantiate(this.doorSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
-		newWall.transform.parent = this.transform;
-		newWall.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-		return newWall;
+		GameObject newDoor = (GameObject) Instantiate(this.doorSpritePrefab, new Vector3(0,0,0), Quaternion.identity);
+		newDoor.transform.parent = this.transform;
+		newDoor.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		
+		UISprite s = newDoor.GetComponent<UISprite>();
+		this.doorSprites.Add( s );
+		
+		return newDoor;
 	}
 	
 	/// <summary>
@@ -624,7 +626,7 @@ public class MazeController : MonoBehaviour
 		int depth = uiTexture.depth;
 		uiTexture.depth = depth - 10;
 		
-		RemoveExistingWallSprites();
+		RemoveWallSprites();
 		
 		if (this.scaleSet)
 		{
@@ -646,15 +648,29 @@ public class MazeController : MonoBehaviour
 		this.screenShotContainer.transform.localScale = textureScale;
 	}
 	
-	private void RemoveExistingWallSprites()
+	private void RemoveWallSprites()
 	{
 		// Remove existing wall sprites after creating a screenshot
 		foreach(UISprite sprite in this.wallSprites)
 		{
-			sprite.gameObject.transform.parent = null;
-			UnityEngine.Object.Destroy(sprite.gameObject);
+			Destroy(sprite.gameObject);
 		}
 		this.wallSprites.Clear();
+	}
+	
+	private void RemoveDoors()
+	{
+		foreach( UISprite sprite in this.doorSprites )
+		{
+			Destroy(sprite.gameObject);
+		}
+		this.doorSprites.Clear();
+	}
+	
+	private void RemoveScreenShot()
+	{
+		Destroy (this.screenShotContainer);
+		this.screenShotContainer = null;		
 	}
 	
 	// In the chain of transforms, calculate all the local offsets relative to the specified transform.

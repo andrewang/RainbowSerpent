@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
 		LoadTheme(themeNum);
 		
 		// NOTE: snakes need to be created before input can be configured.  So snakes need to be created here.
-		CreateSnakes();		
+		CreateSnakes();	
 		
 		LoadMapData(levelNum);
 	}
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
 	{
 		if (this.theme != null)
 		{
-			Destroy(this.theme);
+			Destroy(this.theme.gameObject);
 		}
 		UnityEngine.Object prefab = Resources.Load("theme" + levelNum.ToString());
 		GameObject obj = Instantiate(prefab) as GameObject;
@@ -304,14 +304,39 @@ public class GameManager : MonoBehaviour
 	
 	private void CreateSnakes()
 	{
+		// Delete any existing snakes first.
+		// Cache the length of the player's snake?
+		int playerSnakeLength = SerpentConsts.PlayerSnakeLength;
+		if (this.playerSnake != null && this.playerSnake.Dead == false)
+		{
+			playerSnakeLength = this.playerSnake.NumSegments;
+		}
+		DestroySnakes();
+		
 		this.playerSnakeConf = this.playerSnakeConfig.GetComponent<SnakeConfig>();		
-		CreatePlayerSnake(SerpentConsts.PlayerSnakeLength);
+		CreatePlayerSnake(playerSnakeLength);
 		
 		this.enemySnakeConf = this.theme.EnemySnakeConfig;
-		for (int i = 0; i < this.maxNumEnemySnakes; ++i)
+		
+		List<Snake> enemySnakes = GetEnemySnakes();
+		int currNumEnemySnakes = enemySnakes.Count;
+		
+		for (int i = 0; i < (this.maxNumEnemySnakes - currNumEnemySnakes); ++i)
 		{
 			CreateEnemySnake(SerpentConsts.EnemySnakeLength);
 		}
+	}
+	
+	private void DestroySnakes()
+	{
+		this.playerSnake = null; 
+		for (int i = 0; i < this.snakes.Count; ++i)
+		{
+			Snake s = this.snakes[i];
+			s.ReturnSegmentsToCache();
+			Destroy(s.gameObject);		
+		}
+		this.snakes.Clear();
 	}
 	
 	private Snake CreatePlayerSnake(int length)
@@ -412,8 +437,8 @@ public class GameManager : MonoBehaviour
 	private void PlayerReturnedToStart(Snake playerSnake)
 	{
 		this.playerSnake.Visible = false;
-		this.playerSnake.ReturnToCache();
-		this.playerSnake = null;
+		//this.playerSnake.ReturnToCache();
+		//this.playerSnake = null;
 		
 		// Add one again to player snakes.  This allows new player snakes to increase the total.  When the initial player is spawned that subtracts one.
 		Managers.GameState.ExtraSnakes += 1;
@@ -436,6 +461,12 @@ public class GameManager : MonoBehaviour
 		{
 			// should never happen
 			return;
+		}
+		
+		// Clear frog
+		if (this.frog != null)
+		{
+			RemoveFrog();
 		}
 		
 		gsc.LoadGameLevel(Managers.GameState.Level);
@@ -723,13 +754,20 @@ public class GameManager : MonoBehaviour
 		snake.Dead = true;
 		
 		snake.SnakeSegmentsChanged -= this.NumSnakeSegmentsChanged;
+		snake.ReturnSegmentsToCache();
 		this.snakes.Remove(snake);
+		Destroy(snake.gameObject);
 		
 		CreateEggLayingEvent(Side.Enemy);
 	}
 	
 	private void TriggerPlayerDeathSequence()
 	{
+		if (Managers.GameClock.Paused)
+		{
+			Debug.Log("Clock unpaused.  Why was this necessary?");
+			Managers.GameClock.Paused = false;
+		}
 		Managers.GameClock.RegisterEvent(3.0f,
 			() => PlayerDeathSequence() );
 	}
@@ -758,8 +796,6 @@ public class GameManager : MonoBehaviour
 			}
 			e.Die();
 		}
-		
-		
 	}
 	
 	private void ResetSnakes()
@@ -769,7 +805,6 @@ public class GameManager : MonoBehaviour
 			this.snakes[i].Reset();
 		}
 	}
-	
 	
 	#endregion Snake Death
 	
