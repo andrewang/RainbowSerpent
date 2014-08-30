@@ -1,6 +1,6 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Miscellaneous/SerpentConsts.cs">
     <Files>
       <File FileName="Assets/Scripts/UI/SceneControllers/HelpSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
@@ -9,7 +9,7 @@
       <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="1" Column="1" />
       <File FileName="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Maps/Maze.cs" Line="270" Column="44" />
+      <File FileName="Assets/Scripts/Maps/Maze.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/SplashSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/OptionsSceneController.cs" Line="1" Column="1" />
@@ -23,8 +23,9 @@
       <File FileName="Assets/Scripts/Managers/Managers.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/InputController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="319" Column="48" />
-      <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="113" Column="29" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="184" Column="20" />
+      <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="10" Column="41" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

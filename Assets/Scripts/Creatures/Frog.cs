@@ -32,6 +32,7 @@ public class Frog : MobileCreature
 	public override void Update()
 	{
 		// Decrement movement delay and don't move if the delay hasn't expired
+		// This should be replaced with a game clock event.
 		if (this.currentJumpingDelay > 0.0f)
 		{
 			float delta = RealTime.deltaTime;
