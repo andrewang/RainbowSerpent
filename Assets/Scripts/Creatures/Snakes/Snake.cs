@@ -165,8 +165,9 @@ public class Snake : MobileCreature
 			baseSpeed = difficulty.BaseEnemySpeed;
 			penaltyPerSegment = difficulty.EnemySegmentSlowdown;
 		}
-	
-		this.Speed = baseSpeed - penaltyPerSegment * this.NumSegments;
+		// NOTE: penaltyPerSegment should be a negative value.
+		
+		this.Speed = baseSpeed + penaltyPerSegment * this.NumSegments;
 		if (Managers.GameState.LevelState == LevelState.LevelEnd)
 		{
 			this.Speed *= 2.0f;
@@ -368,8 +369,7 @@ public class Snake : MobileCreature
 		return willDie;
 	}
 	
-	// Method to call on player snake when transitioning levels
-	public void ReturnToCache()
+	public void ReturnSegmentsToCache()
 	{
 		// Return eaten/destroyed segments to the cache.				
 		SnakeSegment seg = this.head;
@@ -380,7 +380,7 @@ public class Snake : MobileCreature
 		// segment, in case previousSeg and seg are the same.
 		previousSeg.NextSegment = null;		
 		
-		// NOTE: Can't return snake head to the snake body cache.
+		// NOTE: Can't return snake head to the snake *body* cache.
 		do
 		{
 			if (seg != this.head)
@@ -396,11 +396,14 @@ public class Snake : MobileCreature
 		} while ( true );
 	
 		// Destroy head prefab and any attached objects - esp with sprite animations.
+		/*
 		UISpriteAnimation[] animations = this.head.GetComponentsInChildren<UISpriteAnimation>();
 		foreach (UISpriteAnimation anim in animations)
 		{
 			Destroy(anim.gameObject);
 		}
+		*/
+		Destroy(this.head.gameObject);
 		this.head = null;
 		
 		UpdateSpeed();
