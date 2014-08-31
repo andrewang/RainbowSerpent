@@ -26,34 +26,23 @@ public class Snake : MobileCreature
 		}
 	}
 	
-	private int initialNumSegments;
+	private int initialLength;
 	
-	public int NumSegments
+	private int length = 0;
+	public int Length
 	{
 		get
 		{
-			int numSegments = 0;
-			SnakeSegment segment = this.head;
-			while (segment != null)
-			{
-				++numSegments;
-				segment = segment.NextSegment;
-			}
-			return numSegments;
+			return this.length;
 		}
 	}
 	
+	private SnakeBody tail;
 	public SnakeBody Tail
 	{
 		get
 		{
-			if (this.head == null) { return null; }
-			SnakeSegment segment = this.head;
-			while (segment.NextSegment != null)
-			{
-				segment = segment.NextSegment;
-			}
-			return segment as SnakeBody;
+			return this.tail;
 		}
 	}
 
@@ -101,7 +90,7 @@ public class Snake : MobileCreature
 		}
 		
 		this.config = config;
-		this.initialNumSegments = numSegments;
+		this.initialLength = numSegments;
 		for (int i = 0; i < numSegments; ++i)
 		{
 			AddSegment();
@@ -132,17 +121,18 @@ public class Snake : MobileCreature
 		{
 			tail.RemoveEgg();
 		}
-
-		// Restore segments
-		int numSegments = this.NumSegments;
-		for (int i = numSegments; i < this.initialNumSegments; ++i)	
-		{
-			AddSegment();
-		}
-		// Make sure the head's gameObject is active
+		
+		// Reset head 
+		this.head.ResetSize();
 		this.head.gameObject.SetActive(true);
 		
-		// NOTE: if an enemy snake ate the player then it will have an extra segment.  Do we need to remove it?		
+		int length = this.Length;
+		
+		// Restore any missing segments
+		for (int i = length; i < this.initialLength; ++i)	
+		{
+			AddSegment();
+		}		
 	}
 	
 	override public void Die()
@@ -167,11 +157,26 @@ public class Snake : MobileCreature
 		}
 		// NOTE: penaltyPerSegment should be a negative value.
 		
-		this.Speed = baseSpeed + penaltyPerSegment * this.NumSegments;
+		this.Speed = baseSpeed + penaltyPerSegment * this.Length;
 		if (Managers.GameState.LevelState == LevelState.LevelEnd)
 		{
 			this.Speed *= 2.0f;
 		}								
+	}
+	
+	public void UpdateLengthAndTail()
+	{
+		this.length = 0;
+		SnakeSegment segment = this.head;
+		SnakeSegment lastSegment = null;
+		while (segment != null)
+		{
+			++this.length;
+			lastSegment = segment;
+			segment = segment.NextSegment;
+		}
+		
+		this.tail = lastSegment as SnakeBody;
 	}
 	
 	public override void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)
@@ -192,7 +197,7 @@ public class Snake : MobileCreature
 		Vector3 displacement = oppositeVector; 
 		if (!withinTile)
 		{
-			displacement *= this.NumSegments * SerpentConsts.CellWidth;
+			displacement *= this.Length * SerpentConsts.CellWidth;
 		}
 		Vector3 tailPos = position + displacement;
 	
@@ -217,6 +222,14 @@ public class Snake : MobileCreature
 	
 	public void AddSegment()
 	{
+		// Don't add a segment if the snake will become bigger than should be possible.
+		if (this.Length == SerpentConsts.MaxSnakeLength)
+		{
+			return;
+		}
+		
+		this.length++;
+		
 		// This method should add a new segment at the end of the snake.  It can be in the same position
 		// as the last segment and will appear when the now next-to-last segment moves away from
 		// its current position.
@@ -233,7 +246,7 @@ public class Snake : MobileCreature
 			SnakeBody newBodySegment = Managers.SnakeBodyCache.GetObject<SnakeBody>();
 			newSegment = newBodySegment;
 			
-			newBodySegment.ResetProperties();			
+			newBodySegment.Reset();			
 			newBodySegment.SetParent(this);			
 			newBodySegment.Snake = this;
 			
@@ -265,7 +278,7 @@ public class Snake : MobileCreature
 		
 		if (this.config.Player)
 		{		
-			int firstColourIndex = (this.NumSegments - 1) % (SerpentConsts.PlayerSegmentColours.Length);
+			int firstColourIndex = (this.Length - 1) % (SerpentConsts.PlayerSegmentColours.Length);
 			Color firstColor = SerpentConsts.PlayerSegmentColours[firstColourIndex];
 			
 			int secondColourIndex = (firstColourIndex + 1) % (SerpentConsts.PlayerSegmentColours.Length);
@@ -283,6 +296,7 @@ public class Snake : MobileCreature
 			this.SnakeSegmentsChanged(this);
 		}
 		UpdateSpeed();
+		UpdateLengthAndTail();
 	}
 	
 	public void ChangeColour(Color newColour)
@@ -311,8 +325,7 @@ public class Snake : MobileCreature
 		if (willDie)
 		{
 			seg = this.head;		
-			previousSeg = seg;	
-			this.head.gameObject.SetActive(false);
+			previousSeg = seg;
 		}
 		else
 		{
@@ -325,6 +338,8 @@ public class Snake : MobileCreature
 					break;
 				}
 			} while (seg != null);
+			
+			previousSeg.NextSegment = null;
 		}
 		
 		if (seg == null)
@@ -333,38 +348,26 @@ public class Snake : MobileCreature
 			return false;
 		}
 
-		// Return eaten/destroyed segments to the cache.				
-		SnakeSegment nextSegment = seg.NextSegment;
+		SnakeSegment nextSegment;
 		
-		// Sever connection to destroyed segments prior to calling destroy but AFTER hanging a pointer to the next 
-		// segment, in case previousSeg and seg are the same.
-		previousSeg.NextSegment = null;		
-		
-		// NOTE: Can't return snake head to the snake body cache.
 		do
 		{
+			nextSegment = seg.NextSegment;
+			seg.ShrinkAndDie();
 			if (this.SnakeSegmentEaten != null)
 			{
 				this.SnakeSegmentEaten(this.Side, seg.gameObject.transform.localPosition);
 			}
-			
-			if (seg != this.head)
-			{
-				Managers.SnakeBodyCache.ReturnObject<SnakeBody>(seg.gameObject);
-			}
+						
 			seg = nextSegment;
-			if (seg == null)
-			{
-				break;
-			}
-			nextSegment = seg.NextSegment;
-		} while ( true );
+		} while ( seg != null );
 		
 		if ( this.SnakeSegmentsChanged != null )
 		{
 			this.SnakeSegmentsChanged( this );
 		}
 		UpdateSpeed();
+		UpdateLengthAndTail();
 		
 		return willDie;
 	}
@@ -395,16 +398,11 @@ public class Snake : MobileCreature
 			nextSegment = seg.NextSegment;
 		} while ( true );
 	
-		// Destroy head prefab and any attached objects - esp with sprite animations.
-		/*
-		UISpriteAnimation[] animations = this.head.GetComponentsInChildren<UISpriteAnimation>();
-		foreach (UISpriteAnimation anim in animations)
-		{
-			Destroy(anim.gameObject);
-		}
-		*/
+		// Destroy head prefab and any attached objects - i.e. sprite animations.
 		Destroy(this.head.gameObject);
 		this.head = null;
+		this.tail = null;
+		this.length = 0;
 		
 		UpdateSpeed();
 		
@@ -636,13 +634,13 @@ public class Snake : MobileCreature
 		if (distanceSquared <= 0.0f)
 		{
 			// If this is a head-head collision, check if we can bite this snake.  If not, do nothing
-			int numSegments = this.NumSegments;
-			int otherSegments = otherSnake.NumSegments;
+			int numSegments = this.Length;
+			int otherSegments = otherSnake.Length;
 			if (numSegments < otherSegments)				
 			{
 				return InteractionState.CloseToSomething;
 			}
-			else if (numSegments == otherSnake.NumSegments)
+			else if (numSegments == otherSnake.Length)
 			{
 				// Note that player snakes lose a tied biting contest
 				if (this.Controller is PlayerSnakeController)

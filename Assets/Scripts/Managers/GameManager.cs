@@ -311,10 +311,10 @@ public class GameManager : MonoBehaviour
 	{
 		// Delete any existing snakes first.
 		// Cache the length of the player's snake?
-		int playerSnakeLength = SerpentConsts.GetSnakeLength(Side.Player, this.levelNum);
+		int playerSnakeLength = SerpentConsts.GetStartingSnakeLength(Side.Player, this.levelNum);
 		if (this.playerSnake != null && this.playerSnake.Dead == false)
 		{
-			playerSnakeLength = this.playerSnake.NumSegments;
+			playerSnakeLength = this.playerSnake.Length;
 		}
 		DestroySnakes();
 		
@@ -326,7 +326,7 @@ public class GameManager : MonoBehaviour
 		List<Snake> enemySnakes = GetEnemySnakes();
 		int currNumEnemySnakes = enemySnakes.Count;
 		
-		int snakeLength = SerpentConsts.GetSnakeLength(Side.Enemy, this.levelNum);
+		int snakeLength = SerpentConsts.GetStartingSnakeLength(Side.Enemy, this.levelNum);
 		
 		for (int i = 0; i < (this.maxNumEnemySnakes - currNumEnemySnakes); ++i)
 		{
@@ -592,7 +592,7 @@ public class GameManager : MonoBehaviour
 	{
 		// time for a random snake to start laying an egg.  But we need a snake with 3+ segments.
 		// TODO allow player snake to lay egg when only 2 segments!
-		List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.NumSegments >= 3 );
+		List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.Length >= 3 );
 		if (qualifiedSnakes.Count == 0)
 		{
 			// Can't spawn an egg right now.  Reset the timer until later
@@ -635,7 +635,7 @@ public class GameManager : MonoBehaviour
 		Direction dir = availableDirections[randomIndex];
 		
 		Snake newSnake = null;
-		int length = SerpentConsts.GetNewlyHatchedSnakeLength( egg.Side );
+		int length = SerpentConsts.NewlyHatchedSnakeLength;
 		if (egg.Side == Side.Enemy)
 		{
 			newSnake = CreateEnemySnake(length);
@@ -828,13 +828,13 @@ public class GameManager : MonoBehaviour
 	{
 		if (this.playerSnake.Dead) { return; }
 		
-		int playerLength = this.playerSnake.NumSegments;
+		int playerLength = this.playerSnake.Length;
 		
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for( int i = 0; i < enemySnakes.Count; ++i)
 		{
 			Snake enemySnake = enemySnakes[i];
-			if (enemySnake.NumSegments >= playerLength)
+			if (enemySnake.Length >= playerLength)
 			{
 				// dangerous colour
 				enemySnake.ChangeColour(this.theme.EnemySnakeColour);

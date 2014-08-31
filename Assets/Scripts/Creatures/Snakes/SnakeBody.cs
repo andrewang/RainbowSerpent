@@ -10,9 +10,9 @@ public class SnakeBody : SnakeSegment
 	// The final segment of a snake may have an egg that it is creating.
 	public Egg Egg { get; set; }
 		
-	public override void ResetProperties()
+	public override void Reset()
 	{
-		base.ResetProperties();
+		base.Reset();
 		RemoveEgg();
 		this.DistanceFromHead = 0.0f;
 	}
@@ -77,5 +77,10 @@ public class SnakeBody : SnakeSegment
 			this.Egg.Die();
 			this.Egg = null;
 		}
+	}
+	
+	override protected void ShrinkComplete()
+	{
+		Managers.SnakeBodyCache.ReturnObject<SnakeBody>(this.gameObject);		
 	}
 }

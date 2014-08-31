@@ -133,11 +133,24 @@ public class SnakeSegment : MonoBehaviour
 	
 	#endregion Properties
 	
-	public virtual void ResetProperties()
+	private UITweener tween;
+	
+	public virtual void Reset()
 	{
 		// Should reset all the segment's properties.
 		this.NextSegment = null;
 		this.sprite.type = UISprite.Type.Filled;
+		ResetSize();
+	}
+	
+	public void ResetSize()
+	{
+		this.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		if (this.tween != null)
+		{
+			Destroy(this.tween);
+			this.tween = null;
+		}
 	}
 		
 	public float DistanceSquaredTo( SnakeSegment otherSegment )
@@ -190,5 +203,21 @@ public class SnakeSegment : MonoBehaviour
 		this.sprite.spriteName = spriteName;
 	}
 
-	#endregion Sprite	
+	#endregion Sprite
+	
+	public void ShrinkAndDie()	
+	{
+		// Make sure the segment is disconnected from other stuff.
+		this.Snake = null;
+		this.NextSegment = null;
+		
+		EventDelegate tweenFinished = new EventDelegate(this, "ShrinkComplete");
+		this.tween = TweenScale.Begin(this.gameObject, 0.5f, new Vector3(0.01f, 0.01f, 0.01f));
+		this.tween.onFinished.Add(tweenFinished);		                                  
+	}
+	
+	virtual protected void ShrinkComplete()
+	{
+		this.gameObject.SetActive(false);
+	}
 }

@@ -149,21 +149,16 @@ public static class SerpentConsts
 	
 	#endregion Eggs
 	
+	#region Number of Snakes
+	
+	public static int InitialNumPlayerSnakes = 3;
+	public static int MaxNumEnemySnakes = 3;
+	
+	#endregion Number of Snakes
+	
 	#region Snake Lengths
 	
-	public static int GetNewlyHatchedSnakeLength( Side side )
-	{
-		if (side == Side.Player)
-		{
-			return SmallPlayerSnakeLength;
-		}
-		else
-		{
-			return SmallEnemySnakeLength;
-		}
-	}
-	
-	public static int GetSnakeLength( Side side, int level )
+	public static int GetStartingSnakeLength( Side side, int level )
 	{
 		if (side == Side.Player)
 		{
@@ -179,13 +174,11 @@ public static class SerpentConsts
 		}
 	}
 	
-	public static int InitialNumPlayerSnakes = 3;
-	public static int MaxNumEnemySnakes = 3;
+	public static int MaxSnakeLength = 7;
+	public static int NewlyHatchedSnakeLength = 2;
 	private static int EnemyFirstLevelSnakeLength = 5;
 	private static int EnemySnakeLength = 7;
-	private static int SmallEnemySnakeLength = 2;
 	private static int PlayerSnakeLength = 3;
-	private static int SmallPlayerSnakeLength = 2;
 	
 	#endregion Snake Lengths
 	
