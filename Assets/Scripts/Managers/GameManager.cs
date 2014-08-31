@@ -212,8 +212,8 @@ public class GameManager : MonoBehaviour
 				return;
 			}
 			
-			// Test for frog
-			if (this.frog != null)
+			// Test for frog if it is not in the middle of a jump
+			if (this.frog != null && !this.frog.Jumping)
 			{
 				InteractionState state = enemySnake.TestForInteraction(this.frog);
 				if (enemyInteractionState < state)
@@ -237,7 +237,7 @@ public class GameManager : MonoBehaviour
 			++i;
 		}
 		
-		if (this.frog != null)
+		if (this.frog != null && !this.frog.Jumping)
 		{
 			InteractionState result =  this.playerSnake.TestForInteraction(this.frog);
 			if (result > playerInteractionState)
@@ -700,6 +700,13 @@ public class GameManager : MonoBehaviour
 	
 	private void SetEgg( Side side, Egg egg )
 	{
+		int intSide = (int) side;
+		if (this.eggs[intSide] != null)
+		{
+			// This object should be destroyed!  Though we shouldn't be creating an egg at the same time as 
+			// one already exists.
+			Destroy(this.eggs[intSide].gameObject);
+		}
 		this.eggs[ (int) side ] = egg;
 	}
 	

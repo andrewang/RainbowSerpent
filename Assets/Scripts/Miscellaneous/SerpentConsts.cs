@@ -5,7 +5,7 @@ using Serpent;
 
 public static class SerpentConsts
 {
-	public const string Version = "0.7.2";
+	public const string Version = "0.7.3";
 	public const int SettingsVersion = 1;
 	public const int ScreenShotVersion = 11;
 	

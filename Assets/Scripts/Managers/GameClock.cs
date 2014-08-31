@@ -70,6 +70,25 @@ public class GameClock : MonoBehaviour
 		this.eventQueue.Add(newEvent);
 	}
 	
+	public void RemoveEvents(EventIdentifier identifier)
+	{
+		// TODO - replace with RemoveALL and predicate call
+		List<GameEvent> eventsToRemove = new List<GameEvent>();
+		
+		foreach (GameEvent e in this.eventQueue)
+		{
+			if (e.Identifier == identifier)
+			{
+				eventsToRemove.Add(e);
+			}
+		}
+		
+		foreach (GameEvent e in eventsToRemove)
+		{
+			this.eventQueue.Remove(e);
+		}
+	}
+	
 	public GameEvent GetEvent(EventIdentifier identifier)
 	{
 		foreach( GameEvent e in this.eventQueue)

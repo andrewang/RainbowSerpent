@@ -4,19 +4,20 @@ using System.Collections.Generic;
 using Serpent;
 
 public class Frog : MobileCreature
-{
+{	
 	[SerializeField] private AudioSource		bounceSound;
 	
 	private float			jumpingDelay;
-	private float			currentJumpingDelay;
 	private FrogController	frogController;
+	
+	public bool Jumping { get; private set; }
 	
 	public void Start()
 	{
 		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
 		this.Speed = difficulty.FrogJumpingSpeed;
 		this.jumpingDelay = difficulty.FrogJumpingDelay;
-		this.currentJumpingDelay = this.jumpingDelay;
+		CreateFutureJumpEvent();
 	}
 	
 	public void SetUp(GameManager gameManager, MazeController mazeController)
@@ -27,31 +28,6 @@ public class Frog : MobileCreature
 
 		this.frogController = new FrogController(this, gameManager, mazeController);		
 		this.Controller = this.frogController;
-	}
-	
-	public override void Update()
-	{
-		// Decrement movement delay and don't move if the delay hasn't expired
-		// This should be replaced with a game clock event.
-		if (this.currentJumpingDelay > 0.0f)
-		{
-			float delta = RealTime.deltaTime;
-			if (delta > 0.1f) { delta = 0.1f; }
-			
-			this.currentJumpingDelay -= delta;
-			if (this.currentJumpingDelay > 0.0f)
-			{
-				return;
-			}
-		}
-		
-		if (this.CurrentDirection != Direction.None)
-		{
-			UpdatePosition();
-			return;			
-		}
-		
-		this.frogController.Hop();
 	}
 	
 	public override void StartMoving(Direction direction)
@@ -66,11 +42,23 @@ public class Frog : MobileCreature
 	public override void ArrivedAtDestination(float remainingDisplacement)
 	{
 		// TODO If the frog has moved off-screen then kill it.
+		CreateFutureJumpEvent();
 		
-		this.currentJumpingDelay = this.jumpingDelay;
 		this.CurrentDirection = Direction.None; // not currently moving but should we really be resetting direction?
 		
 		base.ArrivedAtDestination(remainingDisplacement);
+		this.Jumping = false;
+	}
+	
+	private void CreateFutureJumpEvent()
+	{
+		Managers.GameClock.RegisterEvent(this.jumpingDelay, () => DoJump(), EventIdentifier.FrogJump );
+	}
+	
+	private void DoJump()
+	{
+		this.frogController.Hop();
+		this.Jumping = true;	
 	}
 	
 	// Frogs hop over maze walls so their motion is NEVER blocked.
@@ -83,6 +71,8 @@ public class Frog : MobileCreature
 	
 	public override InteractionState TestForInteraction(Creature otherCreature)
 	{
+		if (this.Jumping) { return InteractionState.Nothing; }
+		
 		if (!(otherCreature is Egg)) { return InteractionState.Nothing; }
 		
 		if (this.TouchesCreature(otherCreature))
@@ -106,6 +96,9 @@ public class Frog : MobileCreature
 		
 		Destroy(this.gameObject);
 		Destroy(this);
+		
+		// Remove jump event
+		Managers.GameClock.RemoveEvents(EventIdentifier.FrogJump);
 	}
 	
 	#endregion Dying

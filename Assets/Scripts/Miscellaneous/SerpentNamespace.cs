@@ -47,6 +47,7 @@ namespace Serpent
 		PlayerEggLaying,
 		EnemyEggLaying,
 		CreateFrog,
+		FrogJump,
 	}
 }
 

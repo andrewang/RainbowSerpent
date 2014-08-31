@@ -1,6 +1,6 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Data/Resources/mazeTemplate.txt">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Data/Resources/level5.txt">
     <Files>
       <File FileName="Assets/Scripts/UI/SceneControllers/HelpSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
@@ -25,16 +25,18 @@
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
       <File FileName="Assets/Data/Resources/level3.txt" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Maps/Maze.cs" Line="1" Column="1" />
-      <File FileName="Assets/Data/Resources/level1.txt" Line="47" Column="2" />
-      <File FileName="Assets/Data/Resources/mazeTemplate.txt" Line="44" Column="5" />
+      <File FileName="Assets/Scripts/Maps/Maze.cs" Line="294" Column="1" />
+      <File FileName="Assets/Data/Resources/mazeTemplate.txt" Line="23" Column="9" />
       <File FileName="Assets/Data/Resources/level2.txt" Line="47" Column="2" />
+      <File FileName="Assets/Data/Resources/level5.txt" Line="24" Column="34" />
+      <File FileName="Assets/Data/Resources/level4.txt" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="125" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" line="113" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="282" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
