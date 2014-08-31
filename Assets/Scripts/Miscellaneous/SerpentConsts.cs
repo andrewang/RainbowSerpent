@@ -18,9 +18,12 @@ public static class SerpentConsts
 	public const string WallsKey = "walls";
 	public const string DoorsKey = "doors";
 	public const string PlayerStartZoneKey = "playerStartZone";
+	public const string PlayerPathHint = "playerPathHint";
 	public const string XKey = "X";
 	public const string YKey = "Y";
-	public const string DirectionKey = "dir";
+	public const string DirectionKey = "direction";
+	public const string SpecialKey = "special";
+	public const string LevelStateRequiredKey = "levelStateRequired";
 	
 	#endregion Level Data Keys
 	

@@ -33,16 +33,20 @@
     {"direction":"W"},
     {"direction":"S","levelStateRequired":"LevelEnd","special":"PlayerZoneEntrance"},
     {"direction":"E","special":"PlayerStart"},
-    {"direction":"E","special":"PlayerZoneExit"},   
-  ],
+    {"direction":"E","special":"PlayerZoneExit"}
+   ],
   "playerStartZone": [
   	{"X":1, "Y":1},
   	{"X":2, "Y":1},
   	{"X":3, "Y":1},
   	{"X":1, "Y":2},
-  	{"X":1, "Y":3},
+  	{"X":1, "Y":3}
+  ],
+  "playerPathHint": [
+  	{"X":10, "Y":2, "direction":"W"},
+  	{"X":10, "Y":3, "direction":"W"},
+  	{"X":9, "Y":10, "direction":"S"}
   ],
   "width": 11,
   "height": 13,
-  "template": "outside11x13"
 }

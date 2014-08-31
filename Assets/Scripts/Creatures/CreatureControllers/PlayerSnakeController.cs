@@ -105,12 +105,17 @@ public class PlayerSnakeController : SnakeController
 	private Direction GoToPlayerZone()
 	{
 		Maze maze = this.mazeController.Maze;
-		IntVector2 targetPos = maze.PlayerStartZoneEntrance;
+		MazeCell headMazeCell = GetCellForHeadPosition();
+		// start by checking player path hint, if any
+		Direction dir = headMazeCell.PlayerPathHint;
+		if (dir != Direction.None) 
+		{
+			return dir;
+		}
 		
-		Direction dir = Direction.None;
 		if (this.reachedPlayerZone == false)
 		{
-			dir = HeadTowards(targetPos);
+			dir = HeadTowards(maze.PlayerStartZoneEntrance);
 			if (dir == Direction.None)
 			{
 				this.reachedPlayerZone = true;

@@ -44,5 +44,4 @@
   ],
   "width": 11,
   "height": 13,
-  "template": "outside11x13"
 }

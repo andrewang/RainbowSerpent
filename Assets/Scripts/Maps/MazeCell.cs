@@ -6,7 +6,8 @@ public class MazeCell
 {
 	public int X { get; private set; }
 	public int Y { get; private set; }
-	public bool InPlayerZone { get; private set; }
+	public bool InPlayerZone { get; set; }
+	public Direction PlayerPathHint { get; set; }
 
 	public Wall[] Walls; 
 	
@@ -33,12 +34,8 @@ public class MazeCell
 		this.X = x;
 		this.Y = y;
 		this.InPlayerZone = false;
+		this.PlayerPathHint = Direction.None;
 		this.Walls = new Wall[(int)Direction.Count];
-	}
-	
-	public void SetInPlayerZone(bool inZone)
-	{
-		this.InPlayerZone = inZone;
 	}
 	
 	public bool IsMotionBlocked(Direction direction)

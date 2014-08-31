@@ -56,6 +56,7 @@ public class Maze : MonoBehaviour
 		List<object> wallData = mazeData.GetObject(SerpentConsts.WallsKey) as List<object>;
 		List<object> doorData = mazeData.GetObject(SerpentConsts.DoorsKey) as List<object>;
 		List<object> playerStartZoneData = mazeData.GetObject(SerpentConsts.PlayerStartZoneKey) as List<object>;
+		List<object> playerPathHintData = mazeData.GetObject (SerpentConsts.PlayerPathHint) as List<object>; // optional
 		
 		// Check data and abort if data is missing  Door data is optional so don't cancel if there isn't any
 		if (width == 0 || height == 0 || wallData == null || playerStartZoneData == null)
@@ -72,13 +73,17 @@ public class Maze : MonoBehaviour
 		// Create all the cells
 		CreateCells();
 		FlagPlayerStartZone(playerStartZoneData);
+		if (playerPathHintData != null)
+		{
+			FlagPlayerPathHints(playerPathHintData);
+		}
 		
 		// Create walls
 		CreateWalls(wallData, doorData);
 		
 		// Mark the "centre position" of the player start
 		int x = Math.Min(this.PlayerStartZoneEntrance.x, this.PlayerStartZoneExit.x);
-		int y = Math.Min(this.PlayerStartZoneEntrance.y, this .PlayerStartZoneExit.y);
+		int y = Math.Min(this.PlayerStartZoneEntrance.y, this.PlayerStartZoneExit.y);
 		this.PlayerStartZoneCentre = new IntVector2(x,y);
 		
 	}
@@ -110,8 +115,29 @@ public class Maze : MonoBehaviour
 			if (x < this.Width && y < this.Height)
 			{
 				MazeCell cell = this.Cells[x,y];
-				cell.SetInPlayerZone(true);
+				cell.InPlayerZone = true;
 			}
+		}
+	}
+	
+	private void FlagPlayerPathHints(List<object> playerPathHintData)
+	{
+		foreach( object o in playerPathHintData )
+		{
+			Dictionary<string,object> dict = o as Dictionary<string,object>;
+			if (dict == null) { continue; }
+			
+			int x = dict.GetInt(SerpentConsts.XKey);
+			int y = dict.GetInt(SerpentConsts.YKey);
+			string dirStr = dict.GetString(SerpentConsts.DirectionKey);
+			if (dirStr == null) { continue; }
+			
+			List<Direction> sides = SerpentConsts.DirectionIndexes[dirStr[0]];
+			if (sides == null || sides.Count == 0) { continue; }
+			
+			Direction dir = sides[0];
+			MazeCell cell = this.Cells[x,y];
+			cell.PlayerPathHint = dir;
 		}
 	}
 
@@ -298,7 +324,7 @@ public class Maze : MonoBehaviour
 			return Direction.None;
 		}
 		
-		string dirStr = doorDict.GetString("direction");
+		string dirStr = doorDict.GetString(SerpentConsts.DirectionKey);
 		
 		if (dirStr.Length == 0)
 		{
@@ -319,7 +345,7 @@ public class Maze : MonoBehaviour
 			return "";
 		}
 		
-		string outStr = doorDict.GetString("special");
+		string outStr = doorDict.GetString(SerpentConsts.SpecialKey);
 		return outStr;		
 	}	
 		
@@ -331,7 +357,7 @@ public class Maze : MonoBehaviour
 			return LevelState.None;
 		}
 		
-		string str = doorDict.GetString("levelStateRequired");	
+		string str = doorDict.GetString(SerpentConsts.LevelStateRequiredKey);	
 		if (str == null)
 		{
 			return LevelState.None;
