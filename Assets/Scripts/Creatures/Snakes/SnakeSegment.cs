@@ -212,7 +212,7 @@ public class SnakeSegment : MonoBehaviour
 		this.NextSegment = null;
 		
 		EventDelegate tweenFinished = new EventDelegate(this, "ShrinkComplete");
-		this.tween = TweenScale.Begin(this.gameObject, 0.5f, new Vector3(0.01f, 0.01f, 0.01f));
+		this.tween = TweenScale.Begin(this.gameObject, 0.3f, new Vector3(0.01f, 0.01f, 0.01f));
 		this.tween.onFinished.Add(tweenFinished);		                                  
 	}
 	

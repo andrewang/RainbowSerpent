@@ -110,6 +110,7 @@
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font (AlphaClip).shader" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Masked Colored.shader" />
      <None Include="Assets\Art\Atlases\Source\Fonts\Nasal.fnt" />
+     <None Include="Assets\Art\Shaders\MaskedTexture.shader" />
      <None Include="Assets\Data\Resources\level4.txt" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (AlphaClip) .shader" />
      <None Include="Assets\Data\Resources\level2.txt" />

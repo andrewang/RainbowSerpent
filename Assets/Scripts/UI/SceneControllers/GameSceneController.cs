@@ -21,6 +21,8 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UILabel scoreLabel = null;
 	[SerializeField] private UILabel livesLabel = null;	
 	[SerializeField] private GameObject buttonsContainer;
+	
+	[SerializeField] private UISprite mapMask = null;
 
 	[SerializeField] private GameObject pauseUIContainer = null;
 	[SerializeField] private GameObject gameOverUIContainer = null;
@@ -50,6 +52,8 @@ public class GameSceneController : RSSceneController
 		if (this.buttons == null || this.buttons.Length == 0) { Debug.LogError("GameSceneController: buttons is null/empty"); }
 		if (this.buttonsContainer == null) { Debug.LogError("GameSceneController: buttonsContainer is null/empty"); }
 		if (this.gameOverUIContainer == null) { Debug.LogError("GameSceneController: gameOverUIContainer is null"); } 
+		
+		if (this.mapMask == null) { Debug.LogError("GameSceneController: mapMask is null"); }
 		
 		if (this.mazePanel == null) { Debug.LogError("GameSceneController: mazePanel is null"); }
 		if (this.debugInfoLabel == null) { Debug.LogError("GameSceneController: debugInfoLabel is null"); }
@@ -116,6 +120,10 @@ public class GameSceneController : RSSceneController
 			button.hover = theme.UIColour;
 		}
 		this.sceneCamera.backgroundColor = theme.BackgroundColour;
+		
+		this.mapMask.color = theme.BackgroundColour;
+		// For now, disable map mask.
+		this.mapMask.gameObject.SetActive(false);
 	}
 	
 	private void ConfigureInput()
@@ -154,8 +162,8 @@ public class GameSceneController : RSSceneController
 		this.scoreLabel.text = Managers.GameState.Score.ToString();
 		this.livesLabel.text = Managers.GameState.ExtraSnakes.ToString();
 		
-		//debugInfoLabel
-		
+		// Debug Info Label
+				
 		string debugInfo = "";
 		
 		UISprite sprite = this.mazeController.GetFirstWallSprite();

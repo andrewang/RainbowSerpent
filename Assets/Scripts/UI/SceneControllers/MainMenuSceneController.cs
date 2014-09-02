@@ -5,12 +5,26 @@ public class MainMenuSceneController : RSSceneController
 {
 	[SerializeField] private UILabel versionLabel;
 	
+	/*
+	[SerializeField] Texture mapTexture;
+	[SerializeField] Texture maskTexture;
+	[SerializeField] GameObject maskDisplayObject;
+	[SerializeField] Material maskingMaterial;
+	*/
+	
 	public override void Start()
 	{
 		base.Start();
 		
 		if (this.versionLabel == null) { return; }
 		this.versionLabel.text = SerpentConsts.Version;
+		
+		/*
+		UITexture texture = maskDisplayObject.AddComponent<UITexture>();
+		texture.material = maskingMaterial;
+		maskingMaterial.SetTexture("_MainTex", mapTexture);
+		maskingMaterial.SetTexture("_Mask", maskTexture);
+		*/
 	}
 
 	public void OnStartPressed()

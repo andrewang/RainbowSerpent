@@ -1,9 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Snakes/Snake.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/SceneControllers/GameSceneController.cs">
     <Files>
+      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/HelpSceneController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="125" Column="32" />
       <File FileName="Assets/Scripts/UI/SceneControllers/CreditsSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
       <File FileName="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
@@ -13,12 +14,10 @@
       <File FileName="Assets/Scripts/Managers/SettingsManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/AudioVolumeControl.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/CreatureController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/GameState.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/MainMenuSceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/MainMenuSceneController.cs" Line="18" Column="3" />
       <File FileName="Assets/NGUI/Scripts/Interaction/UIButtonColor.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/Managers.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/InputController.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" Line="1" Column="1" />
       <File FileName="Assets/Data/Resources/level3.txt" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Maps/Maze.cs" Line="1" Column="1" />
@@ -27,20 +26,21 @@
       <File FileName="Assets/Data/Resources/level5.txt" Line="1" Column="1" />
       <File FileName="Assets/Data/Resources/level4.txt" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/MobileCreature.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="819" Column="22" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="177" Column="34" />
-      <File FileName="Assets/Scripts/Miscellaneous/ScriptCache.cs" Line="52" Column="2" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeBody.cs" Line="86" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="221" Column="36" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="319" Column="28" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="12" Column="15" />
+      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Miscellaneous/ScriptCache.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeBody.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
+      <File FileName="Assets/NGUI/Scripts/Internal/UIDrawCall.cs" Line="1" Column="1" />
+      <File FileName="Assets/NGUI/Scripts/UI/UITexture.cs" Line="22" Column="38" />
+      <File FileName="Assets/NGUI/ReadMe - 3.0.5.txt" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="125" />
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" line="113" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Maps/Maze.cs" line="282" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
