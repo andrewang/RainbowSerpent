@@ -8,6 +8,7 @@ public class DifficultySettings : MonoBehaviour
 	
 	public float BasePlayerSpeed;
 	public float PlayerSegmentSlowdown;
+	public float PlayerInitialEggLayingDelay;
 	public float PlayerEggLayingDelay;
 	public float PlayerEggCreationTime;
 	

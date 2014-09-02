@@ -404,8 +404,8 @@ public class GameManager : MonoBehaviour
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		psc.PlayerControlled = false;
 		
-		// Every time we place the player snake, reset the lay-egg timer.
-		CreateEggLayingEvent(Side.Player);
+		// Every time we place the player snake, create an initial egg-laying event
+		CreateEggLayingEvent(Side.Player, true);
 				
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
@@ -555,7 +555,7 @@ public class GameManager : MonoBehaviour
 		return (e != null);
 	}
 	
-	private void CreateEggLayingEvent(Side side)
+	private void CreateEggLayingEvent(Side side, bool initial = false)
 	{
 		if (EggLayingEventExists(side))
 		{
@@ -564,16 +564,25 @@ public class GameManager : MonoBehaviour
 		}
 		
 		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
-		float delay = difficulty.GetEggLayingDelay(side);
 		
 		EventIdentifier id = (side == Side.Player) ? EventIdentifier.PlayerEggLaying : EventIdentifier.EnemyEggLaying;
 		
 		if (side == Side.Player)
 		{
+			float delay;
+			if (initial)
+			{
+				delay = difficulty.PlayerInitialEggLayingDelay;
+			}
+			else
+			{
+				delay = difficulty.PlayerEggLayingDelay;
+			}
 			Managers.GameClock.RegisterEvent(delay, CheckIfPlayerEggLayingPossible, id);
 		}
 		else
 		{
+			float delay = difficulty.EnemyEggLayingDelay;
 			Managers.GameClock.RegisterEvent(delay, CheckIfEnemyEggLayingPossible, id);
 		}
 	}
@@ -659,10 +668,7 @@ public class GameManager : MonoBehaviour
 		
 		SetEgg(e.Side, null);
 		
-		if (e.Side == Side.Enemy)
-		{
-			CreateEggLayingEvent(Side.Enemy);
-		}
+		CreateEggLayingEvent(e.Side);
 	}
 	
 	private void RemoveUnlaidPlayerEgg()
