@@ -174,10 +174,12 @@
      <Compile Include="Assets\Scripts\UI\Components\MazeController.cs" />
      <Compile Include="Assets\Scripts\UI\Components\MidpointPositioner.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ResizePanel.cs" />
+     <Compile Include="Assets\Scripts\UI\Components\Scale.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScaleClipping.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScaleCollider.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScaleDimensions.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScalePosition.cs" />
+     <Compile Include="Assets\Scripts\UI\Components\ScaleTweenPosition.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScreenShotFileManager.cs" />
      <Compile Include="Assets\Scripts\UI\Components\StretchToFitPanel.cs" />
      <Compile Include="Assets\Scripts\UI\RSSceneController.cs" />

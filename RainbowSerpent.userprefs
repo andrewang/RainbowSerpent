@@ -1,14 +1,16 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/SceneControllers/GameSceneController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/Components/ScalePosition.cs">
     <Files>
-      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="212" Column="16" />
+      <File FileName="Assets/Scripts/UI/Components/ResizePanel.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/Scale.cs" Line="62" Column="60" />
+      <File FileName="Assets/Scripts/UI/Components/ScalePosition.cs" Line="9" Column="34" />
       <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/HelpSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/CreditsSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
       <File FileName="../../SourceTree/liveadzdemo/Assets/Third_Party/NGUI/Scripts/Editor/NGUIEditorTools.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/ScaleDimensions.cs" Line="10" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/SplashSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/OptionsSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/SettingsManager.cs" Line="1" Column="1" />
@@ -39,14 +41,20 @@
       <File FileName="Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/SceneManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="582" Column="1" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="99" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/MazeController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Creatures/Frog.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/Scale.cs" Line="81" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/ScaleCollider.cs" Line="6" Column="3" />
+      <File FileName="Assets/Scripts/UI/Components/ScaleClipping.cs" Line="15" Column="1" />
+      <File FileName="Assets/Scripts/UI/Components/ScreenShotFileManager.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" line="113" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/SceneControllers/GameSceneController.cs" line="231" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/SceneControllers/GameSceneController.cs" line="250" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
