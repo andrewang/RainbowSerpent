@@ -33,7 +33,7 @@ public class ResizePanel : MonoBehaviour
 	{
 	}
 	
-	public void ResizeThePanel()
+	public void Execute()
 	{
 		DeterminePositions();
 		SetAtMidpoint();
@@ -90,7 +90,7 @@ public class ResizePanel : MonoBehaviour
 		}
 	}
 	
-	void SetAtMidpoint()
+	private void SetAtMidpoint()
 	{
 		Vector3 position = this.transform.localPosition;
 			
@@ -110,7 +110,7 @@ public class ResizePanel : MonoBehaviour
 		this.transform.localPosition = position;
 	}
 	
-	void SizePanel()
+	private void SizePanel()
 	{
 		UIPanel panel = this.gameObject.GetComponent<UIPanel>();
 		if (panel == null) { return; }
@@ -150,7 +150,7 @@ public class ResizePanel : MonoBehaviour
 		panel.clipRange = clipRange;
 	}
 	
-	float CalculateDistanceBetweenWidgets( float pos1, float width1, float pos2, float width2 )
+	private float CalculateDistanceBetweenWidgets( float pos1, float width1, float pos2, float width2 )
 	{
 		if (pos1 > pos2)
 		{
@@ -163,7 +163,7 @@ public class ResizePanel : MonoBehaviour
 		return interiorPos2 - interiorPos1;
 	}
 	
-	float Calculate1DMidPoint( float pos1, float width1, float pos2, float width2 )
+	private float Calculate1DMidPoint( float pos1, float width1, float pos2, float width2 )
 	{
 		if (pos1 > pos2)
 		{

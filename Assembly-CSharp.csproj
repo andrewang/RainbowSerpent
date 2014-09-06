@@ -179,6 +179,7 @@
      <Compile Include="Assets\Scripts\UI\Components\ScaleDimensions.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScalePosition.cs" />
      <Compile Include="Assets\Scripts\UI\Components\ScreenShotFileManager.cs" />
+     <Compile Include="Assets\Scripts\UI\Components\StretchToFitPanel.cs" />
      <Compile Include="Assets\Scripts\UI\RSSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneController.cs" />
      <Compile Include="Assets\Scripts\UI\SceneControllers\CreditsSceneController.cs" />
@@ -195,7 +196,6 @@
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Dynamic Font (AlphaClip).shader" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Masked Colored.shader" />
      <None Include="Assets\Art\Atlases\Source\Fonts\Nasal.fnt" />
-     <None Include="Assets\Art\Shaders\MaskedTexture.shader" />
      <None Include="Assets\Data\Resources\level4.txt" />
      <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Colored (Packed) (AlphaClip) .shader" />
      <None Include="Assets\Data\Resources\level2.txt" />

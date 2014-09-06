@@ -22,7 +22,7 @@ public class GameSceneController : RSSceneController
 	[SerializeField] private UILabel livesLabel = null;	
 	[SerializeField] private GameObject buttonsContainer;
 	
-	[SerializeField] private UISprite mapMask = null;
+	[SerializeField] private GameObject[] mapMaskSets = null;
 
 	[SerializeField] private GameObject pauseUIContainer = null;
 	[SerializeField] private GameObject gameOverUIContainer = null;
@@ -32,7 +32,12 @@ public class GameSceneController : RSSceneController
 	
 	[SerializeField] private AudioSource musicSource;
 	
+	private GameObject mapMaskSet;
+	private List<UISprite> mapMaskSprites = new List<UISprite>();	
+	private UITweener maskTweener = null;
+	
 	private int levelLoaded = -1;
+	private int levelToLoad = -1;
 	private bool paused;
 	
 	#endregion Serialized Fields
@@ -53,7 +58,7 @@ public class GameSceneController : RSSceneController
 		if (this.buttonsContainer == null) { Debug.LogError("GameSceneController: buttonsContainer is null/empty"); }
 		if (this.gameOverUIContainer == null) { Debug.LogError("GameSceneController: gameOverUIContainer is null"); } 
 		
-		if (this.mapMask == null) { Debug.LogError("GameSceneController: mapMask is null"); }
+		if (this.mapMaskSets == null || this.mapMaskSets.Length == 0) { Debug.LogError("GameSceneController: mapMask is null"); }
 		
 		if (this.mazePanel == null) { Debug.LogError("GameSceneController: mazePanel is null"); }
 		if (this.debugInfoLabel == null) { Debug.LogError("GameSceneController: debugInfoLabel is null"); }
@@ -67,9 +72,14 @@ public class GameSceneController : RSSceneController
 	
 	override public void OnLoad()
 	{
-		base.OnLoad();		
-		
+		base.OnLoad();
+		ResizeMazePanel();
+				
 		this.gameManager.GameOver += this.GameOver;
+		this.mazeController.OnCreateScreenShot += this.OnCreateScreenShot;
+		this.mazeController.OnLoadScreenShot += this.OnLoadScreenShot;
+		this.mazeController.OnMapLoadComplete += this.OnMapLoadComplete;
+		
 		LoadGameLevel(Managers.GameState.Level);
 	}
 
@@ -80,6 +90,7 @@ public class GameSceneController : RSSceneController
 			// Throw out old stuff
 			ResetForNewLevel();
 		}
+		
 		this.levelLoaded = levelNum;
 		
 		Managers.GameClock.Reset();
@@ -91,6 +102,18 @@ public class GameSceneController : RSSceneController
 		this.gameManager.Setup(levelNum);		
 		ConfigureUI();
 		ConfigureInput();
+		
+		// Ensure one of the mask sets is selected at the start so we can enable it to hide the map
+		if (this.mapMaskSet == null)
+		{
+			SelectMaskAnimation();
+		}
+	}
+	
+	public void TransitionToLevel(int levelNum)
+	{
+		this.levelToLoad = levelNum;
+		HideMap();
 	}
 	
 	private void ResetForNewLevel()
@@ -119,12 +142,145 @@ public class GameSceneController : RSSceneController
 			// This hover colour really only matters for testing, but it's annoying for it not to be set.
 			button.hover = theme.UIColour;
 		}
-		this.sceneCamera.backgroundColor = theme.BackgroundColour;
-		
-		this.mapMask.color = theme.BackgroundColour;
-		// For now, disable map mask.
-		this.mapMask.gameObject.SetActive(false);
+		this.sceneCamera.backgroundColor = theme.BackgroundColour;		
 	}
+	
+	private void ResizeMazePanel()
+	{
+		ResizePanel resizeScript = this.mazePanel.GetComponent<ResizePanel>();
+		if (resizeScript != null)
+		{
+			resizeScript.Execute();
+		}
+		
+		foreach (UISprite mask in this.mapMaskSprites)
+		{
+			StretchToFitPanel stretch = mask.gameObject.GetComponent<StretchToFitPanel>();
+			stretch.Stretch();			
+		}
+	}
+	
+	private void OnCreateScreenShot()
+	{
+		// The mask has to be disabled to create a screenshot.
+		// TODO investigate using another camera not displayed to the screen or something.
+		SetMaskEnabled(false);
+	}
+	
+	private void OnLoadScreenShot()
+	{
+		SetMaskEnabled(true);
+	}
+	
+	private void OnMapLoadComplete()
+	{
+		RevealMap();		
+	}
+	
+	private void RevealMap()
+	{
+		SelectMaskAnimation();
+		// Delay a moment (via coroutine) before doing the reveal.
+		StartCoroutine(RevealMapCoroutine());
+	}	
+	
+	IEnumerator RevealMapCoroutine()
+	{
+		yield return new WaitForSeconds(0.1f);
+		PlayMaskAnimation("OnMapRevealed", true);		
+	}
+	
+	private void OnMapRevealed()
+	{
+		SetMaskEnabled(false);
+		this.maskTweener.onFinished.Clear();
+		this.gameManager.Begin();
+	}
+	
+	private void HideMap()
+	{
+		PlayMaskAnimation("OnMapHidden", false);	
+	}
+	
+	private void OnMapHidden()
+	{
+		this.maskTweener.onFinished.Clear();
+		LoadGameLevel(this.levelToLoad);
+	}
+	
+	private void SelectMaskAnimation()
+	{
+		// Hide any previous mask
+		SetMaskEnabled(false);
+		this.mapMaskSprites.Clear();
+		
+		// Different sets of masks and animations exist.  For instance, zoom in/out from
+		// the centre, pan down, pan right.
+		int numSets = this.mapMaskSets.Length;
+		int setNum = UnityEngine.Random.Range(0, numSets);
+		GameObject set = this.mapMaskSets[setNum];
+		
+		this.mapMaskSet = set;
+		
+		// Recolor the sprites and put them in a list to trigger their animations.
+		LevelTheme theme = this.gameManager.Theme;		
+		UISprite[] maskSprites = set.GetComponentsInChildren<UISprite>(true);
+		foreach( UISprite mask in maskSprites )
+		{
+			mask.color = theme.BackgroundColour;			
+			this.mapMaskSprites.Add(mask);
+		}
+		
+		// Set the new mask to be displayed
+		SetMaskEnabled(true);
+	}
+	
+	private void PlayMaskAnimation(string callback, bool forward)
+	{
+		SetMaskEnabled(true);
+		
+		// Reset which tweener we track, then find a new one when looping.
+		this.maskTweener = null;
+		
+		foreach (UISprite mask in this.mapMaskSprites)
+		{
+			UITweener scaler = mask.gameObject.GetComponent<UITweener>();
+			if (scaler != null)
+			{
+				if (this.maskTweener == null)
+				{
+					this.maskTweener = scaler;
+					EventDelegate onMapRevealedDelegate = new EventDelegate(this, callback);
+					this.maskTweener.onFinished.Add( onMapRevealedDelegate );
+				}
+				scaler.enabled = true;
+				if (forward)
+				{
+					scaler.PlayForward();
+				}
+				else
+				{
+					scaler.PlayReverse();
+				}
+			}
+		}
+	}
+	
+	private void SetMaskEnabled(bool enabled)
+	{
+		if (this.mapMaskSet != null)
+		{
+			this.mapMaskSet.SetActive(enabled);
+		}
+		/*
+		foreach (UISprite mask in this.mapMaskSprites)
+		{
+			mask.gameObject.SetActive(enabled);
+		}
+		*/
+	}
+	
+	
 	
 	private void ConfigureInput()
 	{

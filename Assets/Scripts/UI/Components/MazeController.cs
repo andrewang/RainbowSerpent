@@ -20,11 +20,15 @@ public class MazeController : MonoBehaviour
 	[SerializeField] private ScreenShotTaker screenShotTaker = null; 
 	[SerializeField] private ScreenShotFileManager screenShotFileManager = null;
 	
+	public event Action OnCreateScreenShot;
+	public event Action OnLoadScreenShot;
+	public event Action OnMapLoadComplete; 
+	
 	private int levelNumber;
 	private Color wallColour;
 	
 	private GameObject screenShotContainer;
-	private Action screenShotCompletedAction;
+	//private Action screenShotCompletedAction;
 	private bool screenShotLoaded = false;
 	
 	private bool scaleSet = false;
@@ -57,6 +61,8 @@ public class MazeController : MonoBehaviour
 	/// <param name="mazeTextAsset">Maze text asset.</param>
 	public void SetUp(int levelNum, TextAsset mazeTextAsset, Color wallColour)
 	{
+		
+		
 		this.levelNumber = levelNum;
 		this.wallColour = wallColour;
 		this.Maze.SetUp(mazeTextAsset);
@@ -69,7 +75,7 @@ public class MazeController : MonoBehaviour
 		RemoveWallSprites();
 		RemoveDoors();
 		
-		this.screenShotCompletedAction = null;
+		//this.screenShotCompletedAction = null;
 		this.screenShotLoaded = false;
 		this.scaleSet = false;
 		this.lowerLeftCellCentre = new Vector3(0,0,0);		
@@ -79,19 +85,24 @@ public class MazeController : MonoBehaviour
 	{
 		if (this.scaleSet == false)
 		{
+			/*
 			// Check for a resize component on the panel and make it run FIRST.
 			ResizePanel resizeScript = this.panel.GetComponent<ResizePanel>();
 			if (resizeScript != null)
 			{
-				resizeScript.ResizeThePanel();
+				resizeScript.Execute();
+				
+				// Resize masks at this point.
+				OnPanelResize();
 			}
+			*/
 		
 			DetermineMazeScale();
 			this.scaleSet = true;
 			
 			if (this.useScreenShots == true && this.screenShotContainer == null)
 			{
-				CreateScreenshot(this.screenShotCompletedAction);
+				CreateScreenshot(); //this.screenShotCompletedAction);
 			}
 		}
 	}
@@ -133,6 +144,8 @@ public class MazeController : MonoBehaviour
 		// If a screenshot for this level already exists then use that.
 		if (this.useScreenShots && this.screenShotFileManager.ScreenShotExists(this.levelNumber))
 		{
+			Debug.Log("Reached OnLoadScreenShot case");
+			this.OnLoadScreenShot();
 			Texture2D screenShotTexture = this.screenShotFileManager.LoadScreenShot(this.levelNumber);		
 			UseScreenShot(screenShotTexture);
 			this.screenShotLoaded = true;
@@ -551,34 +564,34 @@ public class MazeController : MonoBehaviour
 	// A couple of screenshots can replace many wall sprites!  One for the outside walls and snake entry points, and
 	// one for everything.	
 	
-	public void CreateScreenshot(Action completedAction)
+	public void CreateScreenshot() 
 	{
 		if (this.useScreenShots == false)
 		{	
 			// just run what was supposed to be executed after creating the screenshot
-			if (completedAction != null)
-			{
-				completedAction();
-			}
+			Debug.Log("Reached OnMapLoadComplete case - screenshots are disabled");			
+			OnMapLoadComplete();
+			
 			return;
 		}
 		
 		if (this.screenShotFileManager.ScreenShotExists(this.levelNumber)) 
 		{
+			Debug.Log("Reached OnMapLoadComplete case - screenshot already exists and should already be loaded");			
+			
+			OnMapLoadComplete();
 			// screenshot should already be attached to the UI
-			if (completedAction != null)
-			{
-				completedAction();
-			}
+			
 			return;
 		}
 		
-		this.screenShotCompletedAction = completedAction;
 		if (this.scaleSet == false)
 		{
 			// it is too early to take a screenshot
 			return;
 		}
+		
+		OnCreateScreenShot();
 		
 		this.Maze.HideDoors();
 		
@@ -596,11 +609,8 @@ public class MazeController : MonoBehaviour
 	private void ScreenShotCreated(Texture2D screenShotTexture)
 	{
 		UseScreenShot(screenShotTexture);
-		if (this.screenShotCompletedAction != null)
-		{
-			this.screenShotCompletedAction();
-			this.screenShotCompletedAction = null;
-		}
+		Debug.Log("Reached OnMapLoadComplete case - screenshot creation done");
+		OnMapLoadComplete();
 	}
 	
 	private void UseScreenShot(Texture2D screenShotTexture)

@@ -52,7 +52,8 @@ public class ScreenShotFileManager : MonoBehaviour
 			{
 				// Does this file match the FULL path for this level and current screen size?
 				string properName = ScreenShotName(levelNumber, version);
-				if (info.FullName != properName)
+				string infoName = info.Name;
+				if (infoName.Equals(properName) == false)
 				{
 					File.Delete(info.FullName);
 				}

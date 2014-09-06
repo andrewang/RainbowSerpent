@@ -129,7 +129,7 @@ public class GameManager : MonoBehaviour
 		this.mazeController.SetUp(levelNum, mazeTextAsset, this.theme.WallColour);		
 
 		// Only place snakes once the map screenshot has been made.  So we pass a reference to the Begin method in here to be invoked when CreateScreenShot is done.
-		this.mazeController.CreateScreenshot(Begin);		
+		this.mazeController.CreateScreenshot(); //Begin);		
 	}
 		
 	private void PlaceCreature(Creature creature, int x, int y, Direction direction)
@@ -293,6 +293,12 @@ public class GameManager : MonoBehaviour
 		// if there is a frog, test against player egg, and test against enemy egg.
 		if (this.frog != null)
 		{
+			Egg playerEgg = GetEgg(Side.Player);
+			if (playerEgg != null)
+			{
+				this.frog.TestForInteraction(playerEgg);				
+			}
+			
 			for (Side side = Side.Player; side <= Side.Enemy; ++side)
 			{
 				Egg e = GetEgg(side);
@@ -300,6 +306,24 @@ public class GameManager : MonoBehaviour
 				
 				this.frog.TestForInteraction(e);
 			}
+			
+			Egg enemyEgg = GetEgg(Side.Enemy);
+			if (enemyEgg != null)
+			{
+				InteractionState state = this.frog.TestForInteraction(enemyEgg);				
+				if (state == InteractionState.KilledSomething)
+				{
+					// check for edge case - could be the end of the level if all the enemy snakes
+					// are dead!
+					List<Snake> enemySnakes = GetEnemySnakes();					
+					if ( enemySnakes.Count == 0)
+					{
+						// egg eaten and no enemy snakes exist
+						EndLevel();			
+					}
+				}
+			}
+			
 		}
 	}
 	
@@ -476,7 +500,7 @@ public class GameManager : MonoBehaviour
 			RemoveFrog();
 		}
 		
-		gsc.LoadGameLevel(Managers.GameState.Level);
+		gsc.TransitionToLevel(Managers.GameState.Level);
 		
 	}
 	
