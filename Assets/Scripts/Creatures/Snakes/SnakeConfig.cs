@@ -8,7 +8,7 @@ public class SnakeConfig : MonoBehaviour
 	public GameObject EggPrefab;
 	public bool Player;
 	
-	public UISprite BodySprite;
+	public string[] BodySpriteNames;
 }
 
 

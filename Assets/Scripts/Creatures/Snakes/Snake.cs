@@ -250,8 +250,11 @@ public class Snake : MobileCreature
 			newBodySegment.SetParent(this);			
 			newBodySegment.Snake = this;
 			
-			// Configure sprite 
-			newBodySegment.SetSpriteName(this.config.BodySprite.spriteName);
+			// Configure sprite.  Figure out which sprite to use based on the BodySprites array.
+			string[] bodySpriteNames = this.config.BodySpriteNames;
+			// Subtract one from length for the head, and one to switch to 0-based array index.
+			int bodySpriteIndex = (this.length - 2) % bodySpriteNames.Length;
+			newBodySegment.SetSpriteName(bodySpriteNames[bodySpriteIndex]);
 			newBodySegment.SetSpriteDepth(this.head.GetSpriteDepth());
 			
 			SnakeSegment last = this.Tail;
