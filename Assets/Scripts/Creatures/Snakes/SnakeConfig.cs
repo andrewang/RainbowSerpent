@@ -9,6 +9,7 @@ public class SnakeConfig : MonoBehaviour
 	public bool Player;
 	
 	public string[] BodySpriteNames;
+	public string TailSpriteName;
 }
 
 

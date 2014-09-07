@@ -228,7 +228,6 @@ public class Snake : MobileCreature
 			return;
 		}
 		
-		this.length++;
 		
 		// This method should add a new segment at the end of the snake.  It can be in the same position
 		// as the last segment and will appear when the now next-to-last segment moves away from
@@ -249,22 +248,42 @@ public class Snake : MobileCreature
 			newBodySegment.Reset();			
 			newBodySegment.SetParent(this);			
 			newBodySegment.Snake = this;
-			
-			// Configure sprite.  Figure out which sprite to use based on the BodySprites array.
+			newBodySegment.SetSpriteDepth(this.head.GetSpriteDepth());
+						
+			// If a tail already exists for this snake (it's not just a head) then that segment's sprite name will need
+			// to be changed
 			string[] bodySpriteNames = this.config.BodySpriteNames;
 			// Subtract one from length for the head, and one to switch to 0-based array index.
 			int bodySpriteIndex = (this.length - 2) % bodySpriteNames.Length;
-			newBodySegment.SetSpriteName(bodySpriteNames[bodySpriteIndex]);
-			newBodySegment.SetSpriteDepth(this.head.GetSpriteDepth());
 			
-			SnakeSegment last = this.Tail;
-			if (last == null) { last = this.head; }
+			SnakeSegment tail = this.Tail;
+			if (tail != null)
+			{
+				tail.SetSpriteName(bodySpriteNames[bodySpriteIndex]);
+			}
 			
-			last.NextSegment = newBodySegment;
+			// Now set the sprite name for the new segment.
+			if (this.config.TailSpriteName != null)
+			{
+				newBodySegment.SetSpriteName(this.config.TailSpriteName);				
+			}
+			else
+			{
+				bodySpriteIndex = (bodySpriteIndex + 1) % bodySpriteNames.Length;
+				newBodySegment.SetSpriteName(bodySpriteNames[bodySpriteIndex]);				
+			}
+						
+			SnakeSegment previousSegment = tail;
+			if (previousSegment == null) 
+			{
+				previousSegment = this.head; 
+			}
+			
+			previousSegment.NextSegment = newBodySegment;
 			
 			// NOTE, assuming that the segments are the same width and height here.
-			SnakeBody lastBodySegment = last as SnakeBody;
-			float distance = last.Height * 0.5f + newBodySegment.Height * 0.5f;
+			SnakeBody lastBodySegment = previousSegment as SnakeBody;
+			float distance = previousSegment.Height * 0.5f + newBodySegment.Height * 0.5f;
 			if (lastBodySegment != null)
 			{
 				distance += lastBodySegment.DistanceFromHead;
@@ -278,6 +297,7 @@ public class Snake : MobileCreature
 		}
 		
 		newSegment.Visible = this.visible;		
+		this.length++;
 		
 		if (this.config.Player)
 		{		

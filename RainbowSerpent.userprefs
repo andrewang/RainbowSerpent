@@ -1,6 +1,6 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Miscellaneous/SerpentUtils.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Creatures/Snakes/Snake.cs">
     <Files>
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="19" />
       <File FileName="Assets/Scripts/UI/Components/ResizePanel.cs" Line="1" Column="1" />
@@ -32,7 +32,6 @@
       <File FileName="Assets/Scripts/Miscellaneous/ScriptCache.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeBody.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeSegment.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Internal/UIDrawCall.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/UI/UITexture.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/ReadMe - 3.0.5.txt" Line="1" Column="1" />
@@ -51,6 +50,8 @@
       <File FileName="Assets/NGUI/Scripts/UI/UISpriteAnimation.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/UI/UISprite.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/SerpentUtils.cs" Line="10" Column="31" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/SnakeConfig.cs" Line="11" Column="15" />
+      <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="269" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
