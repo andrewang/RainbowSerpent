@@ -275,12 +275,13 @@ public class GameManager : MonoBehaviour
 	
 	private void EndLevel()
 	{
+		Managers.GameState.LevelState = LevelState.LevelEnd;			
 		// Remove any unlaid player egg (because it might hatch in the start zone!) and
 		// put the player under AI control so it can zoom back to the start zone.		
-		
-		Managers.GameState.LevelState = LevelState.LevelEnd;			
-		
 		RemoveUnlaidPlayerEgg();
+
+		// Remove all events like future player egg laying.
+		Managers.GameClock.Reset();		
 		
 		PlayerSnakeController psc = this.playerSnake.Controller as PlayerSnakeController;
 		if (psc == null) { return; }
@@ -658,6 +659,8 @@ public class GameManager : MonoBehaviour
 	private void EggFullyGrown( Egg egg )
 	{					
 		egg.SetParent( this.mazeController );
+		// set rotation to vertical
+		egg.transform.localEulerAngles = new Vector3(0,0,0);
 	}
 	
 	private void EggHatched( Egg egg )
