@@ -469,11 +469,12 @@ public class GameManager : MonoBehaviour
 	private void PlayerReturnedToStart(Snake playerSnake)
 	{
 		this.playerSnake.Visible = false;
-		//this.playerSnake.ReturnToCache();
-		//this.playerSnake = null;
 		
 		// Add one again to player snakes.  This allows new player snakes to increase the total.  When the initial player is spawned that subtracts one.
 		Managers.GameState.ExtraSnakes += 1;
+		
+		// Remove any frog now
+		RemoveFrog();
 		
 		// Does a player egg exist?  If so, make it hatch
 		Egg egg = GetEgg ( Side.Player );
@@ -483,7 +484,6 @@ public class GameManager : MonoBehaviour
 			egg.Die();
 			return;
 		}
-		// What if the player had an egg growing at the time of level end
 		
 		// Time to go to the next level.		
 		Managers.GameState.Level += 1;		
@@ -494,13 +494,7 @@ public class GameManager : MonoBehaviour
 			// should never happen
 			return;
 		}
-		
-		// Clear frog
-		if (this.frog != null)
-		{
-			RemoveFrog();
-		}
-		
+				
 		gsc.TransitionToLevel(Managers.GameState.Level);
 		
 	}
