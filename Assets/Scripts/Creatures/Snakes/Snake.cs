@@ -164,7 +164,7 @@ public class Snake : MobileCreature
 		}								
 	}
 	
-	public void UpdateLengthAndTail()
+	public void UpdateValues()
 	{
 		this.length = 0;
 		SnakeSegment segment = this.head;
@@ -177,6 +177,35 @@ public class Snake : MobileCreature
 		}
 		
 		this.tail = lastSegment as SnakeBody;
+		
+		SetSegmentThicknesses();
+	}
+	
+	private void SetSegmentThicknesses()
+	{
+		if (this.config.BodyThickness == null || this.config.BodyThickness.Length == 0) { return; }
+		if (this.length < 2) { return; }
+		
+		// Based on the length of the snake. interpolate into the thickness array to set the scale of the segments
+		// this only applies to the body segments, not the head.  And since we aren't using the head, we have to
+		// subtract 1 from the length before doing this division.
+		float indexStep = (float)this.config.BodyThickness.Length / (float)(this.length - 1);
+		// Summing this findexStep will give for instance values of 3, 6.  but since the array is (presumably)
+		// only size 6, we need to subtract 1.  Also ensure the sum is at least 1 each time.
+		if (indexStep < 1.0f) { indexStep = 1.0f; }
+		
+		float sum = -1.0f;
+		string logString = "Thicknesses for snake with length " + this.length + " and step " + indexStep;
+		for (SnakeSegment seg = this.head.NextSegment; seg != null; seg = seg.NextSegment)	
+		{
+			sum += indexStep;
+			int index = (int)sum;
+			float thickness = this.config.BodyThickness[index];
+			Vector3 scale = new Vector3(thickness, 1.0f, 1.0f);
+			seg.transform.localScale = scale;
+			logString = logString + " " + thickness;
+		}		
+		Debug.Log (logString);
 	}
 	
 	public override void SetInitialLocation(Vector3 position, Direction facingDirection, bool withinTile = false)
@@ -187,8 +216,7 @@ public class Snake : MobileCreature
 		// Set head location to the desired position
 		// Each body segment should be laid out in opposite direction
 		this.head.transform.localPosition = position;
-		this.trail.UpdateHeadPosition(position);
-		
+		this.trail.UpdateHeadPosition(position);		
 		
 		Direction oppositeDirection = SerpentConsts.OppositeDirection[ (int) facingDirection ];
 		Vector3 oppositeVector = SerpentConsts.DirectionVector3[ (int) oppositeDirection ];
@@ -228,7 +256,6 @@ public class Snake : MobileCreature
 			return;
 		}
 		
-		
 		// This method should add a new segment at the end of the snake.  It can be in the same position
 		// as the last segment and will appear when the now next-to-last segment moves away from
 		// its current position.
@@ -257,13 +284,14 @@ public class Snake : MobileCreature
 			int bodySpriteIndex = (this.length - 2) % bodySpriteNames.Length;
 			
 			SnakeSegment tail = this.Tail;
+			/*
 			if (tail != null)
 			{
 				tail.SetSpriteName(bodySpriteNames[bodySpriteIndex]);
 			}
 			
 			// Now set the sprite name for the new segment.
-			if (this.config.TailSpriteName != null)
+			if (this.config.TailSpriteName != null && this.config.TailSpriteName.Length > 0)
 			{
 				newBodySegment.SetSpriteName(this.config.TailSpriteName);				
 			}
@@ -272,7 +300,13 @@ public class Snake : MobileCreature
 				bodySpriteIndex = (bodySpriteIndex + 1) % bodySpriteNames.Length;
 				newBodySegment.SetSpriteName(bodySpriteNames[bodySpriteIndex]);				
 			}
-						
+			*/
+			
+
+			bodySpriteIndex = (bodySpriteIndex + 1) % bodySpriteNames.Length;
+			newBodySegment.SetSpriteName(bodySpriteNames[bodySpriteIndex]);				
+			
+																		
 			SnakeSegment previousSegment = tail;
 			if (previousSegment == null) 
 			{
@@ -283,7 +317,8 @@ public class Snake : MobileCreature
 			
 			// NOTE, assuming that the segments are the same width and height here.
 			SnakeBody lastBodySegment = previousSegment as SnakeBody;
-			float distance = previousSegment.Height * 0.5f + newBodySegment.Height * 0.5f;
+			// Subtract 1 from distance to get the segments to overlap just a bit.
+			float distance = previousSegment.Height * 0.5f + newBodySegment.Height * 0.5f - 1.0f;
 			if (lastBodySegment != null)
 			{
 				distance += lastBodySegment.DistanceFromHead;
@@ -319,7 +354,7 @@ public class Snake : MobileCreature
 			this.SnakeSegmentsChanged(this);
 		}
 		UpdateSpeed();
-		UpdateLengthAndTail();
+		UpdateValues();
 	}
 	
 	public void ChangeColour(Color newColour)
@@ -390,7 +425,7 @@ public class Snake : MobileCreature
 			this.SnakeSegmentsChanged( this );
 		}
 		UpdateSpeed();
-		UpdateLengthAndTail();
+		UpdateValues();
 		
 		return willDie;
 	}

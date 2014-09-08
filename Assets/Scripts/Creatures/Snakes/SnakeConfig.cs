@@ -10,6 +10,8 @@ public class SnakeConfig : MonoBehaviour
 	
 	public string[] BodySpriteNames;
 	public string TailSpriteName;
+	
+	public float[] BodyThickness;
 }
 
 
