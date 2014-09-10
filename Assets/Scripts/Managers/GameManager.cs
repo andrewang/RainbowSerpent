@@ -12,8 +12,9 @@ public class GameManager : MonoBehaviour
 	#region Serialized Fields
 	// Main component systems
 	[SerializeField] private MazeController mazeController = null;
-	//[SerializeField] private AnimationManager animationManager = null;
-	
+
+	[SerializeField] private EggManager eggManager;
+		
 	// Prefabs used to instantiate creatures
 	[SerializeField] private GameObject snakePrefab = null;
 	[SerializeField] private GameObject frogPrefab = null;
@@ -29,14 +30,11 @@ public class GameManager : MonoBehaviour
 	private List<Snake> snakes = new List<Snake>();
 	
 	private Snake playerSnake = null; 
-
 	private SnakeConfig enemySnakeConf;	
 	private int maxNumEnemySnakes;	
 	
 	private bool updateSnakeColours = false;
 		
-	private Egg[] eggs = new Egg[2];
-	
 	private Frog frog = null;
 	
 	private LevelTheme theme;
@@ -278,7 +276,7 @@ public class GameManager : MonoBehaviour
 		Managers.GameState.LevelState = LevelState.LevelEnd;			
 		// Remove any unlaid player egg (because it might hatch in the start zone!) and
 		// put the player under AI control so it can zoom back to the start zone.		
-		RemoveUnlaidPlayerEgg();
+		this.eggManager.RemoveUnlaidPlayerEgg();
 
 		// Remove all events like future player egg laying.
 		Managers.GameClock.Reset();		
@@ -430,7 +428,7 @@ public class GameManager : MonoBehaviour
 		psc.PlayerControlled = false;
 		
 		// Every time we place the player snake, create an initial egg-laying event
-		CreateEggLayingEvent(Side.Player, true);
+		this.eggManager.CreateEggLayingEvent(Side.Player, true);
 				
 		List<Snake> enemySnakes = GetEnemySnakes();
 		for (int i = 0; i < enemySnakes.Count; ++i)
@@ -480,7 +478,8 @@ public class GameManager : MonoBehaviour
 		Egg egg = GetEgg ( Side.Player );
 		if ( egg != null )
 		{
-			EggHatched( egg );
+			this.eggManager.EggHatched( egg );
+			// is this necessary?
 			egg.Die();
 			return;
 		}
@@ -513,6 +512,12 @@ public class GameManager : MonoBehaviour
 	
 	private void FrogDied(Creature frog)
 	{
+		// Create an event to create a new frog if we're still playing at this time.
+		if (Managers.GameState.LevelState != LevelState.Playing)
+		{
+			return;
+		}
+		
 		CreateFrogCreationEvent();
 	}
 	
@@ -567,106 +572,30 @@ public class GameManager : MonoBehaviour
 	
 	#region Snake Egg
 	
-	private bool EggLayingEventExists(Side side)
-	{
-		EventIdentifier id = (side == Side.Player) ? EventIdentifier.PlayerEggLaying : EventIdentifier.EnemyEggLaying;
-		GameEvent e = Managers.GameClock.GetEvent(id);
-		return (e != null);
-	}
-	
-	private void CreateEggLayingEvent(Side side, bool initial = false)
-	{
-		if (EggLayingEventExists(side))
-		{
-			// event exists - abort!
-			return;
-		}
-		
-		DifficultySettings difficulty = Managers.SettingsManager.GetCurrentSettings();
-		
-		EventIdentifier id = (side == Side.Player) ? EventIdentifier.PlayerEggLaying : EventIdentifier.EnemyEggLaying;
-		
-		if (side == Side.Player)
-		{
-			float delay;
-			if (initial)
-			{
-				delay = difficulty.PlayerInitialEggLayingDelay;
-			}
-			else
-			{
-				delay = difficulty.PlayerEggLayingDelay;
-			}
-			Managers.GameClock.RegisterEvent(delay, CheckIfPlayerEggLayingPossible, id);
-		}
-		else
-		{
-			float delay = difficulty.EnemyEggLayingDelay;
-			Managers.GameClock.RegisterEvent(delay, CheckIfEnemyEggLayingPossible, id);
-		}
-	}
-	
-	private void CheckIfPlayerEggLayingPossible()
-	{
-		CheckIfEggLayingPossible(Side.Player);
-	}
-
-	private void CheckIfEnemyEggLayingPossible()
-	{
-		CheckIfEggLayingPossible(Side.Enemy);
-	}
-	
-	private void CheckIfEggLayingPossible(Side side)
+	public Snake GetQualifiedEggLayer(Side side)
 	{
 		// time for a random snake to start laying an egg.  But we need a snake with 3+ segments.
 		// TODO allow player snake to lay egg when only 2 segments!
-		List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.Length >= 3 );
-		if (qualifiedSnakes.Count == 0)
+		
+		// If enemy, check for maximum numbers.
+		if (side == Side.Enemy && this.GetEnemySnakes().Count == this.maxNumEnemySnakes) 
 		{
-			// Can't spawn an egg right now.  Reset the timer until later
-			CreateEggLayingEvent(side);
-			return;
+			// No snake can lay an egg.
+			return null;
 		}
 		
+		List<Snake> qualifiedSnakes = this.snakes.FindAll( s => s.Side == side && s.Length >= 3 );
+		if (qualifiedSnakes.Count == 0) { return null; }
 		int i = UnityEngine.Random.Range(0, qualifiedSnakes.Count);
 		Snake snake = qualifiedSnakes[i];
-		Egg e = CreateEgg(snake);
-		SetEgg( side, e );
-		e.Setup();
+		return snake;
 	}
 	
-	private Egg CreateEgg(Snake snake)
+	public void CreateNewlyHatchedSnake(Side side, MazeCell cell, Direction dir)
 	{
-		Egg e = snake.CreateEgg();
-		
-		e.Side = snake.Side;		
-		e.CreatureDied += EggDied;
-		e.Hatched += EggHatched;
-		e.FullyGrown += EggFullyGrown;		
-		
-		SnakeBody lastSegment = snake.Tail;
-		lastSegment.BeginToCreateEgg(e);
-		
-		return e;
-	}
-	
-	private void EggFullyGrown( Egg egg )
-	{					
-		egg.SetParent( this.mazeController );
-		// set rotation to vertical
-		egg.transform.localEulerAngles = new Vector3(0,0,0);
-	}
-	
-	private void EggHatched( Egg egg )
-	{
-		MazeCell cell = this.mazeController.GetCellForPosition( egg.transform.localPosition );
-		List<Direction> availableDirections = cell.UnblockedDirections;
-		int randomIndex = UnityEngine.Random.Range (0, availableDirections.Count);
-		Direction dir = availableDirections[randomIndex];
-		
 		Snake newSnake = null;
 		int length = SerpentConsts.NewlyHatchedSnakeLength;
-		if (egg.Side == Side.Enemy)
+		if (side == Side.Enemy)
 		{
 			newSnake = CreateEnemySnake(length);
 		}
@@ -674,67 +603,18 @@ public class GameManager : MonoBehaviour
 		{
 			newSnake = CreatePlayerSnake(length);
 		}
-		EggDied( egg );
 		
 		PlaceSnake(newSnake, cell.X, cell.Y, dir, true);	
 	}
-	
-	private void EggDied(Creature creature)
-	{
-		Egg e = creature as Egg;
-		if (e == null) { return; }
-		
-		e.FullyGrown -= this.EggFullyGrown;
-		e.Hatched -= this.EggHatched;
-		
-		SetEgg(e.Side, null);
-		
-		CreateEggLayingEvent(e.Side);
-	}
-	
-	private void RemoveUnlaidPlayerEgg()
-	{
-		// Do a direct access of the eggs array because GetEgg() screens out eggs which aren't laid
-		Egg egg = this.eggs[(int)Side.Player];
-		if (egg && egg.IsFullyGrown == false)
-		{
-			this.playerSnake.Tail.RemoveEgg();
-		}
-	}
-	
+
 	public List<Creature> GetEggs()
 	{
-		List<Creature> eggs = new List<Creature>();
-		
-		for (int i = 0; i < this.eggs.Length; ++i)
-		{
-			if (this.eggs[i] == null || this.eggs[i].IsFullyGrown == false) { continue; }
-			
-			eggs.Add( this.eggs[i] );
-		}
-		return eggs;
+		return this.eggManager.GetEggs();
 	}
 	
 	public Egg GetEgg( Side side )
 	{
-		int iSide = (int) side;
-		if (this.eggs[iSide] == null || this.eggs[iSide].IsFullyGrown == false)
-		{
-			return null;
-		}
-		return this.eggs[ (int) side ];
-	}
-	
-	private void SetEgg( Side side, Egg egg )
-	{
-		int intSide = (int) side;
-		if (this.eggs[intSide] != null)
-		{
-			// This object should be destroyed!  Though we shouldn't be creating an egg at the same time as 
-			// one already exists.
-			Destroy(this.eggs[intSide].gameObject);
-		}
-		this.eggs[ (int) side ] = egg;
+		return this.eggManager.GetEgg( side );
 	}
 	
 	#endregion Snake Eggs
@@ -799,14 +679,15 @@ public class GameManager : MonoBehaviour
 		this.snakes.Remove(snake);
 		Destroy(snake.gameObject);
 		
-		CreateEggLayingEvent(Side.Enemy);
+		this.eggManager.CreateEggLayingEvent(Side.Enemy);
 	}
 	
 	private void TriggerPlayerDeathSequence()
 	{
+		Managers.GameState.LevelState = LevelState.PlayerDead;
+		
 		if (Managers.GameClock.Paused)
 		{
-			Debug.Log("Clock unpaused.  Why was this necessary?");
 			Managers.GameClock.Paused = false;
 		}
 		Managers.GameClock.RegisterEvent(3.0f,
@@ -815,28 +696,13 @@ public class GameManager : MonoBehaviour
 	
 	private void PlayerDeathSequence ()
 	{
-		HandleEggsAfterPlayerDeath();
+		this.eggManager.HandleEggsAfterPlayerDeath();
 
 		// reset stuff		
 		ResetSnakes();
 		RemoveFrog();
 		
 		Begin();	
-	}
-	
-	private void HandleEggsAfterPlayerDeath()
-	{
-		for( int side = 0; side <= (int) Side.Enemy; ++side )
-		{
-			Egg e = this.eggs[side];
-			if (e == null) { continue; }
-			
-			if (side == (int)Side.Enemy)
-			{				
-				EggHatched(e);
-			}
-			e.Die();
-		}
 	}
 	
 	private void ResetSnakes()

@@ -73,13 +73,18 @@ public class GameSceneController : RSSceneController
 	override public void OnLoad()
 	{
 		base.OnLoad();
-		ResizeMazePanel();
+		StartCoroutine(LoadFirstLevel());
 				
 		this.gameManager.GameOver += this.GameOver;
 		this.mazeController.OnCreateScreenShot += this.OnCreateScreenShot;
 		this.mazeController.OnLoadScreenShot += this.OnLoadScreenShot;
 		this.mazeController.OnMapLoadComplete += this.OnMapLoadComplete;
-		
+	}
+	
+	private IEnumerator LoadFirstLevel()
+	{
+		yield return new WaitForEndOfFrame();
+		ResizeMazePanel();
 		LoadGameLevel(Managers.GameState.Level);
 	}
 
@@ -108,6 +113,9 @@ public class GameSceneController : RSSceneController
 		{
 			SelectMaskAnimation();
 		}
+		
+		this.mazeController.Blah();
+		
 	}
 	
 	public void TransitionToLevel(int levelNum)

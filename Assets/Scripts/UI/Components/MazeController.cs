@@ -13,6 +13,7 @@ public class MazeController : MonoBehaviour
 	[SerializeField] private GameObject wallSpritePrefab = null;
 	[SerializeField] private GameObject doorSpritePrefab = null;
 	[SerializeField] private GameObject[] cornerPrefabs = new GameObject[0];
+	[SerializeField] private GameObject debugHintPrefab = null;
 	
 	[SerializeField] private GameObject screenShotPrefab = null;	
 	[SerializeField] private UIPanel panel = null;
@@ -28,7 +29,6 @@ public class MazeController : MonoBehaviour
 	private Color wallColour;
 	
 	private GameObject screenShotContainer;
-	//private Action screenShotCompletedAction;
 	private bool screenShotLoaded = false;
 	
 	private bool scaleSet = false;
@@ -61,8 +61,6 @@ public class MazeController : MonoBehaviour
 	/// <param name="mazeTextAsset">Maze text asset.</param>
 	public void SetUp(int levelNum, TextAsset mazeTextAsset, Color wallColour)
 	{
-		
-		
 		this.levelNumber = levelNum;
 		this.wallColour = wallColour;
 		this.Maze.SetUp(mazeTextAsset);
@@ -75,17 +73,18 @@ public class MazeController : MonoBehaviour
 		RemoveWallSprites();
 		RemoveDoors();
 		
-		//this.screenShotCompletedAction = null;
 		this.screenShotLoaded = false;
 		this.scaleSet = false;
 		this.lowerLeftCellCentre = new Vector3(0,0,0);		
 	}
 	
-	void LateUpdate()
+	public void Blah()
 	{
-		if (this.scaleSet == false)
+		if (this.scaleSet == true)
 		{
-			/*
+			return;
+		}
+		/*
 			// Check for a resize component on the panel and make it run FIRST.
 			ResizePanel resizeScript = this.panel.GetComponent<ResizePanel>();
 			if (resizeScript != null)
@@ -97,13 +96,12 @@ public class MazeController : MonoBehaviour
 			}
 			*/
 		
-			DetermineMazeScale();
-			this.scaleSet = true;
-			
-			if (this.useScreenShots == true && this.screenShotContainer == null)
-			{
-				CreateScreenshot(); //this.screenShotCompletedAction);
-			}
+		DetermineMazeScale();
+		this.scaleSet = true;
+		
+		if (this.useScreenShots == true && this.screenShotContainer == null)
+		{
+			CreateScreenshot();
 		}
 	}
 		
@@ -158,6 +156,9 @@ public class MazeController : MonoBehaviour
 		{	
 			CreateCornerSprites();
 		}
+		
+		//Enable only for debugging
+		//CreateHintSprites();
 	}
 	
 	private void CreateHorizontalWallSprites()
@@ -489,6 +490,20 @@ public class MazeController : MonoBehaviour
 		this.wallSprites.Add(sprite);
 	}
 	
+	private void CreateHintSprites()
+	{
+		for (int y = 0; y < this.Maze.Height; ++y)
+		{
+			for (int x = 0; x < this.Maze.Width; ++x)
+			{
+				MazeCell cell = this.Maze.Cells[x,y];
+				if (cell.PlayerPathHint == Direction.None) { continue; }
+
+				CreateHintSprite(x, y, cell.PlayerPathHint);				
+			}
+		}
+	}
+	
 	/// <summary>
 	/// Creates a wall object with default parentage and scale
 	/// </summary>
@@ -515,6 +530,19 @@ public class MazeController : MonoBehaviour
 		this.doorSprites.Add( s );
 		
 		return newDoor;
+	}
+	
+	private void CreateHintSprite(int x, int y, Direction dir)
+	{
+		Vector3 position = this.GetCellCentre(x, y);
+		Vector3 rotation = SerpentConsts.RotationVector3[(int)dir];
+		
+		GameObject hint = (GameObject) Instantiate(this.debugHintPrefab, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity);
+		hint.transform.eulerAngles = rotation;
+		hint.transform.parent = this.transform;
+		hint.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+		hint.transform.localPosition = position;
+		
 	}
 	
 	/// <summary>

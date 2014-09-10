@@ -43,9 +43,9 @@
   	{"X":1, "Y":3}
   ],
   "playerPathHint": [
-  	{"X":10, "Y":2, "direction":"W"},
-  	{"X":10, "Y":3, "direction":"W"},
-  	{"X":9, "Y":10, "direction":"S"}
+  	{"X":2, "Y":10, "direction":"W"},
+  	{"X":3, "Y":10, "direction":"W"},
+  	{"X":10, "Y":9, "direction":"S"}
   ],
   "width": 11,
   "height": 13,

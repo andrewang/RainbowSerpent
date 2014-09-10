@@ -17,6 +17,7 @@ namespace Serpent
 		None = 0,
 		LevelStart,
 		Playing,
+		PlayerDead,
 		LevelEnd
 	}
 	
