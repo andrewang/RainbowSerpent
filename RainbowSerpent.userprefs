@@ -1,7 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/SceneControllers/GameSceneController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/UI/AudioVolumeControl.cs">
     <Files>
+      <File FileName="Assets/Scripts/UI/Components/Scale.cs" Line="34" Column="4" />
+      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeHead.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Egg.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeConfig.cs" Line="1" Column="1" />
@@ -16,7 +18,7 @@
       <File FileName="Assets/Scripts/UI/SceneControllers/SplashSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/OptionsSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/SettingsManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/AudioVolumeControl.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/AudioVolumeControl.cs" Line="35" Column="3" />
       <File FileName="Assets/Scripts/Creatures/CreatureControllers/CreatureController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/SceneControllers/MainMenuSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Interaction/UIButtonColor.cs" Line="1" Column="1" />
@@ -39,8 +41,7 @@
       <File FileName="Assets/Scripts/Miscellaneous/DifficultySettings.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Miscellaneous/ScreenShotTaker.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/SceneManager.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="205" Column="25" />
-      <File FileName="Assets/Scripts/Creatures/Frog.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/GameSceneController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/ScaleCollider.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/ScaleClipping.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/UI/Components/ScreenShotFileManager.cs" Line="1" Column="1" />
@@ -50,18 +51,17 @@
       <File FileName="Assets/Scripts/Miscellaneous/SerpentUtils.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/Snake.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Creatures/Snakes/SnakeTrail.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Miscellaneous/SerpentConsts.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Managers/GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/Managers/EggManager.cs" Line="1" Column="1" />
       <File FileName="Assets/NGUI/Scripts/Interaction/UIDragObject.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" Line="31" Column="3" />
+      <File FileName="Assets/Scripts/UI/SceneControllers/ScreenShotSceneController.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Miscellaneous/GameState.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/Creatures/CreatureControllers/PlayerSnakeController.cs" line="113" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/MazeController.cs" line="571" />
-      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/ScreenShotFileManager.cs" line="117" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/MazeController.cs" line="602" />
+      <Breakpoint file="/Users/chriscamfield/Workspace/RainbowSerpent/Assets/Scripts/UI/Components/MazeController.cs" line="537" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

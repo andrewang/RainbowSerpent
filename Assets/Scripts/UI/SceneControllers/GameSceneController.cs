@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using SerpentExtensions;
 
 public class GameSceneController : RSSceneController
 {
@@ -237,6 +238,12 @@ public class GameSceneController : RSSceneController
 		{
 			mask.color = theme.BackgroundColour;			
 			this.mapMaskSprites.Add(mask);
+			
+			TweenColor colourTween = mask.GetComponent<TweenColor>();
+			if (colourTween != null)
+			{
+				colourTween.Recolour(theme.BackgroundColour);				
+			}
 		}
 		
 		// Set the new mask to be displayed

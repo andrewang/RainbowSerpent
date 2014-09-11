@@ -128,6 +128,23 @@ namespace SerpentExtensions
 			
 			return size;
 		}
+		
+		static public void Recolour(this TweenColor tween, Color colour)
+		{
+			Color from = tween.from;
+			Color to = tween.to;
+			
+			from.r = colour.r;
+			from.g = colour.g;
+			from.b = colour.b;
+						
+			to.r = colour.r;
+			to.g = colour.g;
+			to.b = colour.b;
+			
+			tween.from = from;
+			tween.to = to;
+		}
 	}
 
 }
